@@ -57,7 +57,7 @@ SELECT cote, __dummy FROM imported_data WHERE __dummy IS NOT NULL;
 SELECT * FROM imported_data;
 SELECT COUNT(*) FROM imported_data;
 
--- Fonction utilitaure : extrait l'id de la cote (MX-F-<id>)
+-- Fonction utilitaire : extrait l'id de la cote (MX-F-<id>)
 CREATE OR REPLACE FUNCTION cote_to_id(cote text)
 RETURNS int AS $$
 BEGIN
@@ -65,5 +65,24 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-SELECT COUNT(DISTINCT datatype), COUNT(datatype) FROM imported_data;
-SELECT COUNT(datatype) FROM imported_data WHERE datatype IS NULL;
+SELECT localisation, editeur FROM imported_data;
+SELECT editeur FROM imported_data;
+
+CREATE OR REPLACE FUNCTION parse_editeur()
+RETURNS VOID AS $$
+DECLARE
+	trimmed_text CURSOR FOR SELECT DISTINCT((regexp_split_to_array(editeur, 'Responsable del archivo\s*:{0,1}\s*'))[2]) FROM imported_data;
+	editeur_line RECORD;
+BEGIN
+	OPEN trimmed_text;
+	LOOP
+	FETCH trimmed_text INTO editeur_line;
+	IF NOT FOUND THEN EXIT; END IF;
+	RAISE NOTICE '%', editeur_line;
+	END LOOP;
+	CLOSE trimmed_text;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Supprime le début de la ligne
+SELECT parse_editeur();
