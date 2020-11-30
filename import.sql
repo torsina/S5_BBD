@@ -56,6 +56,19 @@ CSV HEADER;
 UPDATE imported_data SET date_analyse = TRIM(BOTH '$' FROM date_analyse);
 UPDATE imported_data SET date_creation_notice = TRIM(BOTH '$' FROM date_analyse);
 
+UPDATE imported_data SET nature_document = UPPER(nature_document);
+UPDATE imported_data SET nature_document = REPLACE(nature_document, 'JPE', 'JPG');
+UPDATE imported_data SET nature_document = REPLACE(nature_document, 'JPGG', 'JPG');
+UPDATE imported_data SET nature_document = REPLACE(nature_document, 'JPEG', 'JPG');
+UPDATE imported_data SET nature_document = REPLACE(nature_document, 'JPGG', 'JPG');
+UPDATE imported_data SET nature_document = REPLACE(nature_document, 'JPGGG', 'JPG');
+UPDATE imported_data SET nature_document = REPLACE(nature_document, 'PNE', 'PNG');
+UPDATE imported_data SET nature_document = REPLACE(nature_document, 'PNGG', 'PNG');
+UPDATE imported_data SET nature_document = REPLACE(nature_document, 'ARCHIVOS', '');
+UPDATE imported_data SET nature_document = REPLACE(nature_document, 'ARCHIVO', '');
+UPDATE imported_data SET nature_document = REPLACE(nature_document, 'EN PDF', 'PDF');
+UPDATE imported_data SET nature_document = TRIM(nature_document);
+
 -- Exploration
 SELECT cote, __dummy FROM imported_data WHERE __dummy IS NOT NULL;
 SELECT * FROM imported_data;
