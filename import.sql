@@ -85,5 +85,17 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION parse_format(format text, dt text)
+RETURNS text[] AS $$
+DECLARE
+	output text[]
+BEGIN
+	regexp_split_to_array(editeur, 'Responsable del archivo\s*:{0,1}\s*'))[2])
+END;
+$$ LANGUAGE plpgsql;
+
 -- Supprime le début de la ligne
 SELECT parse_editeur();
+
+SELECT DISTINCT(notes) FROM imported_data;
+SELECT cote, notes FROM imported_data WHERE notes='El archivo original se llama:5.jpg';
