@@ -70,6 +70,77 @@ UPDATE imported_data SET dates = '1910-1940' WHERE cote='MX-F-1063';
 UPDATE imported_data SET dates = '1910-1925' WHERE cote='MX-F-30';
 
 UPDATE imported_data SET titre = 'Magarita Xirgu' WHERE cote='MX-F-20';
+UPDATE imported_data SET titre = TRIM(titre);
+
+UPDATE imported_data SET sous_titre = TRIM(sous_titre);
+
+UPDATE imported_data SET auteur = trim(auteur);
+UPDATE imported_data SET auteur = null WHERE LOWER(auteur)='indeterminado';
+
+UPDATE imported_data SET destinataire = trim(destinataire);
+
+UPDATE imported_data SET sujet = trim(sujet);
+UPDATE imported_data SET sujet = 'Margarita xirgu' WHERE cote='MX-F-185';
+
+UPDATE imported_data SET description = trim(description);
+
+UPDATE imported_data SET notes = trim(notes);
+
+UPDATE imported_data SET resume = trim(resume);
+
+UPDATE imported_data SET editeur = REPLACE(editeur, ':', '');
+UPDATE imported_data SET editeur = REPLACE(editeur, '|', '');
+UPDATE imported_data SET editeur = REPLACE(editeur, ',', '');
+UPDATE imported_data SET editeur = REPLACE(editeur, '  ', '');
+UPDATE imported_data SET editeur = REPLACE(editeur, 'fonfo', 'fondo');
+UPDATE imported_data SET editeur = REPLACE(editeur, 'espectateur', 'spectateur');
+UPDATE imported_data SET editeur = REPLACE(editeur, 'Jose', 'José');
+UPDATE imported_data SET editeur = REPLACE(editeur, '. ', '.');
+UPDATE imported_data SET editeur = REPLACE(editeur, 'Responsable del archivo  Familia Margarita Xirgu (Xavier Rius Xirgu Ester Xirgu Cortacans Natalia Valenzuela) Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)', 'Responsable del archivo  Familia Margarita Xirgu (Xavier Rius Xirgu Ester Xirgu Cortacans Natalia Valenzuela)Editor Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)');
+UPDATE imported_data SET editeur = REPLACE(editeur, 'Responsable del archivo Indeterminadospectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)', 'Responsable del archivo Indeterminado spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)');
+UPDATE imported_data SET editeur = REPLACE(editeur, 'Responsable del archivo IndeterminadoEditor Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)', 'Responsable del archivo Indeterminado Editor Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)');
+UPDATE imported_data SET editeur = REPLACE(editeur, 'Responsable del archivo  Fondo Margarita Xirgu del Instituto del Teatro de la Diputación de Barcelona.Editor Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)', 'Responsable del archivo Fondo Margarita Xirgu del Instituto del Teatro de la Diputación de Barcelona.Editor Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)');
+UPDATE imported_data SET editeur = TRIM(editeur);
+
+UPDATE imported_data SET localisation = TRIM(localisation);
+UPDATE imported_data SET localisation = null WHERE LOWER(localisation)='desconocido' or LOWER(localisation)='indeterminado';
+UPDATE imported_data SET localisation = 'Punta Ballena Uruguay' WHERE localisation=' Punta Ballena (Maldonado) Uruguay' or localisation='Punta Ballena';
+UPDATE imported_data SET localisation = 'Teatro Solís, Montevideo (Uruguay)' WHERE localisation='Teatro Solís de Montevideo';
+UPDATE imported_data SET localisation = 'EMAD: Escuela Municipal de Arte Dramático de Montevideo' WHERE localisation='EMAD: Escuela Municipal de Arte Dramático de Montevideo.';
+UPDATE imported_data SET localisation = 'Madrid España' WHERE localisation='Madrid' or localisation='Madrid España';
+UPDATE imported_data SET localisation = 'Mérida España' WHERE localisation='Merida' or localisation='Mérida' or localisation='Merida España' or localisation='Meridaa';
+
+UPDATE imported_data SET droits = TRIM(droits);
+UPDATE imported_data SET droits = 'Archives familiar de Margarita Xirgu – Licencia Licencia Creative Commons CC-BY-NC-ND (Attribution-Non Commercial-No Derivatives 4.0 International)' WHERE droits='Archives familiales Margarita Xirgu – Licencia Licencia Creative Commons CC-BY-NC-ND (Attribution-Non Commercial-No Derivatives 4.0 International)';
+UPDATE imported_data SET droits = 'Mx-4/413/650' WHERE droits='Mx-4/413/650$';
+UPDATE imported_data SET droits = 'Mx-950/953' WHERE droits='Mx950/953$';
+
+UPDATE imported_data SET ayants_droit = trim(ayants_droit);
+
+-- Certains formats sont indéterminés, on les remplace par NULL
+UPDATE imported_data SET format=NULL WHERE format='Indeterminado';
+-- On supprime les formats erronnés. La colonne format ne définit pas le format de fichier (doublon avec nature_document).
+UPDATE imported_data SET format=NULL WHERE LOWER(format) ~ '(jp[e]{0,1}g|png|pdf)';
+-- Format invalide, juste du texte, dupliqué de notes
+UPDATE imported_data SET format=NULL WHERE cote='MX-F-247';
+
+UPDATE imported_data SET langue = trim(UPPER(langue));
+
+UPDATE imported_data SET etat_genetique = trim(etat_genetique);
+
+UPDATE imported_data SET relations_genetiques = trim(relations_genetiques);
+UPDATE imported_data SET relations_genetiques = REPLACE(relations_genetiques, '$', '');
+UPDATE imported_data SET relations_genetiques = 'MX-579/612/827/828/829/83/831/832/833/834/835/836' WHERE relations_genetiques='Mx-579-Mx-612/827/828/829/830/831/832/833/83/835/836';
+UPDATE imported_data SET relations_genetiques = 'Mx-603/651' WHERE relations_genetiques='MX-603/M-651' or relations_genetiques='Mx-603/Mx651';
+UPDATE imported_data SET relations_genetiques = 'Mx-971/972/73/974/975/976/977/978' WHERE relations_genetiques='Mx-971/972/73/974/975/976/977978';
+
+UPDATE imported_data SET autres_ressources_relation = trim(autres_ressources_relation);
+
+
+
+SELECT * FROM imported_data;
+SELECT * FROM imported_data WHERE relations_genetiques='Mx-579-Mx-612/827/828/829/830/831/832/833/83/835/836';
+SELECT distinct(autres_ressources_relation) FROM imported_data ORDER BY autres_ressources_relation;
 
 UPDATE imported_data SET date_analyse = TRIM(BOTH '$' FROM date_analyse);
 UPDATE imported_data SET date_creation_notice = TRIM(BOTH '$' FROM date_analyse);
@@ -86,13 +157,6 @@ UPDATE imported_data SET nature_document = REPLACE(nature_document, 'ARCHIVOS', 
 UPDATE imported_data SET nature_document = REPLACE(nature_document, 'ARCHIVO', '');
 UPDATE imported_data SET nature_document = REPLACE(nature_document, 'EN PDF', 'PDF');
 UPDATE imported_data SET nature_document = TRIM(nature_document);
-
--- Certains formats sont indéterminés, on les remplace par NULL
-UPDATE imported_data SET format=NULL WHERE format='Indeterminado';
--- On supprime les formats erronnés. La colonne format ne définit pas le format de fichier (doublon avec nature_document).
-UPDATE imported_data SET format=NULL WHERE LOWER(format) ~ '(jp[e]{0,1}g|png|pdf)';
--- Format invalide, juste du texte, dupliqué de notes
-UPDATE imported_data SET format=NULL WHERE cote='MX-F-247';
 
 -- Exploration
 SELECT cote, __dummy FROM imported_data WHERE __dummy IS NOT NULL;
