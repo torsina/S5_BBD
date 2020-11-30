@@ -29,7 +29,7 @@ CREATE TABLE imported_data (
 	etat_general text,
 	publication text,
 	representation text,
-	contexte_egographique text,
+	contexte_geographique text,
 	lieu_expedition text,
 	type_publication text,
 	titre_publication text,
@@ -48,7 +48,7 @@ CREATE TABLE imported_data (
 );
 
 COPY imported_data
-FROM E'E:\\Esp-fotos.csv'
+FROM 'D:\Boulot\L3\BASE_DE_DONNEES\PROJET\Esp-fotos.csv'
 DELIMITER ';'
 CSV HEADER;
 
@@ -136,15 +136,6 @@ UPDATE imported_data SET relations_genetiques = 'Mx-971/972/73/974/975/976/977/9
 
 UPDATE imported_data SET autres_ressources_relation = trim(autres_ressources_relation);
 
-
-
-SELECT * FROM imported_data;
-SELECT * FROM imported_data WHERE relations_genetiques='Mx-579-Mx-612/827/828/829/830/831/832/833/83/835/836';
-SELECT distinct(autres_ressources_relation) FROM imported_data ORDER BY autres_ressources_relation;
-
-UPDATE imported_data SET date_analyse = TRIM(BOTH '$' FROM date_analyse);
-UPDATE imported_data SET date_creation_notice = TRIM(BOTH '$' FROM date_analyse);
-
 UPDATE imported_data SET nature_document = UPPER(nature_document);
 UPDATE imported_data SET nature_document = REPLACE(nature_document, 'JPE', 'JPG');
 UPDATE imported_data SET nature_document = REPLACE(nature_document, 'JPGG', 'JPG');
@@ -157,6 +148,70 @@ UPDATE imported_data SET nature_document = REPLACE(nature_document, 'ARCHIVOS', 
 UPDATE imported_data SET nature_document = REPLACE(nature_document, 'ARCHIVO', '');
 UPDATE imported_data SET nature_document = REPLACE(nature_document, 'EN PDF', 'PDF');
 UPDATE imported_data SET nature_document = TRIM(nature_document);
+
+UPDATE imported_data SET support = trim(upper(support));
+
+UPDATE imported_data SET etat_general = TRIM(lower(etat_general));
+UPDATE imported_data SET etat_general = TRIM(lower(etat_general));
+UPDATE imported_data SET etat_general = 'médiocre' WHERE etat_general = 'mediocre';
+UPDATE imported_data SET etat_general = null WHERE etat_general = 'indeterminado';
+
+UPDATE imported_data SET publication = TRIM(publication);
+
+UPDATE imported_data SET representation = TRIM(representation);
+
+UPDATE imported_data SET contexte_geographique = TRIM(contexte_geographique);
+UPDATE imported_data SET contexte_geographique = null WHERE LOWER(contexte_geographique)='desconocido' or LOWER(contexte_geographique)='indeterminado' or contexte_geographique='#VALUE!';
+UPDATE imported_data SET contexte_geographique = 'Uruguay' WHERE contexte_geographique='uruguay';
+UPDATE imported_data SET contexte_geographique = 'Punta del Este' WHERE contexte_geographique='Punta del este';
+UPDATE imported_data SET contexte_geographique = 'Mérida España' WHERE contexte_geographique='Merida España' or contexte_geographique='Merida' or contexte_geographique='Merdia España' or contexte_geographique='Medirda';
+UPDATE imported_data SET contexte_geographique = 'Madrid España' WHERE contexte_geographique='España Madrid';
+UPDATE imported_data SET contexte_geographique = 'España' WHERE contexte_geographique='Espagne';
+UPDATE imported_data SET contexte_geographique = 'Buenos Aires Argentina' WHERE contexte_geographique='Buenos Aires';
+UPDATE imported_data SET contexte_geographique = 'Barcelona España' WHERE contexte_geographique='Barcelona';
+UPDATE imported_data SET contexte_geographique = 'Badalona España' WHERE contexte_geographique='Badalona' or contexte_geographique='España Badalona';
+
+UPDATE imported_data SET lieu_expedition = TRIM(lieu_expedition);
+
+UPDATE imported_data SET type_publication = TRIM(type_publication);
+
+UPDATE imported_data SET titre_publication = TRIM(titre_publication);
+
+UPDATE imported_data SET lieu_publication = TRIM(lieu_publication);
+
+UPDATE imported_data SET numero_publication = TRIM(numero_publication);
+
+UPDATE imported_data SET periodicite = TRIM(periodicite);
+
+UPDATE imported_data SET directeur_publication = TRIM(directeur_publication);
+
+UPDATE imported_data SET auteur_analyse = TRIM(auteur_analyse);
+
+UPDATE imported_data SET date_analyse = TRIM(date_analyse);
+UPDATE imported_data SET date_analyse = TRIM(BOTH '$' FROM date_analyse);
+UPDATE imported_data SET date_analyse = '2015-01-01/2019-01-01' WHERE date_analyse = '2015/2019';
+
+UPDATE imported_data SET auteur_description = TRIM(auteur_description);
+UPDATE imported_data SET auteur_description = 'Gil Alan' WHERE auteur_description = 'Alan Gil';
+
+UPDATE imported_data SET date_creation_notice = TRIM(date_creation_notice);
+UPDATE imported_data SET date_creation_notice = TRIM(BOTH '$' FROM date_analyse);
+UPDATE imported_data SET date_creation_notice = '2015-01-01/2019-01-01' WHERE date_creation_notice = '2015/2019';
+
+UPDATE imported_data SET auteur_revision = TRIM(auteur_revision);
+
+UPDATE imported_data SET date_revision_notice = TRIM(date_revision_notice);
+ALTER TABLE imported_data 
+	ALTER date_revision_notice DROP DEFAULT,
+	ALTER date_revision_notice TYPE timestamp USING date_revision_notice::timestamp;
+
+UPDATE imported_data SET auteur_transcription = TRIM(auteur_transcription);
+
+UPDATE imported_data SET publication=(SELECT __dummy FROM imported_data WHERE cote='MX-F-93') WHERE cote='MX-F-92';
+UPDATE imported_data SET publication=(SELECT __dummy FROM imported_data WHERE cote='MX-F-94') WHERE cote='MX-F-93';
+UPDATE imported_data SET publication=(SELECT __dummy FROM imported_data WHERE cote='MX-F-95') WHERE cote='MX-F-94';
+
+ALTER TABLE imported_data DROP COLUMN __dummy;
 
 -- Exploration
 SELECT cote, __dummy FROM imported_data WHERE __dummy IS NOT NULL;
