@@ -53,6 +53,24 @@ DELIMITER ';'
 CSV HEADER;
 
 -- NETTOYAGE DE LA TABLE
+
+UPDATE imported_data SET cote = TRIM(cote);
+
+UPDATE imported_data SET type = TRIM(type);
+
+UPDATE imported_data SET datatype = UPPER(TRIM(datatype));
+
+UPDATE imported_data SET dates = TRIM(dates);
+UPDATE imported_data SET dates = null WHERE LOWER(dates)='desconocido' or LOWER(dates)='indeterminado' or LOWER(dates)='gunther gerzso' or LOWER(dates)='victorio macho';
+UPDATE imported_data SET dates = '1906-1920' WHERE cote='MX-F-20';
+UPDATE imported_data SET dates = '1950-1970' WHERE cote='MX-F-132';
+UPDATE imported_data SET dates = '1996' WHERE cote='MX-F-33';
+UPDATE imported_data SET dates = '1980-2000' WHERE cote='MX-F-1042';
+UPDATE imported_data SET dates = '1910-1940' WHERE cote='MX-F-1063';
+UPDATE imported_data SET dates = '1910-1925' WHERE cote='MX-F-30';
+
+UPDATE imported_data SET titre = 'Magarita Xirgu' WHERE cote='MX-F-20';
+
 UPDATE imported_data SET date_analyse = TRIM(BOTH '$' FROM date_analyse);
 UPDATE imported_data SET date_creation_notice = TRIM(BOTH '$' FROM date_analyse);
 
