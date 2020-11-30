@@ -52,6 +52,10 @@ FROM E'E:\\Esp-fotos.csv'
 DELIMITER ';'
 CSV HEADER;
 
+-- NETTOYAGE DE LA TABLE
+UPDATE imported_data SET date_analyse = TRIM(BOTH '$' FROM date_analyse);
+UPDATE imported_data SET date_creation_notice = TRIM(BOTH '$' FROM date_analyse);
+
 -- Exploration
 SELECT cote, __dummy FROM imported_data WHERE __dummy IS NOT NULL;
 SELECT * FROM imported_data;
