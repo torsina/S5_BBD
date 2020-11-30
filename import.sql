@@ -54,12 +54,28 @@ CSV HEADER;
 
 -- NETTOYAGE DE LA TABLE
 
+/*
+On retire les caractères en trop avant et après le mot.
+*/
 UPDATE imported_data SET cote = TRIM(cote);
 
+/*
+On retire les caractères en trop avant et après le mot.
+*/
 UPDATE imported_data SET type = TRIM(type);
 
+/*
+On retire les caractères en trop avant et après le mot.
+On passe datatype en majuscule pour des raisons de lisibilité
+*/
 UPDATE imported_data SET datatype = UPPER(TRIM(datatype));
 
+/*
+On retire les caractères en trop avant et après le mot.
+Toutes les dates inconnues sont passées à "null".
+Correctiondes erreurs pour certaines dates.
+Décalage de la colonne titre pour "MX-F-20" corrigé.
+*/
 UPDATE imported_data SET dates = TRIM(dates);
 UPDATE imported_data SET dates = null WHERE LOWER(dates)='desconocido' or LOWER(dates)='indeterminado' or LOWER(dates)='gunther gerzso' or LOWER(dates)='victorio macho';
 UPDATE imported_data SET dates = '1906-1920' WHERE cote='MX-F-20';
@@ -69,25 +85,56 @@ UPDATE imported_data SET dates = '1980-2000' WHERE cote='MX-F-1042';
 UPDATE imported_data SET dates = '1910-1940' WHERE cote='MX-F-1063';
 UPDATE imported_data SET dates = '1910-1925' WHERE cote='MX-F-30';
 
+/*
+On retire les caractères en trop avant et après le mot.
+Titre pour "MX-F-20" actualisée.
+*/
 UPDATE imported_data SET titre = 'Magarita Xirgu' WHERE cote='MX-F-20';
 UPDATE imported_data SET titre = TRIM(titre);
 
+/*
+On retire les caractères en trop avant et après le mot.
+*/
 UPDATE imported_data SET sous_titre = TRIM(sous_titre);
 
+/*
+On retire les caractères en trop avant et après le mot.
+On passe à "null" tous les auteurs inconnus
+*/
 UPDATE imported_data SET auteur = trim(auteur);
 UPDATE imported_data SET auteur = null WHERE LOWER(auteur)='indeterminado';
 
+/*
+On retire les caractères en trop avant et après le mot.
+*/
 UPDATE imported_data SET destinataire = trim(destinataire);
 
+/*
+On retire les caractères en trop avant et après le mot.
+Correction d'une erreur pour "MX-F-185"
+*/
 UPDATE imported_data SET sujet = trim(sujet);
 UPDATE imported_data SET sujet = 'Margarita xirgu' WHERE cote='MX-F-185';
 
+/*
+On retire les caractères en trop avant et après le mot.
+*/
 UPDATE imported_data SET description = trim(description);
 
+/*
+On retire les caractères en trop avant et après le mot.
+*/
 UPDATE imported_data SET notes = trim(notes);
 
+/*
+On retire les caractères en trop avant et après le mot.
+*/
 UPDATE imported_data SET resume = trim(resume);
 
+/*
+On retire les caractères en trop avant et après le mot.
+Correction des erreurs pour certains éditeurs.
+*/
 UPDATE imported_data SET editeur = REPLACE(editeur, ':', '');
 UPDATE imported_data SET editeur = REPLACE(editeur, '|', '');
 UPDATE imported_data SET editeur = REPLACE(editeur, ',', '');
@@ -102,6 +149,11 @@ UPDATE imported_data SET editeur = REPLACE(editeur, 'Responsable del archivo In
 UPDATE imported_data SET editeur = REPLACE(editeur, 'Responsable del archivo  Fondo Margarita Xirgu del Instituto del Teatro de la Diputación de Barcelona.Editor Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)', 'Responsable del archivo Fondo Margarita Xirgu del Instituto del Teatro de la Diputación de Barcelona.Editor Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)');
 UPDATE imported_data SET editeur = TRIM(editeur);
 
+/*
+On retire les caractères en trop avant et après le mot.
+On passe les localisations inconnues à "null".
+Correction des erreurs pour certaines localisations.
+*/
 UPDATE imported_data SET localisation = TRIM(localisation);
 UPDATE imported_data SET localisation = null WHERE LOWER(localisation)='desconocido' or LOWER(localisation)='indeterminado';
 UPDATE imported_data SET localisation = 'Punta Ballena Uruguay' WHERE localisation=' Punta Ballena (Maldonado) Uruguay' or localisation='Punta Ballena';
@@ -110,32 +162,60 @@ UPDATE imported_data SET localisation = 'EMAD: Escuela Municipal de Arte Dramát
 UPDATE imported_data SET localisation = 'Madrid España' WHERE localisation='Madrid' or localisation='Madrid España';
 UPDATE imported_data SET localisation = 'Mérida España' WHERE localisation='Merida' or localisation='Mérida' or localisation='Merida España' or localisation='Meridaa';
 
+/*
+On retire les caractères en trop avant et après le mot.
+Correction des erreurs pour certains droits.
+*/
 UPDATE imported_data SET droits = TRIM(droits);
 UPDATE imported_data SET droits = 'Archives familiar de Margarita Xirgu – Licencia Licencia Creative Commons CC-BY-NC-ND (Attribution-Non Commercial-No Derivatives 4.0 International)' WHERE droits='Archives familiales Margarita Xirgu – Licencia Licencia Creative Commons CC-BY-NC-ND (Attribution-Non Commercial-No Derivatives 4.0 International)';
 UPDATE imported_data SET droits = 'Mx-4/413/650' WHERE droits='Mx-4/413/650$';
 UPDATE imported_data SET droits = 'Mx-950/953' WHERE droits='Mx950/953$';
 
+/*
+On retire les caractères en trop avant et après le mot.
+*/
 UPDATE imported_data SET ayants_droit = trim(ayants_droit);
 
--- Certains formats sont indéterminés, on les remplace par NULL
+/*
+On retire les caractères en trop avant et après le mot.
+On passe les formats indéterminés à "null".
+On supprime les formats erronnés. La colonne format ne définit pas le format de fichier (doublon avec nature_document).
+Correction des erreurs sur "MX-F-247", dupliqué de notes
+*/
+UPDATE imported_data SET format = trim(format);
 UPDATE imported_data SET format=NULL WHERE format='Indeterminado';
--- On supprime les formats erronnés. La colonne format ne définit pas le format de fichier (doublon avec nature_document).
-UPDATE imported_data SET format=NULL WHERE LOWER(format) ~ '(jp[e]{0,1}g|png|pdf)';
--- Format invalide, juste du texte, dupliqué de notes
+UPDATE imported_data SET format=NULL WHERE LOWER(format) ~ '(jp[e]{0,1}g|png|pdf)'; 
 UPDATE imported_data SET format=NULL WHERE cote='MX-F-247';
 
+/*
+On retire les caractères en trop avant et après le mot.
+*/
 UPDATE imported_data SET langue = trim(UPPER(langue));
 
+/*
+On retire les caractères en trop avant et après le mot.
+*/
 UPDATE imported_data SET etat_genetique = trim(etat_genetique);
 
+/*
+On retire les caractères en trop avant et après le mot ainsi que les "$".
+Correction des erreurs pour certaines relations génétiques.
+*/
 UPDATE imported_data SET relations_genetiques = trim(relations_genetiques);
 UPDATE imported_data SET relations_genetiques = REPLACE(relations_genetiques, '$', '');
 UPDATE imported_data SET relations_genetiques = 'MX-579/612/827/828/829/83/831/832/833/834/835/836' WHERE relations_genetiques='Mx-579-Mx-612/827/828/829/830/831/832/833/83/835/836';
 UPDATE imported_data SET relations_genetiques = 'Mx-603/651' WHERE relations_genetiques='MX-603/M-651' or relations_genetiques='Mx-603/Mx651';
 UPDATE imported_data SET relations_genetiques = 'Mx-971/972/73/974/975/976/977/978' WHERE relations_genetiques='Mx-971/972/73/974/975/976/977978';
 
+/*
+On retire les caractères en trop avant et après le mot.
+*/
 UPDATE imported_data SET autres_ressources_relation = trim(autres_ressources_relation);
 
+/*
+On retire les caractères en trop avant et après le mot.
+Correction des erreurs pour certaines nature de document + simplification du nom.
+*/
 UPDATE imported_data SET nature_document = UPPER(nature_document);
 UPDATE imported_data SET nature_document = REPLACE(nature_document, 'JPE', 'JPG');
 UPDATE imported_data SET nature_document = REPLACE(nature_document, 'JPGG', 'JPG');
@@ -149,17 +229,35 @@ UPDATE imported_data SET nature_document = REPLACE(nature_document, 'ARCHIVO', '
 UPDATE imported_data SET nature_document = REPLACE(nature_document, 'EN PDF', 'PDF');
 UPDATE imported_data SET nature_document = TRIM(nature_document);
 
+/*
+On retire les caractères en trop avant et après le mot.
+*/
 UPDATE imported_data SET support = trim(upper(support));
 
-UPDATE imported_data SET etat_general = TRIM(lower(etat_general));
+/*
+On retire les caractères en trop avant et après le mot.
+On passe les états indéfinis à "null".
+Correction des erreurs pour certains états.
+*/
 UPDATE imported_data SET etat_general = TRIM(lower(etat_general));
 UPDATE imported_data SET etat_general = 'médiocre' WHERE etat_general = 'mediocre';
 UPDATE imported_data SET etat_general = null WHERE etat_general = 'indeterminado';
 
+/*
+On retire les caractères en trop avant et après le mot.
+*/
 UPDATE imported_data SET publication = TRIM(publication);
 
+/*
+On retire les caractères en trop avant et après le mot.
+*/
 UPDATE imported_data SET representation = TRIM(representation);
 
+/*
+On retire les caractères en trop avant et après le mot.
+On passe les zones géographiques indéfinies à "null".
+Correction des erreurs pour certaines zones géographiques.
+*/
 UPDATE imported_data SET contexte_geographique = TRIM(contexte_geographique);
 UPDATE imported_data SET contexte_geographique = null WHERE LOWER(contexte_geographique)='desconocido' or LOWER(contexte_geographique)='indeterminado' or contexte_geographique='#VALUE!';
 UPDATE imported_data SET contexte_geographique = 'Uruguay' WHERE contexte_geographique='uruguay';
@@ -171,47 +269,98 @@ UPDATE imported_data SET contexte_geographique = 'Buenos Aires Argentina' WHERE 
 UPDATE imported_data SET contexte_geographique = 'Barcelona España' WHERE contexte_geographique='Barcelona';
 UPDATE imported_data SET contexte_geographique = 'Badalona España' WHERE contexte_geographique='Badalona' or contexte_geographique='España Badalona';
 
+/*
+On retire les caractères en trop avant et après le mot.
+*/
 UPDATE imported_data SET lieu_expedition = TRIM(lieu_expedition);
 
+/*
+On retire les caractères en trop avant et après le mot.
+*/
 UPDATE imported_data SET type_publication = TRIM(type_publication);
 
+/*
+On retire les caractères en trop avant et après le mot.
+*/
 UPDATE imported_data SET titre_publication = TRIM(titre_publication);
 
+/*
+On retire les caractères en trop avant et après le mot.
+*/
 UPDATE imported_data SET lieu_publication = TRIM(lieu_publication);
 
+/*
+On retire les caractères en trop avant et après le mot.
+*/
 UPDATE imported_data SET numero_publication = TRIM(numero_publication);
 
+/*
+On retire les caractères en trop avant et après le mot.
+*/
 UPDATE imported_data SET periodicite = TRIM(periodicite);
 
+/*
+On retire les caractères en trop avant et après le mot.
+*/
 UPDATE imported_data SET directeur_publication = TRIM(directeur_publication);
 
+/*
+On retire les caractères en trop avant et après le mot.
+*/
 UPDATE imported_data SET auteur_analyse = TRIM(auteur_analyse);
 
+/*
+On retire les caractères en trop avant et après le mot ainsi que le "$".
+Correction d'une date pour une future utilisation
+*/
 UPDATE imported_data SET date_analyse = TRIM(date_analyse);
 UPDATE imported_data SET date_analyse = TRIM(BOTH '$' FROM date_analyse);
 UPDATE imported_data SET date_analyse = '2015-01-01/2019-01-01' WHERE date_analyse = '2015/2019';
 
+/*
+On retire les caractères en trop avant et après le mot.
+Correction des erreurs pour certains noms (convention: nom puis prénom).
+*/
 UPDATE imported_data SET auteur_description = TRIM(auteur_description);
 UPDATE imported_data SET auteur_description = 'Gil Alan' WHERE auteur_description = 'Alan Gil';
 
+/*
+On retire les caractères en trop avant et après le mot ainsi que le "$".
+Correction d'une date pour une future utilisation
+*/
 UPDATE imported_data SET date_creation_notice = TRIM(date_creation_notice);
 UPDATE imported_data SET date_creation_notice = TRIM(BOTH '$' FROM date_analyse);
 UPDATE imported_data SET date_creation_notice = '2015-01-01/2019-01-01' WHERE date_creation_notice = '2015/2019';
 
+/*
+On retire les caractères en trop avant et après le mot.
+*/
 UPDATE imported_data SET auteur_revision = TRIM(auteur_revision);
 
+/*
+On retire les caractères en trop avant et après le mot.
+On passe la table en type "timestamp" pour une future utilisation.
+*/
 UPDATE imported_data SET date_revision_notice = TRIM(date_revision_notice);
 ALTER TABLE imported_data 
 	ALTER date_revision_notice DROP DEFAULT,
 	ALTER date_revision_notice TYPE timestamp USING date_revision_notice::timestamp;
 
+/*
+On retire les caractères en trop avant et après le mot.
+*/
 UPDATE imported_data SET auteur_transcription = TRIM(auteur_transcription);
 
+/*
+Correction des erreurs concernant le décalage de la colonne duplication.
+*/
 UPDATE imported_data SET publication=(SELECT __dummy FROM imported_data WHERE cote='MX-F-93') WHERE cote='MX-F-92';
 UPDATE imported_data SET publication=(SELECT __dummy FROM imported_data WHERE cote='MX-F-94') WHERE cote='MX-F-93';
 UPDATE imported_data SET publication=(SELECT __dummy FROM imported_data WHERE cote='MX-F-95') WHERE cote='MX-F-94';
 
+-- Désormais cette colonne n'est plus d'aucune utilité
 ALTER TABLE imported_data DROP COLUMN __dummy;
+
 
 -- Exploration
 SELECT cote, __dummy FROM imported_data WHERE __dummy IS NOT NULL;
