@@ -77,8 +77,9 @@ BEGIN
 	OPEN trimmed_text;
 	LOOP
 	FETCH trimmed_text INTO editeur_line;
-	IF NOT FOUND THEN EXIT; END IF;
-	RAISE NOTICE '%', editeur_line;
+		IF NOT FOUND THEN EXIT; END IF;
+		
+		RAISE NOTICE '%', editeur_line;
 	END LOOP;
 	CLOSE trimmed_text;
 END;
