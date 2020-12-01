@@ -116,6 +116,9 @@ UPDATE imported_data SET sous_titre=TRIM(sous_titre);
 -- "MX-F-556" a un sous-titre vide mais non NULL.
 UPDATE imported_data SET sous_titre=NULL WHERE char_length(sous_titre)=0;
 
+-- Test, on vérifie bien que seuls un enregistrement a un sous-titre.
+SELECT COUNT(sous_titre)=1 FROM imported_data;
+
 ------------------------------------------------AUTEUR------------------------------------------------
 
 /*
@@ -123,22 +126,35 @@ On retire les caractères en trop avant et après le mot.
 On passe à "null" tous les auteurs inconnus
 */
 UPDATE imported_data SET auteur=TRIM(auteur);
+-- Un des auteurs a des caractères blancs au début (codes ASCII 0xC2, 0xAO et 0x20), que TRIM n'arrive pas à enlever.
+UPDATE imported_data SET auteur=regexp_replace(auteur, '^[\xC2\xA0\x20]*', '');
 -- On fait une comparaison avec le texte en minuscule pour ignorer la casse
 UPDATE imported_data SET auteur=NULL WHERE LOWER(auteur)='indeterminado';
+-- Correction manuelle de l'enregistrement "MX-F-438"
+UPDATE imported_data SET auteur='Antonio Bueno' WHERE auteur='Antoinio Bueno';
+-- Nom imcomplet, "MX-F-314"
+UPDATE imported_data SET auteur='Amparo Climent Corbín' WHERE auteur LIKE 'Amparo Climent%';
+-- Problème de casse
+UPDATE imported_data SET auteur='Frederico Garcia Lorca' WHERE LOWER(auteur)='frederico garcia lorca';
+UPDATE imported_data SET auteur=regexp_replace(auteur, '\.$', ''); -- Certains enregistrements ont un auteur qui finit par ".". On le supprime.
+UPDATE imported_data SET auteur='Revista Mundo Nuevo' WHERE LOWER(auteur)='nuevo mundo' OR LOWER(auteur)='nuevo mundo revista';
 
 ------------------------------------------------DESTINATAIRE------------------------------------------------
 
--- On retire les caractères en trop avant et après le mot.
-UPDATE imported_data SET destinataire=TRIM(destinataire);
+-- Il n'y a pas de destinataires
 
 ------------------------------------------------SUJET------------------------------------------------
 
 /*
-On retire les caractères en trop avant et après le mot.
+On retire les caractères en trop avant et après le sujet.
 Correction d'une erreur pour "MX-F-185"
 */
 UPDATE imported_data SET sujet=TRIM(sujet);
+-- Un des sujets a des caractères blancs au début (codes ASCII 0xC2, 0xAO et 0x20), que TRIM n'arrive pas à enlever.
+UPDATE imported_data SET sujet=regexp_replace(sujet, '^[\xC2\xA0\x20]*', '');
 UPDATE imported_data SET sujet='Margarita xirgu' WHERE cote='MX-F-185';
+
+------------------------------------------------DESCRIPTION------------------------------------------------
 
 /*
 On retire les caractères en trop avant et après le mot.
