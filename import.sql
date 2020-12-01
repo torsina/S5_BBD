@@ -127,7 +127,7 @@ On passe à "null" tous les auteurs inconnus
 */
 UPDATE imported_data SET auteur=TRIM(auteur);
 -- Un des auteurs a des caractères blancs au début (codes ASCII 0xC2, 0xAO et 0x20), que TRIM n'arrive pas à enlever.
-UPDATE imported_data SET auteur=regexp_replace(auteur, '^[\xC2\xA0\x20]*', '');
+UPDATE imported_data SET auteur=trim_blank(auteur);
 -- On fait une comparaison avec le texte en minuscule pour ignorer la casse
 UPDATE imported_data SET auteur=NULL WHERE LOWER(auteur)='indeterminado';
 -- Correction manuelle de l'enregistrement "MX-F-438"
@@ -150,113 +150,128 @@ On retire les caractères en trop avant et après le sujet.
 Correction d'une erreur pour "MX-F-185"
 */
 UPDATE imported_data SET sujet=TRIM(sujet);
--- Un des sujets a des caractères blancs au début (codes ASCII 0xC2, 0xAO et 0x20), que TRIM n'arrive pas à enlever.
-UPDATE imported_data SET sujet=regexp_replace(sujet, '^[\xC2\xA0\x20]*', '');
+--Caractères blancs au début (codes ASCII 0xC2, 0xAO et 0x20), que TRIM n'arrive pas à enlever.
+UPDATE imported_data SET sujet=trim_blank(sujet);
 UPDATE imported_data SET sujet='Margarita xirgu' WHERE cote='MX-F-185';
 
 ------------------------------------------------DESCRIPTION------------------------------------------------
 
 /*
-On retire les caractères en trop avant et après le mot.
+On retire les caractères en trop avant et après la description.
 */
-UPDATE imported_data SET description = trim(description);
+UPDATE imported_data SET description=TRIM(description);
+-- Caractères blancs au début (codes ASCII 0xC2, 0xAO, 0x20 et 0x0A), que TRIM n'arrive pas à enlever.
+UPDATE imported_data SET description=trim_blank(description);
+UPDATE imported_data SET description=NULL WHERE char_length(description)=0;
+UPDATE imported_data SET description=regexp_replace(description, '^-[[:blank:]]*', '');
+
+-- SELECT description, COUNT(auteur_description) FROM imported_data GROUP BY description HAVING COUNT(DISTINCT auteur_description) != 1;
+-- SELECT * FROM imported_data WHERE description='Foto de Margarita Xirgu sacada en el "peristilo" del teatro romano de Mérida, caracterizada de Elektra';
+
+------------------------------------------------NOTES------------------------------------------------
 
 /*
-On retire les caractères en trop avant et après le mot.
+On retire les caractères en trop avant et après les notes.
 */
-UPDATE imported_data SET notes = trim(notes);
+UPDATE imported_data SET notes=TRIM(notes);
+
+------------------------------------------------RESUME------------------------------------------------
 
 /*
 On retire les caractères en trop avant et après le mot.
 */
 UPDATE imported_data SET resume=TRIM(resume);
 
+-- Aucune donnée
+
+------------------------------------------------EDITEUR------------------------------------------------
+
 /*
 On retire les caractères en trop avant et après le mot.
 Correction des erreurs pour certains éditeurs.
 */
-UPDATE imported_data SET editeur = REPLACE(editeur, ':', '');
-UPDATE imported_data SET editeur = REPLACE(editeur, '|', '');
-UPDATE imported_data SET editeur = REPLACE(editeur, ',', '');
-UPDATE imported_data SET editeur = REPLACE(editeur, '  ', '');
-UPDATE imported_data SET editeur = REPLACE(editeur, 'fonfo', 'fondo');
-UPDATE imported_data SET editeur = REPLACE(editeur, 'espectateur', 'spectateur');
-UPDATE imported_data SET editeur = REPLACE(editeur, 'Jose', 'José');
-UPDATE imported_data SET editeur = REPLACE(editeur, '. ', '.');
-UPDATE imported_data SET editeur = REPLACE(editeur, 'Responsable del archivo  Familia Margarita Xirgu (Xavier Rius Xirgu Ester Xirgu Cortacans Natalia Valenzuela) Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)', 'Responsable del archivo  Familia Margarita Xirgu (Xavier Rius Xirgu Ester Xirgu Cortacans Natalia Valenzuela)Editor Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)');
-UPDATE imported_data SET editeur = REPLACE(editeur, 'Responsable del archivo Indeterminadospectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)', 'Responsable del archivo Indeterminado spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)');
-UPDATE imported_data SET editeur = REPLACE(editeur, 'Responsable del archivo IndeterminadoEditor Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)', 'Responsable del archivo Indeterminado Editor Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)');
-UPDATE imported_data SET editeur = REPLACE(editeur, 'Responsable del archivo  Fondo Margarita Xirgu del Instituto del Teatro de la Diputación de Barcelona.Editor Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)', 'Responsable del archivo Fondo Margarita Xirgu del Instituto del Teatro de la Diputación de Barcelona.Editor Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)');
-UPDATE imported_data SET editeur = TRIM(editeur);
+UPDATE imported_data SET editeur=REPLACE(editeur, ':', '');
+UPDATE imported_data SET editeur=REPLACE(editeur, '|', '');
+UPDATE imported_data SET editeur=REPLACE(editeur, ',', '');
+UPDATE imported_data SET editeur=REPLACE(editeur, '  ', '');
+UPDATE imported_data SET editeur=REPLACE(editeur, 'fonfo', 'fondo');
+UPDATE imported_data SET editeur=REPLACE(editeur, 'espectateur', 'spectateur');
+UPDATE imported_data SET editeur=REPLACE(editeur, 'Jose', 'José');
+UPDATE imported_data SET editeur=REPLACE(editeur, '. ', '.');
+UPDATE imported_data SET editeur=REPLACE(editeur, 'Responsable del archivo  Familia Margarita Xirgu (Xavier Rius Xirgu Ester Xirgu Cortacans Natalia Valenzuela) Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)', 'Responsable del archivo  Familia Margarita Xirgu (Xavier Rius Xirgu Ester Xirgu Cortacans Natalia Valenzuela)Editor Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)');
+UPDATE imported_data SET editeur=REPLACE(editeur, 'Responsable del archivo Indeterminadospectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)', 'Responsable del archivo Indeterminado spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)');
+UPDATE imported_data SET editeur=REPLACE(editeur, 'Responsable del archivo IndeterminadoEditor Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)', 'Responsable del archivo Indeterminado Editor Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)');
+UPDATE imported_data SET editeur=REPLACE(editeur, 'Responsable del archivo  Fondo Margarita Xirgu del Instituto del Teatro de la Diputación de Barcelona.Editor Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)', 'Responsable del archivo Fondo Margarita Xirgu del Instituto del Teatro de la Diputación de Barcelona.Editor Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)');
+UPDATE imported_data SET editeur=TRIM(editeur);
 
 /*
 On retire les caractères en trop avant et après le mot.
-On passe les localisations inconnues à "null".
+On passe les localisations inconnues à "NULL".
 Correction des erreurs pour certaines localisations.
 */
-UPDATE imported_data SET localisation = TRIM(localisation);
-UPDATE imported_data SET localisation = null WHERE LOWER(localisation)='desconocido' or LOWER(localisation)='indeterminado';
-UPDATE imported_data SET localisation = 'Punta Ballena Uruguay' WHERE localisation=' Punta Ballena (Maldonado) Uruguay' or localisation='Punta Ballena';
-UPDATE imported_data SET localisation = 'Teatro Solís, Montevideo (Uruguay)' WHERE localisation='Teatro Solís de Montevideo';
-UPDATE imported_data SET localisation = 'EMAD: Escuela Municipal de Arte Dramático de Montevideo' WHERE localisation='EMAD: Escuela Municipal de Arte Dramático de Montevideo.';
-UPDATE imported_data SET localisation = 'Madrid España' WHERE localisation='Madrid' or localisation='Madrid España';
-UPDATE imported_data SET localisation = 'Mérida España' WHERE localisation='Merida' or localisation='Mérida' or localisation='Merida España' or localisation='Meridaa';
+UPDATE imported_data SET localisation=TRIM(localisation);
+UPDATE imported_data SET localisation=NULL WHERE LOWER(localisation)='desconocido' OR LOWER(localisation)='indeterminado';
+UPDATE imported_data SET localisation='Punta Ballena Uruguay' WHERE localisation=' Punta Ballena (Maldonado) Uruguay' OR localisation='Punta Ballena';
+UPDATE imported_data SET localisation='Teatro Solís, Montevideo (Uruguay)' WHERE localisation='Teatro Solís de Montevideo';
+UPDATE imported_data SET localisation='EMAD: Escuela Municipal de Arte Dramático de Montevideo' WHERE localisation='EMAD: Escuela Municipal de Arte Dramático de Montevideo.';
+UPDATE imported_data SET localisation='Madrid España' WHERE localisation='Madrid' OR localisation='Madrid España';
+UPDATE imported_data SET localisation='Mérida España' WHERE localisation='Merida' OR localisation='Mérida' OR localisation='Merida España' OR localisation='Meridaa';
 
 /*
-On retire les caractères en trop avant et après le mot.
+On retire les caractères en trop avant et après les droits.
 Correction des erreurs pour certains droits.
 */
-UPDATE imported_data SET droits = TRIM(droits);
-UPDATE imported_data SET droits = 'Archives familiar de Margarita Xirgu – Licencia Licencia Creative Commons CC-BY-NC-ND (Attribution-Non Commercial-No Derivatives 4.0 International)' WHERE droits='Archives familiales Margarita Xirgu – Licencia Licencia Creative Commons CC-BY-NC-ND (Attribution-Non Commercial-No Derivatives 4.0 International)';
-UPDATE imported_data SET droits = 'Mx-4/413/650' WHERE droits='Mx-4/413/650$';
-UPDATE imported_data SET droits = 'Mx-950/953' WHERE droits='Mx950/953$';
+UPDATE imported_data SET droits=TRIM(droits);
+UPDATE imported_data SET droits='Archives familiar de Margarita Xirgu – Licencia Licencia Creative Commons CC-BY-NC-ND (Attribution-Non Commercial-No Derivatives 4.0 International)' WHERE droits='Archives familiales Margarita Xirgu – Licencia Licencia Creative Commons CC-BY-NC-ND (Attribution-Non Commercial-No Derivatives 4.0 International)';
+UPDATE imported_data SET droits='Mx-4/413/650' WHERE droits='Mx-4/413/650$';
+UPDATE imported_data SET droits='Mx-950/953' WHERE droits='Mx950/953$';
 
 /*
-On retire les caractères en trop avant et après le mot.
+On retire les caractères en trop avant et après les ayants-droit.
 */
-UPDATE imported_data SET ayants_droit = trim(ayants_droit);
+UPDATE imported_data SET ayants_droit=TRIM(ayants_droit);
 
 /*
-On retire les caractères en trop avant et après le mot.
-On passe les formats indéterminés à "null".
+On retire les caractères en trop avant et après le format.
+On passe les formats indéterminés à "NULL".
 On supprime les formats erronnés. La colonne format ne définit pas le format de fichier (doublon avec nature_document).
 Correction des erreurs sur "MX-F-247", dupliqué de notes
 */
-UPDATE imported_data SET format = trim(format);
+UPDATE imported_data SET format=TRIM(format);
 UPDATE imported_data SET format=NULL WHERE format='Indeterminado';
 UPDATE imported_data SET format=NULL WHERE LOWER(format) ~ '(jp[e]{0,1}g|png|pdf)'; 
 UPDATE imported_data SET format=NULL WHERE cote='MX-F-247';
 
 /*
-On retire les caractères en trop avant et après le mot.
+On retire les caractères en trop avant et après la langue.
 */
-UPDATE imported_data SET langue = trim(UPPER(langue));
+UPDATE imported_data SET langue=TRIM(LOWER(langue));
 
 /*
-On retire les caractères en trop avant et après le mot.
+On retire les caractères en trop avant et après l'état génétique..
 */
-UPDATE imported_data SET etat_genetique = trim(etat_genetique);
+UPDATE imported_data SET etat_genetique=TRIM(etat_genetique);
 
 /*
 On retire les caractères en trop avant et après le mot ainsi que les "$".
 Correction des erreurs pour certaines relations génétiques.
 */
-UPDATE imported_data SET relations_genetiques = trim(relations_genetiques);
-UPDATE imported_data SET relations_genetiques = REPLACE(relations_genetiques, '$', '');
-UPDATE imported_data SET relations_genetiques = 'MX-579/612/827/828/829/83/831/832/833/834/835/836' WHERE relations_genetiques='Mx-579-Mx-612/827/828/829/830/831/832/833/83/835/836';
-UPDATE imported_data SET relations_genetiques = 'Mx-603/651' WHERE relations_genetiques='MX-603/M-651' or relations_genetiques='Mx-603/Mx651';
-UPDATE imported_data SET relations_genetiques = 'Mx-971/972/73/974/975/976/977/978' WHERE relations_genetiques='Mx-971/972/73/974/975/976/977978';
+UPDATE imported_data SET relations_genetiques=TRIM(relations_genetiques);
+UPDATE imported_data SET relations_genetiques=REPLACE(relations_genetiques, '$', '');
+UPDATE imported_data SET relations_genetiques='MX-579/612/827/828/829/83/831/832/833/834/835/836' WHERE relations_genetiques='Mx-579-Mx-612/827/828/829/830/831/832/833/83/835/836';
+UPDATE imported_data SET relations_genetiques='Mx-603/651' WHERE relations_genetiques='MX-603/M-651' OR relations_genetiques='Mx-603/Mx651';
+UPDATE imported_data SET relations_genetiques='Mx-971/972/73/974/975/976/977/978' WHERE relations_genetiques='Mx-971/972/73/974/975/976/977978';
 
 /*
-On retire les caractères en trop avant et après le mot.
+On retire les caractères en trop avant et après les autres relations.
 */
-UPDATE imported_data SET autres_ressources_relation = trim(autres_ressources_relation);
+UPDATE imported_data SET autres_ressources_relation=TRIM(autres_ressources_relation);
 
 /*
-On retire les caractères en trop avant et après le mot.
+On retire les caractères en trop avant et après la nature du document.
 Correction des erreurs pour certaines nature de document + simplification du nom.
 */
-UPDATE imported_data SET nature_document = UPPER(nature_document);
+UPDATE imported_data SET nature_document=UPPER(nature_document);
 UPDATE imported_data SET nature_document = REPLACE(nature_document, 'JPE', 'JPG');
 UPDATE imported_data SET nature_document = REPLACE(nature_document, 'JPGG', 'JPG');
 UPDATE imported_data SET nature_document = REPLACE(nature_document, 'JPEG', 'JPG');
@@ -266,13 +281,13 @@ UPDATE imported_data SET nature_document = REPLACE(nature_document, 'PNE', 'PNG'
 UPDATE imported_data SET nature_document = REPLACE(nature_document, 'PNGG', 'PNG');
 UPDATE imported_data SET nature_document = REPLACE(nature_document, 'ARCHIVOS', '');
 UPDATE imported_data SET nature_document = REPLACE(nature_document, 'ARCHIVO', '');
-UPDATE imported_data SET nature_document = REPLACE(nature_document, 'EN PDF', 'PDF');
+UPDATE imported_data SET nature_document = regexp_replace(nature_document, '$.*PDF.*^', 'PDF');
 UPDATE imported_data SET nature_document = TRIM(nature_document);
 
 /*
-On retire les caractères en trop avant et après le mot.
+On retire les caractères en trop avant et après le support.
 */
-UPDATE imported_data SET support = trim(upper(support));
+UPDATE imported_data SET support=TRIM(UPPER(support));
 
 /*
 On retire les caractères en trop avant et après le mot.
@@ -434,6 +449,22 @@ BEGIN
 	CLOSE trimmed_text;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION trim_blank(t text)
+RETURNS text AS $$
+DECLARE
+	t_returned text;
+BEGIN
+	t_returned := regexp_replace(t, '^[\xC2\xA0\x20\x0A]*', '');
+	IF char_length(t_returned)=0
+	THEN
+		RETURN NULL;
+	ELSE
+		RETURN t_returned;
+	END IF;
+END;
+$$ LANGUAGE plpgsql;
+
 
 /*CREATE OR REPLACE FUNCTION parse_format(format text, dt text)
 RETURNS text[] AS $$
