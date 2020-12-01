@@ -557,3 +557,20 @@ INSERT INTO responsable_archive(nom) VALUES
 ('Carmen M.Gual'),('Colección de escenografía del Instituto del Teatro de la Diputación de Barcelona'),
 ('Festival de Mérida'),('Foto Archivo Xavier Rius Xirgu'),('Fotos de su nieto Jaime Gutiérrez Morcillo'),
 ('José Antonio'),('Lluis Andú');
+								       
+								       
+								       ----------------------- GESTION DATATYPE et SUPPORT -----------------------
+DROP TABLE IF EXISTS support, datatype;
+CREATE TABLE support (
+	nom_support varchar(10) primary key
+);
+
+CREATE TABLE datatype (
+	nom_datatype varchar(50),
+	nom_support varchar(10),
+	PRIMARY KEY (nom_datatype,nom_support),
+	FOREIGN KEY (nom_support) REFERENCES support(nom_support)
+);
+
+INSERT INTO support VALUES ('DIGITAL'),('PAPEL');
+INSERT INTO datatype VALUES ('imagen','DIGITAL'),('text','PAPEL');
