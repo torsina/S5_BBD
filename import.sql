@@ -46,44 +46,60 @@ CREATE TABLE imported_data (
 	auteur_transcription text,
 	__dummy text
 );
-
+-- Importation du CSV. Pourquoi en 2020, ce logiciel n'accepte pas les chemins relatifs ????
 COPY imported_data
-FROM 'D:\Boulot\L3\BASE_DE_DONNEES\PROJET\Esp-fotos.csv'
+FROM 'E:\Esp-fotos.csv'/*'D:\Boulot\L3\BASE_DE_DONNEES\PROJET\Esp-fotos.csv'*/
 DELIMITER ';'
 CSV HEADER;
 
 -- NETTOYAGE DE LA TABLE
 
-/*
-On retire les caractères en trop avant et après le mot.
-*/
-UPDATE imported_data SET cote = TRIM(cote);
+------------------------------------------------COTE------------------------------------------------
+
+-- On retire les caractères en trop avant et après la cote.
+UPDATE imported_data SET cote=TRIM(cote);
+
+-- Test, on vérifie que toutes les cotes sont uniques et qu'elles vérifient bien le bon format.
+SELECT COUNT(DISTINCT cote)=1122 FROM imported_data WHERE cote ~ '\w{1,3}-\w{1,3}-\w{1,3}';
+
+------------------------------------------------TYPE------------------------------------------------
+
+-- On retire les caractères en trop avant et après le type.
+UPDATE imported_data SET type=TRIM(type);
+
+------------------------------------------------DATATYPE------------------------------------------------
+
 
 /*
 On retire les caractères en trop avant et après le mot.
+On passe datatype en minsucule pour uniformiser la casse, qui était différente.
 */
-UPDATE imported_data SET type = TRIM(type);
+UPDATE imported_data SET datatype=LOWER(TRIM(datatype));
 
-/*
-On retire les caractères en trop avant et après le mot.
-On passe datatype en majuscule pour des raisons de lisibilité
-*/
-UPDATE imported_data SET datatype = UPPER(TRIM(datatype));
+------------------------------------------------DATES------------------------------------------------
+
+SELECT * FROM imported_data WHERE dates ~ '\d{2}/\d{2}/\d{4}';
+SELECT * FROM imported_data WHERE cote='AS-AA1-01';
 
 /*
 On retire les caractères en trop avant et après le mot.
 Toutes les dates inconnues sont passées à "null".
-Correctiondes erreurs pour certaines dates.
+Correction des erreurs pour certaines dates.
+Certains enregistrements avaient du texte invalide dans cette colonne.
+Ces textes sont des informations redondantes (déjà dans colonne notes).
 Décalage de la colonne titre pour "MX-F-20" corrigé.
 */
-UPDATE imported_data SET dates = TRIM(dates);
-UPDATE imported_data SET dates = null WHERE LOWER(dates)='desconocido' or LOWER(dates)='indeterminado' or LOWER(dates)='gunther gerzso' or LOWER(dates)='victorio macho';
-UPDATE imported_data SET dates = '1906-1920' WHERE cote='MX-F-20';
-UPDATE imported_data SET dates = '1950-1970' WHERE cote='MX-F-132';
-UPDATE imported_data SET dates = '1996' WHERE cote='MX-F-33';
-UPDATE imported_data SET dates = '1980-2000' WHERE cote='MX-F-1042';
-UPDATE imported_data SET dates = '1910-1940' WHERE cote='MX-F-1063';
-UPDATE imported_data SET dates = '1910-1925' WHERE cote='MX-F-30';
+UPDATE imported_data SET dates=TRIM(dates);
+UPDATE imported_data SET dates=NULL WHERE LOWER(dates)='desconocido' or LOWER(dates)='indeterminado' or LOWER(dates)='gunther gerzso' or LOWER(dates)='victorio macho';
+-- Corrections individuelles
+UPDATE imported_data SET dates='1906-1920' WHERE cote='MX-F-20';
+UPDATE imported_data SET dates='1950-1970' WHERE cote='MX-F-132';
+UPDATE imported_data SET dates='1996' WHERE cote='MX-F-33';
+UPDATE imported_data SET dates='1980-2000' WHERE cote='MX-F-1042';
+UPDATE imported_data SET dates='1910-1940' WHERE cote='MX-F-1063';
+UPDATE imported_data SET dates='1910-1925' WHERE cote='MX-F-30';
+
+------------------------------------------------TITRE------------------------------------------------
 
 /*
 On retire les caractères en trop avant et après le mot.
@@ -359,7 +375,7 @@ UPDATE imported_data SET publication=(SELECT __dummy FROM imported_data WHERE co
 UPDATE imported_data SET publication=(SELECT __dummy FROM imported_data WHERE cote='MX-F-95') WHERE cote='MX-F-94';
 
 -- Désormais cette colonne n'est plus d'aucune utilité
-ALTER TABLE imported_data DROP COLUMN __dummy;
+-- TODO : ALTER TABLE imported_data DROP COLUMN __dummy;
 
 
 -- Exploration
