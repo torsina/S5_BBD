@@ -113,6 +113,8 @@ UPDATE imported_data SET titre=TRIM(titre);
 
 -- On retire les caractères en trop avant et après le sous-titre.
 UPDATE imported_data SET sous_titre=TRIM(sous_titre);
+-- "MX-F-556" a un sous-titre vide mais non NULL.
+UPDATE imported_data SET sous_titre=NULL WHERE char_length(sous_titre)=0;
 
 ------------------------------------------------AUTEUR------------------------------------------------
 
