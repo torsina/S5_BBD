@@ -122,8 +122,8 @@ SELECT COUNT(sous_titre)=1 FROM imported_data;
 ------------------------------------------------AUTEUR------------------------------------------------
 
 /*
-On retire les caractères en trop avant et après le mot.
-On passe à "null" tous les auteurs inconnus
+On retire les caractères en trop avant et après l'auteur.
+On passe à "NULL" tous les auteurs inconnus
 */
 UPDATE imported_data SET auteur=TRIM(auteur);
 -- Un des auteurs a des caractères blancs au début (codes ASCII 0xC2, 0xAO et 0x20), que TRIM n'arrive pas à enlever.
@@ -295,9 +295,11 @@ On passe les états indéfinis à "null".
 Correction des erreurs pour certains états.
 */
 UPDATE imported_data SET etat_general = TRIM(lower(etat_general));
-UPDATE imported_data SET etat_general = 'médiocre' WHERE etat_general = 'mediocre';
+-- Français -> Espagnol
+UPDATE imported_data SET etat_general = 'mediocre' WHERE etat_general = 'médiocre';
 UPDATE imported_data SET etat_general = null WHERE etat_general = 'indeterminado';
 
+SELECT DISTINCT etat_general FROM imported_data;
 /*
 On retire les caractères en trop avant et après le mot.
 */
