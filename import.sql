@@ -657,7 +657,7 @@ CREATE TABLE titre (
 								       ----------------------- GESTION DESCRIPTION -----------------------
 DROP TABLE IF EXISTS description CASCADE;
 CREATE TABLE description (
-	id_description serial primary key,
+	id_description serial PRIMARY KEY,
 	texte text,
 	id_auteur integer,
 	FOREIGN KEY (id_auteur) REFERENCES personne(id_personne)
@@ -666,22 +666,23 @@ CREATE TABLE description (
 ----------------------- GESTION SUJET -----------------------
 DROP TABLE IF EXISTS sujet CASCADE;
 CREATE TABLE sujet (
-	id_sujet serial primary key,
-	texte text
+	id_sujet serial PRIMARY KEY,
+	texte text NOT NULL
 );
------------------------- GESTION TAILLE
+------------------------ GESTION TAILLE ------------------------
 DROP TABLE IF EXISTS taille_image CASCADE;
 CREATE TABLE taille_image (
-    id_taille_image serial primary key,
-    largeur int NOT NULL ,
+    id_taille_image serial PRIMARY KEY,
+    largeur int NOT NULL,
     longueur int NOT NULL,
-    taille int NULL
+    taille int NULL,
+	CHECK(largeur > 32 AND longueur > 32)
 );
 
 DROP TABLE IF EXISTS taille_texte CASCADE;
 CREATE TABLE taille_texte (
-    id_taille_texte serial primary key,
-    valeur text
+    id_taille_texte serial PRIMARY KEY,
+    valeur text NOT NULL
 );
 
 ----------------------- TABLE DOCUMENT -----------------------
