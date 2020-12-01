@@ -628,3 +628,32 @@ CREATE TABLE taille_texte (
     id_taille_texte serial primary key,
     valeur text
 );
+
+----------------------- TABLE DOCUMENT -----------------------
+
+/*DROP TABLE IF EXISTS documents CASCADE;
+CREATE TABLE documents(
+	cote varchar(15) primary key,
+	nom_datatype varchar(20) NOT NULL,
+	nom_support varchar(10) NOT NULL,
+	dates_debut timestamp,
+	dates_fin timestamp,
+	id_titre integer NOT NULL,
+	sous_titre text,
+	id_sujet integer,
+	id_description integer,
+	notes text,
+	id_responsable_archive integer DEFAULT NULL,
+	id_editeur integer NOT NULL,
+	id_responsable_scientifique integer NOT NULL,
+	
+	
+	FOREIGN KEY (id_sujet) REFERENCES sujet(id_sujet),
+	FOREIGN KEY (id_description) REFERENCES description(id_description),
+	FOREIGN KEY (nom_datatype,nom_support) REFERENCES datatype(nom_datatype,nom_support),
+	FOREIGN KEY (id_responsable_archive) REFERENCES responsable_archive(id_responsable_archive),
+	FOREIGN KEY (id_titre) REFERENCES titre(id_titre),
+	FOREIGN KEY (id_editeur) REFERENCES editeur(id_editeur),
+	FOREIGN KEY (id_responsable_scientifique) REFERENCES responsable_scientifique(id_responsable_scientifique)
+);
+								       
