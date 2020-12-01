@@ -175,8 +175,10 @@ UPDATE imported_data SET description=regexp_replace(description, '^-[[:blank:]]*
 
 /*
 On retire les caractères en trop avant et après les notes.
+Passe de la valeur "type" de "AS-AA1-01" dans notes
 */
 UPDATE imported_data SET notes=TRIM(notes);
+UPDATE imported_data SET notes = (SELECT type FROM imported_data WHERE cote ='AS-AA1-01')||' | '||(SELECT notes FROM imported_data WHERE cote ='AS-AA1-01') WHERE cote ='AS-AA1-01';
 
 ------------------------------------------------RESUME------------------------------------------------
 
