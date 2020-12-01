@@ -150,10 +150,26 @@ On retire les caractères en trop avant et après le sujet.
 Correction d'une erreur pour "MX-F-185"
 */
 UPDATE imported_data SET sujet=TRIM(sujet);
---Caractères blancs au début (codes ASCII 0xC2, 0xAO et 0x20), que TRIM n'arrive pas à enlever.
-UPDATE imported_data SET sujet=trim_blank(sujet);
+-- Un des sujets a des caractères blancs au début (codes ASCII 0xC2, 0xAO et 0x20), que TRIM n'arrive pas à enlever.
+UPDATE imported_data SET sujet=regexp_replace(sujet, '^[\xC2\xA0\x20]*', '');
 UPDATE imported_data SET sujet='Margarita xirgu' WHERE cote='MX-F-185';
-
+UPDATE imported_data SET sujet=null WHERE lower(sujet)='indeterminado' or sujet='Indeterminadp';
+UPDATE imported_data SET sujet='Cartel exposicion sobre Margarita Xirgu' WHERE (sujet)='cartel Margarita Xirgu';
+UPDATE imported_data SET sujet='Figurina' WHERE (sujet)='Figurines';
+UPDATE imported_data SET sujet='Foto de Margarita Xirgu' WHERE (sujet)='foto de Margarita xirgu' or sujet='Foto de Margarita xirgu' 
+or sujet='Foto de Margarita Xirgu' or sujet='Foto de Margarita Xiru' or sujet='foto deMargarita Xirgu' or sujet='Foto Margarita Xirgu'
+or sujet='Fotoe  de Margarita Xirgu';
+UPDATE imported_data SET sujet='Foto de Miguel Xirgu' WHERE (sujet)='foto de Miguel Xirgu' or sujet='Foto de Miguel xirgu' or sujet='Foto de Miquel Xirgu' or sujet='Miguel Xirgu';
+UPDATE imported_data SET sujet='Homenaje a Margarita Xirgu' WHERE (sujet)='Homenaje a Margarita Xirgu' 
+or sujet='homenaje a Margarita Xirgu' or sujet='Foto de Miquel Xirgu';
+UPDATE imported_data SET sujet='Margarita Xirgu' WHERE (sujet)='Magararita xirgu' or sujet='Margarita  Xirgu' or sujet='Margarita Xiirgu'
+or sujet='Margarita xirgu' or sujet='Magararita xirgu';
+UPDATE imported_data SET sujet='Margarita Xirgu Actuando' WHERE (sujet)='Margarita Xirgu actuando';
+UPDATE imported_data SET sujet='Margarita Xirgu de Elektra' WHERE (sujet)='Margarita Xirgu Elektra';
+UPDATE imported_data SET sujet='Medea Cartel' WHERE (sujet)='Medea';
+UPDATE imported_data SET sujet='Teatro Solis' WHERE (sujet)='Teatro Solís';
+					     
+					     
 ------------------------------------------------DESCRIPTION------------------------------------------------
 
 /*
@@ -612,3 +628,87 @@ INSERT INTO responsable_archive(nom) VALUES
 ('Carmen M.Gual'),('Colección de escenografía del Instituto del Teatro de la Diputación de Barcelona'),
 ('Festival de Mérida'),('Foto Archivo Xavier Rius Xirgu'),('Fotos de su nieto Jaime Gutiérrez Morcillo'),
 ('José Antonio'),('Lluis Andú');
+								       
+								       
+								       ----------------------- GESTION DATATYPE et SUPPORT -----------------------
+DROP TABLE IF EXISTS support, datatype;
+CREATE TABLE support (
+	nom_support varchar(10) primary key
+);
+
+CREATE TABLE datatype (
+	nom_datatype varchar(50),
+	nom_support varchar(10),
+	PRIMARY KEY (nom_datatype,nom_support),
+	FOREIGN KEY (nom_support) REFERENCES support(nom_support)
+);
+
+INSERT INTO support VALUES ('DIGITAL'),('PAPEL');
+INSERT INTO datatype VALUES ('imagen','DIGITAL'),('text','PAPEL');
+								       
+----------------------- GESTION TITTRE -----------------------
+DROP TABLE IF EXISTS titre CASCADE;
+CREATE TABLE titre (
+	id_titre serial primary key,
+	nom varchar(150)
+);
+								       
+
+								       ----------------------- GESTION DESCRIPTION -----------------------
+DROP TABLE IF EXISTS description CASCADE;
+CREATE TABLE description (
+	id_description serial primary key,
+	texte text,
+	id_auteur integer,
+	FOREIGN KEY (id_auteur) REFERENCES personne(id_personne)
+);
+
+----------------------- GESTION SUJET -----------------------
+DROP TABLE IF EXISTS sujet CASCADE;
+CREATE TABLE sujet (
+	id_sujet serial primary key,
+	texte text
+);
+------------------------ GESTION TAILLE
+DROP TABLE IF EXISTS taille_image CASCADE;
+CREATE TABLE taille_image (
+    id_taille_image serial primary key,
+    largeur int NOT NULL ,
+    longueur int NOT NULL,
+    taille int NULL
+);
+
+DROP TABLE IF EXISTS taille_texte CASCADE;
+CREATE TABLE taille_texte (
+    id_taille_texte serial primary key,
+    valeur text
+);
+
+----------------------- TABLE DOCUMENT -----------------------
+
+/*DROP TABLE IF EXISTS documents CASCADE;
+CREATE TABLE documents(
+	cote varchar(15) primary key,
+	nom_datatype varchar(20) NOT NULL,
+	nom_support varchar(10) NOT NULL,
+	dates_debut timestamp,
+	dates_fin timestamp,
+	id_titre integer NOT NULL,
+	sous_titre text,
+	id_sujet integer,
+	id_description integer,
+	notes text,
+	id_responsable_archive integer DEFAULT NULL,
+	id_editeur integer NOT NULL,
+	id_responsable_scientifique integer NOT NULL,
+	
+	
+	FOREIGN KEY (id_sujet) REFERENCES sujet(id_sujet),
+	FOREIGN KEY (id_description) REFERENCES description(id_description),
+	FOREIGN KEY (nom_datatype,nom_support) REFERENCES datatype(nom_datatype,nom_support),
+	FOREIGN KEY (id_responsable_archive) REFERENCES responsable_archive(id_responsable_archive),
+	FOREIGN KEY (id_titre) REFERENCES titre(id_titre),
+	FOREIGN KEY (id_editeur) REFERENCES editeur(id_editeur),
+	FOREIGN KEY (id_responsable_scientifique) REFERENCES responsable_scientifique(id_responsable_scientifique)
+);
+								       
