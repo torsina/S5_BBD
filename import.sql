@@ -77,12 +77,8 @@ On passe datatype en minsucule pour uniformiser la casse, qui était différente
 UPDATE imported_data SET datatype=LOWER(TRIM(datatype));
 
 ------------------------------------------------DATES------------------------------------------------
-
-SELECT * FROM imported_data WHERE dates ~ '\d{2}/\d{2}/\d{4}';
-SELECT * FROM imported_data WHERE cote='AS-AA1-01';
-
 /*
-On retire les caractères en trop avant et après le mot.
+On retire les caractères en trop avant et après la date.
 Toutes les dates inconnues sont passées à "null".
 Correction des erreurs pour certaines dates.
 Certains enregistrements avaient du texte invalide dans cette colonne.
@@ -99,38 +95,48 @@ UPDATE imported_data SET dates='1980-2000' WHERE cote='MX-F-1042';
 UPDATE imported_data SET dates='1910-1940' WHERE cote='MX-F-1063';
 UPDATE imported_data SET dates='1910-1925' WHERE cote='MX-F-30';
 
+UPDATE imported_data SET dates='1992-2020' WHERE cote='MX-F-1058'; -- '19920-2020' -> '1992-2020'
+UPDATE imported_data SET dates=regexp_replace(dates, '\.$', ''); -- Certains enregistrements ont une date qui finit par ".". On le supprime.
+
+-- Test, vérifie que tous les enregistrements sont au bon format.
+SELECT COUNT(*)=0 FROM imported_data WHERE dates !~ '^\d{4}-\d{2}-\d{2}$' AND dates !~ '^\d{4}$' AND dates !~ '^\d{4}-\d{4}$';
+
+
 ------------------------------------------------TITRE------------------------------------------------
-
 /*
-On retire les caractères en trop avant et après le mot.
-Titre pour "MX-F-20" actualisée.
+Titre pour "MX-F-20" actualisé (NULL -> 'Magarita Xirgu').
+On retire les caractères en trop avant et après le titre.
 */
-UPDATE imported_data SET titre = 'Magarita Xirgu' WHERE cote='MX-F-20';
-UPDATE imported_data SET titre = TRIM(titre);
+UPDATE imported_data SET titre='Magarita Xirgu' WHERE cote='MX-F-20';
+UPDATE imported_data SET titre=TRIM(titre);
+------------------------------------------------SOUS-TITRE------------------------------------------------
 
-/*
-On retire les caractères en trop avant et après le mot.
-*/
-UPDATE imported_data SET sous_titre = TRIM(sous_titre);
+-- On retire les caractères en trop avant et après le sous-titre.
+UPDATE imported_data SET sous_titre=TRIM(sous_titre);
+
+------------------------------------------------AUTEUR------------------------------------------------
 
 /*
 On retire les caractères en trop avant et après le mot.
 On passe à "null" tous les auteurs inconnus
 */
-UPDATE imported_data SET auteur = trim(auteur);
-UPDATE imported_data SET auteur = null WHERE LOWER(auteur)='indeterminado';
+UPDATE imported_data SET auteur=TRIM(auteur);
+-- On fait une comparaison avec le texte en minuscule pour ignorer la casse
+UPDATE imported_data SET auteur=NULL WHERE LOWER(auteur)='indeterminado';
 
-/*
-On retire les caractères en trop avant et après le mot.
-*/
-UPDATE imported_data SET destinataire = trim(destinataire);
+------------------------------------------------DESTINATAIRE------------------------------------------------
+
+-- On retire les caractères en trop avant et après le mot.
+UPDATE imported_data SET destinataire=TRIM(destinataire);
+
+------------------------------------------------SUJET------------------------------------------------
 
 /*
 On retire les caractères en trop avant et après le mot.
 Correction d'une erreur pour "MX-F-185"
 */
-UPDATE imported_data SET sujet = trim(sujet);
-UPDATE imported_data SET sujet = 'Margarita xirgu' WHERE cote='MX-F-185';
+UPDATE imported_data SET sujet=TRIM(sujet);
+UPDATE imported_data SET sujet='Margarita xirgu' WHERE cote='MX-F-185';
 
 /*
 On retire les caractères en trop avant et après le mot.
@@ -145,7 +151,7 @@ UPDATE imported_data SET notes = trim(notes);
 /*
 On retire les caractères en trop avant et après le mot.
 */
-UPDATE imported_data SET resume = trim(resume);
+UPDATE imported_data SET resume=TRIM(resume);
 
 /*
 On retire les caractères en trop avant et après le mot.
