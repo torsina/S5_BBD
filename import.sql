@@ -63,9 +63,12 @@ UPDATE imported_data SET cote=TRIM(cote);
 SELECT COUNT(DISTINCT cote)=1122 FROM imported_data WHERE cote ~ '\w{1,3}-\w{1,3}-\w{1,3}';
 
 ------------------------------------------------TYPE------------------------------------------------
-
--- On retire les caractères en trop avant et après le type.
+/*
+On retire les caractères en trop avant et après le type.
+Lorsque la cote commence par "MX-F" on passe alors le type en "Fotos"
+*/
 UPDATE imported_data SET type=TRIM(type);
+UPDATE imported_data SET type='Fotos' WHERE SUBSTRING(cote,0,5)='MX-F';
 
 ------------------------------------------------DATATYPE------------------------------------------------
 
