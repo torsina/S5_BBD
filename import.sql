@@ -187,7 +187,7 @@ UPDATE imported_data SET resume=TRIM(resume);
 ------------------------------------------------EDITEUR------------------------------------------------
 
 /*
-On retire les caractères en trop avant et après le mot.
+On retire les caractères en trop avant et après l'éditeur.
 Correction des erreurs pour certains éditeurs.
 */
 UPDATE imported_data SET editeur=REPLACE(editeur, ':', '');
@@ -204,6 +204,8 @@ UPDATE imported_data SET editeur=REPLACE(editeur, 'Responsable del archivo Inde
 UPDATE imported_data SET editeur=REPLACE(editeur, 'Responsable del archivo  Fondo Margarita Xirgu del Instituto del Teatro de la Diputación de Barcelona.Editor Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)', 'Responsable del archivo Fondo Margarita Xirgu del Instituto del Teatro de la Diputación de Barcelona.Editor Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)');
 UPDATE imported_data SET editeur=TRIM(editeur);
 
+------------------------------------------------LOCALISATION------------------------------------------------
+
 /*
 On retire les caractères en trop avant et après le mot.
 On passe les localisations inconnues à "NULL".
@@ -211,25 +213,36 @@ Correction des erreurs pour certaines localisations.
 */
 UPDATE imported_data SET localisation=TRIM(localisation);
 UPDATE imported_data SET localisation=NULL WHERE LOWER(localisation)='desconocido' OR LOWER(localisation)='indeterminado';
-UPDATE imported_data SET localisation='Punta Ballena Uruguay' WHERE localisation=' Punta Ballena (Maldonado) Uruguay' OR localisation='Punta Ballena';
-UPDATE imported_data SET localisation='Teatro Solís, Montevideo (Uruguay)' WHERE localisation='Teatro Solís de Montevideo';
+UPDATE imported_data SET localisation='Punta Ballena' WHERE localisation=' Punta Ballena (Maldonado) Uruguay' OR localisation='Punta Ballena Uruguay';
+UPDATE imported_data SET localisation='Teatro Solís, Montevideo' WHERE localisation='Teatro Solís, Montevideo (Uruguay)';
+-- Suppression du point à la fin du texte
 UPDATE imported_data SET localisation='EMAD: Escuela Municipal de Arte Dramático de Montevideo' WHERE localisation='EMAD: Escuela Municipal de Arte Dramático de Montevideo.';
-UPDATE imported_data SET localisation='Madrid España' WHERE localisation='Madrid' OR localisation='Madrid España';
-UPDATE imported_data SET localisation='Mérida España' WHERE localisation='Merida' OR localisation='Mérida' OR localisation='Merida España' OR localisation='Meridaa';
+UPDATE imported_data SET localisation='Madrid' WHERE localisation='Madrid' OR localisation='Madrid España';
+UPDATE imported_data SET localisation='Mérida' WHERE localisation='Merida' OR localisation='Mérida' OR localisation='Merida España' OR localisation='Meridaa';
+UPDATE imported_data SET localisation=regexp_replace(localisation, '[[:blank:]]+España$', '');
+-- "MX-F-449" a une localisation qui est erronnée (c'est la description, dupliquée).
+UPDATE imported_data SET localisation=NULL WHERE localisation='figura de cera de Margarita Xirgu';
 
+------------------------------------------------DROITS------------------------------------------------
 /*
 On retire les caractères en trop avant et après les droits.
 Correction des erreurs pour certains droits.
 */
 UPDATE imported_data SET droits=TRIM(droits);
 UPDATE imported_data SET droits='Archives familiar de Margarita Xirgu – Licencia Licencia Creative Commons CC-BY-NC-ND (Attribution-Non Commercial-No Derivatives 4.0 International)' WHERE droits='Archives familiales Margarita Xirgu – Licencia Licencia Creative Commons CC-BY-NC-ND (Attribution-Non Commercial-No Derivatives 4.0 International)';
-UPDATE imported_data SET droits='Mx-4/413/650' WHERE droits='Mx-4/413/650$';
-UPDATE imported_data SET droits='Mx-950/953' WHERE droits='Mx950/953$';
+-- Supprime les éventuels caractères '$' à la fin du texte.
+UPDATE imported_data SET droits=regexp_replace('\$+$', '');
+
+------------------------------------------------AYANTS-DROIT------------------------------------------------
 
 /*
 On retire les caractères en trop avant et après les ayants-droit.
 */
 UPDATE imported_data SET ayants_droit=TRIM(ayants_droit);
+
+-- Aucune donnée
+
+------------------------------------------------FORMAT------------------------------------------------
 
 /*
 On retire les caractères en trop avant et après le format.
@@ -239,9 +252,17 @@ Correction des erreurs sur "MX-F-247", dupliqué de notes
 */
 UPDATE imported_data SET format=TRIM(format);
 UPDATE imported_data SET format=NULL WHERE format='Indeterminado';
-UPDATE imported_data SET format=NULL WHERE LOWER(format) ~ '(jp[e]{0,1}g|png|pdf)'; 
+-- On supprime les extensions de fichier (avec ou sans point) dans la colonne format car doublon et non consistent.
+UPDATE imported_data SET format=regexp_replace(LOWER(format), '[[:blank:]]*\.{0,1}(j[[:blank:]]{0,1}p[e]{0,1}g|png|pdf)[[:blank:]]*$', '');
+-- Si certains formats sont vides, on les met à NULL. Important après l'opération précédente.
+UPDATE imported_data SET sous_titre=NULL WHERE char_length(sous_titre)=0;
+-- Texte dans le format qui est le même que dans notes.
 UPDATE imported_data SET format=NULL WHERE cote='MX-F-247';
 
+
+SELECT DISTINCT(format) FROM imported_data;
+SELECT regexp_matches(LOWER('640 × 454 49,5 ko'), '(\d{2,4}[[:blank:]]*[x×][[:blank:]]*\d{2,4})[[:blank:]]*(\d{1,2}[\.,]{0,1}[kmg]o)$');
+SELECT regexp_matches(LOWER('640 × 454 49,5'), '(\d{2,3}[[:blank:]]*[x×][[:blank:]]*\d{2,3})[[:blank:]]*(\d{1,2}([\.\,][[:blank:]]*[kmg]?o)?)$');
 /*
 On retire les caractères en trop avant et après la langue.
 */
@@ -281,9 +302,8 @@ UPDATE imported_data SET nature_document = REPLACE(nature_document, 'PNE', 'PNG'
 UPDATE imported_data SET nature_document = REPLACE(nature_document, 'PNGG', 'PNG');
 UPDATE imported_data SET nature_document = REPLACE(nature_document, 'ARCHIVOS', '');
 UPDATE imported_data SET nature_document = REPLACE(nature_document, 'ARCHIVO', '');
-UPDATE imported_data SET nature_document = regexp_replace(nature_document, '$.*PDF.*^', 'PDF');
+UPDATE imported_data SET nature_document=regexp_replace(nature_document, '^.*PDF.*$', 'PDF');
 UPDATE imported_data SET nature_document = TRIM(nature_document);
-
 /*
 On retire les caractères en trop avant et après le support.
 */
@@ -291,15 +311,15 @@ UPDATE imported_data SET support=TRIM(UPPER(support));
 
 /*
 On retire les caractères en trop avant et après le mot.
-On passe les états indéfinis à "null".
+On passe les états indéfinis à "NULL".
 Correction des erreurs pour certains états.
 */
-UPDATE imported_data SET etat_general = TRIM(lower(etat_general));
+UPDATE imported_data SET etat_general=TRIM(LOWER(etat_general));
 -- Français -> Espagnol
-UPDATE imported_data SET etat_general = 'mediocre' WHERE etat_general = 'médiocre';
-UPDATE imported_data SET etat_general = null WHERE etat_general = 'indeterminado';
+UPDATE imported_data SET etat_general='mediocre' WHERE LOWER(etat_general)='médiocre';
+UPDATE imported_data SET etat_general=NULL WHERE LOWER(etat_general)='indeterminado';
 
-SELECT DISTINCT etat_general FROM imported_data;
+
 /*
 On retire les caractères en trop avant et après le mot.
 */
