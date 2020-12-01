@@ -582,3 +582,20 @@ CREATE TABLE titre (
 	nom varchar(150)
 );
 								       
+
+								       ----------------------- GESTION DESCRIPTION -----------------------
+DROP TABLE IF EXISTS description CASCADE;
+CREATE TABLE description (
+	id_description serial primary key,
+	texte text,
+	id_auteur integer,
+	FOREIGN KEY (id_auteur) REFERENCES personne(id_personne)
+);
+
+----------------------- GESTION SUJET -----------------------
+DROP TABLE IF EXISTS sujet CASCADE;
+CREATE TABLE sujet (
+	id_sujet serial primary key,
+	texte text
+);
+
