@@ -574,3 +574,11 @@ CREATE TABLE datatype (
 
 INSERT INTO support VALUES ('DIGITAL'),('PAPEL');
 INSERT INTO datatype VALUES ('imagen','DIGITAL'),('text','PAPEL');
+								       
+----------------------- GESTION TITTRE -----------------------
+DROP TABLE IF EXISTS titre CASCADE;
+CREATE TABLE titre (
+	id_titre serial primary key,
+	nom varchar(150)
+);
+								       
