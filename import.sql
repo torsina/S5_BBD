@@ -153,10 +153,26 @@ On retire les caractères en trop avant et après le sujet.
 Correction d'une erreur pour "MX-F-185"
 */
 UPDATE imported_data SET sujet=TRIM(sujet);
---Caractères blancs au début (codes ASCII 0xC2, 0xAO et 0x20), que TRIM n'arrive pas à enlever.
-UPDATE imported_data SET sujet=trim_blank(sujet);
+-- Un des sujets a des caractères blancs au début (codes ASCII 0xC2, 0xAO et 0x20), que TRIM n'arrive pas à enlever.
+UPDATE imported_data SET sujet=regexp_replace(sujet, '^[\xC2\xA0\x20]*', '');
 UPDATE imported_data SET sujet='Margarita xirgu' WHERE cote='MX-F-185';
-
+UPDATE imported_data SET sujet=null WHERE lower(sujet)='indeterminado' or sujet='Indeterminadp';
+UPDATE imported_data SET sujet='Cartel exposicion sobre Margarita Xirgu' WHERE (sujet)='cartel Margarita Xirgu';
+UPDATE imported_data SET sujet='Figurina' WHERE (sujet)='Figurines';
+UPDATE imported_data SET sujet='Foto de Margarita Xirgu' WHERE (sujet)='foto de Margarita xirgu' or sujet='Foto de Margarita xirgu' 
+or sujet='Foto de Margarita Xirgu' or sujet='Foto de Margarita Xiru' or sujet='foto deMargarita Xirgu' or sujet='Foto Margarita Xirgu'
+or sujet='Fotoe  de Margarita Xirgu';
+UPDATE imported_data SET sujet='Foto de Miguel Xirgu' WHERE (sujet)='foto de Miguel Xirgu' or sujet='Foto de Miguel xirgu' or sujet='Foto de Miquel Xirgu' or sujet='Miguel Xirgu';
+UPDATE imported_data SET sujet='Homenaje a Margarita Xirgu' WHERE (sujet)='Homenaje a Margarita Xirgu' 
+or sujet='homenaje a Margarita Xirgu' or sujet='Foto de Miquel Xirgu';
+UPDATE imported_data SET sujet='Margarita Xirgu' WHERE (sujet)='Magararita xirgu' or sujet='Margarita  Xirgu' or sujet='Margarita Xiirgu'
+or sujet='Margarita xirgu' or sujet='Magararita xirgu';
+UPDATE imported_data SET sujet='Margarita Xirgu Actuando' WHERE (sujet)='Margarita Xirgu actuando';
+UPDATE imported_data SET sujet='Margarita Xirgu de Elektra' WHERE (sujet)='Margarita Xirgu Elektra';
+UPDATE imported_data SET sujet='Medea Cartel' WHERE (sujet)='Medea';
+UPDATE imported_data SET sujet='Teatro Solis' WHERE (sujet)='Teatro Solís';
+					     
+					     
 ------------------------------------------------DESCRIPTION------------------------------------------------
 
 /*
