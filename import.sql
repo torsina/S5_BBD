@@ -598,4 +598,17 @@ CREATE TABLE sujet (
 	id_sujet serial primary key,
 	texte text
 );
+------------------------ GESTION TAILLE
+DROP TABLE IF EXISTS taille_image CASCADE;
+CREATE TABLE taille_image (
+    id_taille_image serial primary key,
+    largeur int NOT NULL ,
+    longueur int NOT NULL,
+    taille int NULL
+);
 
+DROP TABLE IF EXISTS taille_texte CASCADE;
+CREATE TABLE taille_texte (
+    id_taille_texte serial primary key,
+    valeur text
+);
