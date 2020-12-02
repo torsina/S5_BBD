@@ -583,8 +583,19 @@ SELECT parse_editeur();
 SELECT DISTINCT(notes) FROM imported_data;
 SELECT cote, notes FROM imported_data WHERE notes='El archivo original se llama:5.jpg';
 SELECT format FROM imported_data WHERE format ~ '(.*)(\d+\s*[x×X]\s*\d+)(.*)'; --regexp_matches(format, '.*(\d+\s*[x×]\s*\d+).*')
-								       
-								       ----------------------- GESTION EDITEUR -----------------------
+						 
+						 
+						 
+						 
+						 
+						 
+						 
+						 
+						 
+						 
+						 
+------------------------------------------------ CRÉATION DES TABLES ------------------------------------------------
+						 
 
 DROP TABLE IF EXISTS editeur, responsable_archive, responsable_scientifique, personne;
 CREATE TABLE editeur (
@@ -611,30 +622,7 @@ CREATE TABLE responsable_scientifique (
 	PRIMARY KEY (id_reponsable),
 	FOREIGN KEY (id_reponsable) REFERENCES personne(id_personne)
 );
-
-INSERT INTO personne(nom,prenom) VALUES ('Gil','Alan');
-INSERT INTO personne(nom,prenom) VALUES ('Chantraine Braillon','Cécile');
-INSERT INTO personne(nom,prenom) VALUES ('Idmhand','Fatiha');
-
-INSERT INTO responsable_scientifique VALUES (1, 'La Rochelle Université', 'Alumno', 'Master LEA Amérique');
-INSERT INTO responsable_scientifique VALUES (2, 'La Rochelle Université', 'Profesor', 'Equipo CRHIA');
-INSERT INTO responsable_scientifique VALUES (3, 'La Rochelle Université', 'Profesor', 'CRLA Institut des textes et manuscrits modernes CNRS-UMR8132');
-
-INSERT INTO editeur(nom_editeur) VALUES ('Editor Proyecto e-spectateur AAP 2020 '),('Editor Proyecto CollEx-Persée Archivos 3.0 AAP 2018 ');
-
-INSERT INTO responsable_archive(nom) VALUES
-('Familia de Maragrita Xirgu (fondo de los hermanos Xiru)'),('Albert Prats Prat'),('Departamento de Cultura de la Generalidad de Cataluña '),
-('Fondo Margarita Xirgu del Instituto del Teatro de la Diputación de Barcelona'),('Foto Escena Catalana'),
-('MAE Barcelona'),('Arxiu Marta Prats Xirgu'),('Francesc Foguet i Boreu'),
-('Dr Sylvie Josserand Colla (Equipo Archivos-CRLA Institut des textes et manuscrits modernes CNRS-UMR8132)'),
-('La Vanguardia'), ('El Instituto del Teatro de la Diputación de Barcelona'),
-('Teatro de Barcelona'),('Amadeu Mariné Vadalaco'), ('Antonina Rodrigo'),('Antonio y Ramon Clapés'),('Biblioteca Sebastiá Juan Arbó'),
-('Carmen M.Gual'),('Colección de escenografía del Instituto del Teatro de la Diputación de Barcelona'),
-('Festival de Mérida'),('Foto Archivo Xavier Rius Xirgu'),('Fotos de su nieto Jaime Gutiérrez Morcillo'),
-('José Antonio'),('Lluis Andú');
-								       
-								       
-								       ----------------------- GESTION DATATYPE et SUPPORT -----------------------
+						 
 DROP TABLE IF EXISTS support, datatype;
 CREATE TABLE support (
 	nom_support varchar(10) primary key
@@ -646,19 +634,13 @@ CREATE TABLE datatype (
 	PRIMARY KEY (nom_datatype,nom_support),
 	FOREIGN KEY (nom_support) REFERENCES support(nom_support)
 );
-
-INSERT INTO support VALUES ('DIGITAL'),('PAPEL');
-INSERT INTO datatype VALUES ('imagen','DIGITAL'),('text','PAPEL');
 								       
------------------------ GESTION TITTRE -----------------------
 DROP TABLE IF EXISTS titre CASCADE;
 CREATE TABLE titre (
 	id_titre serial primary key,
 	nom varchar(150)
 );
 								       
-
-								       ----------------------- GESTION DESCRIPTION -----------------------
 DROP TABLE IF EXISTS description CASCADE;
 CREATE TABLE description (
 	id_description serial PRIMARY KEY,
@@ -667,13 +649,12 @@ CREATE TABLE description (
 	FOREIGN KEY (id_auteur) REFERENCES personne(id_personne)
 );
 
------------------------ GESTION SUJET -----------------------
 DROP TABLE IF EXISTS sujet CASCADE;
 CREATE TABLE sujet (
 	id_sujet serial PRIMARY KEY,
 	texte text NOT NULL
 );
------------------------- GESTION TAILLE ------------------------
+
 DROP TABLE IF EXISTS taille_image CASCADE;
 CREATE TABLE taille_image (
     id_taille_image serial PRIMARY KEY,
@@ -688,8 +669,6 @@ CREATE TABLE taille_texte (
     id_taille_texte serial PRIMARY KEY,
     valeur text NOT NULL
 );
-
------------------------ TABLE DOCUMENT -----------------------
 
 /*DROP TABLE IF EXISTS documents CASCADE;
 CREATE TABLE documents(
@@ -715,5 +694,34 @@ CREATE TABLE documents(
 	FOREIGN KEY (id_titre) REFERENCES titre(id_titre),
 	FOREIGN KEY (id_editeur) REFERENCES editeur(id_editeur),
 	FOREIGN KEY (id_responsable_scientifique) REFERENCES responsable_scientifique(id_responsable_scientifique)
-);
-								       
+);*/
+						 
+	
+						
+						 
+						 
+------------------------------------------------ MISE EN PLACE DES INSERTIONS ------------------------------------------------						
+						 
+INSERT INTO personne(nom,prenom) VALUES ('Gil','Alan');
+INSERT INTO personne(nom,prenom) VALUES ('Chantraine Braillon','Cécile');
+INSERT INTO personne(nom,prenom) VALUES ('Idmhand','Fatiha');
+
+INSERT INTO responsable_scientifique VALUES (1, 'La Rochelle Université', 'Alumno', 'Master LEA Amérique');
+INSERT INTO responsable_scientifique VALUES (2, 'La Rochelle Université', 'Profesor', 'Equipo CRHIA');
+INSERT INTO responsable_scientifique VALUES (3, 'La Rochelle Université', 'Profesor', 'CRLA Institut des textes et manuscrits modernes CNRS-UMR8132');
+
+INSERT INTO editeur(nom_editeur) VALUES ('Editor Proyecto e-spectateur AAP 2020 '),('Editor Proyecto CollEx-Persée Archivos 3.0 AAP 2018 ');
+
+INSERT INTO responsable_archive(nom) VALUES
+('Familia de Maragrita Xirgu (fondo de los hermanos Xiru)'),('Albert Prats Prat'),('Departamento de Cultura de la Generalidad de Cataluña '),
+('Fondo Margarita Xirgu del Instituto del Teatro de la Diputación de Barcelona'),('Foto Escena Catalana'),
+('MAE Barcelona'),('Arxiu Marta Prats Xirgu'),('Francesc Foguet i Boreu'),
+('Dr Sylvie Josserand Colla (Equipo Archivos-CRLA Institut des textes et manuscrits modernes CNRS-UMR8132)'),
+('La Vanguardia'), ('El Instituto del Teatro de la Diputación de Barcelona'),
+('Teatro de Barcelona'),('Amadeu Mariné Vadalaco'), ('Antonina Rodrigo'),('Antonio y Ramon Clapés'),('Biblioteca Sebastiá Juan Arbó'),
+('Carmen M.Gual'),('Colección de escenografía del Instituto del Teatro de la Diputación de Barcelona'),
+('Festival de Mérida'),('Foto Archivo Xavier Rius Xirgu'),('Fotos de su nieto Jaime Gutiérrez Morcillo'),
+('José Antonio'),('Lluis Andú');
+		
+INSERT INTO support VALUES ('DIGITAL'),('PAPEL');
+INSERT INTO datatype VALUES ('imagen','DIGITAL'),('text','PAPEL');								       
