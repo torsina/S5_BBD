@@ -501,14 +501,34 @@ Correction des erreurs pour certaines zones géographiques.
 */
 UPDATE imported_data SET contexte_geographique = TRIM(contexte_geographique);
 UPDATE imported_data SET contexte_geographique = null WHERE LOWER(contexte_geographique)='desconocido' or LOWER(contexte_geographique)='indeterminado' or contexte_geographique='#VALUE!';
-UPDATE imported_data SET contexte_geographique = 'Uruguay' WHERE contexte_geographique='uruguay';
-UPDATE imported_data SET contexte_geographique = 'Punta del Este' WHERE contexte_geographique='Punta del este';
-UPDATE imported_data SET contexte_geographique = 'Mérida España' WHERE contexte_geographique='Merida España' or contexte_geographique='Merida' or contexte_geographique='Merdia España' or contexte_geographique='Medirda';
-UPDATE imported_data SET contexte_geographique = 'Madrid España' WHERE contexte_geographique='España Madrid';
-UPDATE imported_data SET contexte_geographique = 'España' WHERE contexte_geographique='Espagne';
-UPDATE imported_data SET contexte_geographique = 'Buenos Aires Argentina' WHERE contexte_geographique='Buenos Aires';
-UPDATE imported_data SET contexte_geographique = 'Barcelona España' WHERE contexte_geographique='Barcelona';
-UPDATE imported_data SET contexte_geographique = 'Badalona España' WHERE contexte_geographique='Badalona' or contexte_geographique='España Badalona';
+UPDATE imported_data SET contexte_geographique = 'Uruguay' 
+WHERE contexte_geographique='uruguay' or contexte_geographique='Punta del este'
+or contexte_geographique='Teatro Solís de Montevideo' or contexte_geographique='Punta del Este'
+or contexte_geographique='intendencia Maldonado' or contexte_geographique='Punta ballena Uruguay'
+or contexte_geographique='Montevideo' or contexte_geographique='Uruguay Montevideo'
+or contexte_geographique='Uruguay | Montevideo';
+UPDATE imported_data SET contexte_geographique = 'España' 
+WHERE contexte_geographique='Merida España' or contexte_geographique='Merida' 
+or contexte_geographique='Merdia España' or contexte_geographique='Medirda'
+or contexte_geographique='España Madrid' or contexte_geographique='Espagne'
+or contexte_geographique='Barcelona' or contexte_geographique='Badalona' 
+or contexte_geographique='España Badalona' or contexte_geographique='Barcelona'
+or contexte_geographique='Sevilla' or contexte_geographique='Molins de Rei'
+or contexte_geographique='Plaza Margarida Xirgu Barcelona' or contexte_geographique='Colección de escenografía del Instituto del Teatro de la Diputación de Barcelona.'
+or contexte_geographique='Madrid España' or contexte_geographique='Girona' or contexte_geographique='Barcelona España'
+or contexte_geographique='Guimera' or contexte_geographique='España Zaragoza' or contexte_geographique='Sala Margarita Xirgu,Teatro Español, Madrid, España'
+or contexte_geographique='teatro Goya de Barcelona' or contexte_geographique='Teatro romano de Merida'
+or contexte_geographique='Museo de Badalona' or contexte_geographique='Badalona España'
+or contexte_geographique='España Cataluña' or contexte_geographique='Cataluña España'
+or contexte_geographique='Mérida España' or contexte_geographique='Valencia'
+or contexte_geographique='Granada España';
+UPDATE imported_data SET contexte_geographique = 'Argentina' WHERE 
+contexte_geographique='Buenos Aires' or contexte_geographique='Buenos Aires Argentina';
+UPDATE imported_data SET contexte_geographique = 'Estados Unidos' WHERE contexte_geographique='Puerto Rico';
+UPDATE imported_data SET contexte_geographique = 'Chile' WHERE contexte_geographique='chile';
+UPDATE imported_data SET contexte_geographique = 'America Latina' WHERE contexte_geographique='Uruguay Argentina o Chile' or contexte_geographique='Hispanoameirca';
+UPDATE imported_data SET contexte_geographique=trim_blank(contexte_geographique);
+
 
 /*
 On retire les caractères en trop avant et après le mot.
