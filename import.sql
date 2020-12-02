@@ -48,7 +48,7 @@ CREATE TABLE imported_data (
 );
 -- Importation du CSV. Pourquoi en 2020, ce logiciel n'accepte pas les chemins relatifs ????
 COPY imported_data
-FROM 'E:\Esp-fotos.csv'/*'D:\Boulot\L3\BASE_DE_DONNEES\PROJET\Esp-fotos.csv'*/
+FROM 'D:\Boulot\L3\BASE_DE_DONNEES\PROJET\Esp-fotos.csv'
 DELIMITER ';'
 CSV HEADER;
 
@@ -299,10 +299,10 @@ UPDATE imported_data SET editeur=REPLACE(editeur, 'fonfo', 'fondo');
 UPDATE imported_data SET editeur=REPLACE(editeur, 'espectateur', 'spectateur');
 UPDATE imported_data SET editeur=REPLACE(editeur, 'Jose', 'José');
 UPDATE imported_data SET editeur=REPLACE(editeur, '. ', '.');
-UPDATE imported_data SET editeur=REPLACE(editeur, 'Responsable del archivo  Familia Margarita Xirgu (Xavier Rius Xirgu Ester Xirgu Cortacans Natalia Valenzuela) Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)', 'Responsable del archivo  Familia Margarita Xirgu (Xavier Rius Xirgu Ester Xirgu Cortacans Natalia Valenzuela)Editor Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)');
-UPDATE imported_data SET editeur=REPLACE(editeur, 'Responsable del archivo Indeterminadospectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)', 'Responsable del archivo Indeterminado spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)');
-UPDATE imported_data SET editeur=REPLACE(editeur, 'Responsable del archivo IndeterminadoEditor Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)', 'Responsable del archivo Indeterminado Editor Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)');
-UPDATE imported_data SET editeur=REPLACE(editeur, 'Responsable del archivo  Fondo Margarita Xirgu del Instituto del Teatro de la Diputación de Barcelona.Editor Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)', 'Responsable del archivo Fondo Margarita Xirgu del Instituto del Teatro de la Diputación de Barcelona.Editor Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)');
+UPDATE imported_data SET editeur=REPLACE(editeur, 'Responsable del archivo  Familia Margarita Xirgu (Xavier Rius Xirgu Ester Xirgu Cortacans Natalia Valenzuela) Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)', 'Responsable del archivo  Familia Margarita Xirgu (Xavier Rius Xirgu Ester Xirgu Cortacans Natalia Valenzuela)Editor Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)');
+UPDATE imported_data SET editeur=REPLACE(editeur, 'Responsable del archivo Indeterminadospectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)', 'Responsable del archivo Indeterminado spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)');
+UPDATE imported_data SET editeur=REPLACE(editeur, 'Responsable del archivo IndeterminadoEditor Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)', 'Responsable del archivo Indeterminado Editor Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)');
+UPDATE imported_data SET editeur=REPLACE(editeur, 'Responsable del archivo  Fondo Margarita Xirgu del Instituto del Teatro de la Diputación de Barcelona.Editor Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)', 'Responsable del archivo Fondo Margarita Xirgu del Instituto del Teatro de la Diputación de Barcelona.Editor Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)');
 UPDATE imported_data SET editeur=TRIM(editeur);
 
 ------------------------------------------------LOCALISATION------------------------------------------------
@@ -314,7 +314,7 @@ Correction des erreurs pour certaines localisations.
 */
 UPDATE imported_data SET localisation=TRIM(localisation);
 UPDATE imported_data SET localisation=NULL WHERE LOWER(localisation)='desconocido' OR LOWER(localisation)='indeterminado';
-UPDATE imported_data SET localisation='Punta Ballena' WHERE localisation=' Punta Ballena (Maldonado) Uruguay' OR localisation='Punta Ballena Uruguay';
+UPDATE imported_data SET localisation='Punta Ballena' WHERE localisation=' Punta Ballena (Maldonado) Uruguay' OR localisation='Punta Ballena Uruguay';
 UPDATE imported_data SET localisation='Teatro Solís, Montevideo' WHERE localisation='Teatro Solís, Montevideo (Uruguay)';
 -- Suppression du point à la fin du texte
 UPDATE imported_data SET localisation='EMAD: Escuela Municipal de Arte Dramático de Montevideo' WHERE localisation='EMAD: Escuela Municipal de Arte Dramático de Montevideo.';
@@ -332,7 +332,7 @@ Correction des erreurs pour certains droits.
 UPDATE imported_data SET droits=TRIM(droits);
 UPDATE imported_data SET droits='Archives familiar de Margarita Xirgu – Licencia Licencia Creative Commons CC-BY-NC-ND (Attribution-Non Commercial-No Derivatives 4.0 International)' WHERE droits='Archives familiales Margarita Xirgu – Licencia Licencia Creative Commons CC-BY-NC-ND (Attribution-Non Commercial-No Derivatives 4.0 International)';
 -- Supprime les éventuels caractères '$' à la fin du texte.
-UPDATE imported_data SET droits=regexp_replace('\$+$', '');
+UPDATE imported_data SET droits=REPLACE(droits, '$', '');
 
 ------------------------------------------------AYANTS-DROIT------------------------------------------------
 
@@ -387,8 +387,8 @@ UPDATE imported_data SET format=regexp_replace(format, '^((\d{2,4})[[:blank:]]*[
 SELECT regexp_matches(LOWER('640 × 454 49,5 ko'), '(\d{2,3}[[:blank:]]*[x×][[:blank:]]*\d{2,3})[[:blank:]]*(\d{1,2}([\.\,]\d{1,2})?[[:blank:]]*([kmg]o))?$');--'(\d{2,4}[[:blank:]]*[x×][[:blank:]]*\d{2,4})[[:blank:]]*(\d{1,2}[\.,]{0,1}[kmg]o)$');
 SELECT format FROM imported_data WHERE regexp_replace(blank_to_space(format), '^[\xC2\xA0\x20\x0A]*', ' ') !~ '(\d{2,4}[[:blank:]]*[x×][[:blank:]]*\d{2,4})[[:blank:]]*(\d{1,3}([\.\,]\d{1,2})?[[:blank:]]*([kmg]o))?$';
 SELECT regexp_replace('277×582 414,7ko', E'[\\xC2\\xA0\\x20\\x0A]', ' ', 'g') ~ '(\d{2,4}[[:blank:]]*[x×][[:blank:]]*\d{2,4})[[:blank:]]*(\d{1,3}([\.\,]\d{1,2})?[[:blank:]]*([kmg]o))?$';
-SELECT parse_format('277 × 582 414,7 ko');
-SELECT regexp_replace('277 × 582 414,7 ko', E'[\\xC2\\xA0\\x20\\x0A]', 'a', 'g');
+SELECT parse_format('277 × 582 414,7 ko');
+SELECT regexp_replace('277 × 582 414,7 ko', E'[\\xC2\\xA0\\x20\\x0A]', 'a', 'g');
 SELECT regexp_matches(blank_to_space('277x55 3,5ko'), '(\d{2,3}[[:blank:]]*[x×][[:blank:]]*\d{2,3})[[:blank:]]*(\d{1,2}([\.\,]\d{1,2})?[[:blank:]]*([kmg]o))?$');*/
 SELECT cote, format FROM imported_data WHERE parse_format(format) IS NULL AND format IS NOT NULL;
 SELECT regexp_replace('476 × 464231,5 ko [sjask56]', '^((\d{2,4})[[:blank:]]*[x×][[:blank:]]*(\d{2,4}))[[:blank:]]*((\d{1,3}([\.\,]\d{1,2})?)[[:blank:]]*([kmg]o))?([[:blank:]]\[.*\])?$', '\2x\3 \5\7\8');
@@ -597,7 +597,7 @@ SELECT format FROM imported_data WHERE format ~ '(.*)(\d+\s*[x×X]\s*\d+)(.*)'; 
 ------------------------------------------------ CRÉATION DES TABLES ------------------------------------------------
 						 
 
-DROP TABLE IF EXISTS editeur, responsable_archive, responsable_scientifique, personne;
+DROP TABLE IF EXISTS editeur, responsable_archive, responsable_scientifique, personne CASCADE;
 CREATE TABLE editeur (
 	id_editeur serial primary key,
 	nom_editeur varchar(150)
@@ -724,4 +724,4 @@ INSERT INTO responsable_archive(nom) VALUES
 ('José Antonio'),('Lluis Andú');
 		
 INSERT INTO support VALUES ('DIGITAL'),('PAPEL');
-INSERT INTO datatype VALUES ('imagen','DIGITAL'),('text','PAPEL');								       
+INSERT INTO datatype VALUES ('imagen','DIGITAL'),('text','PAPEL');
