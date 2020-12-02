@@ -52,7 +52,92 @@ FROM 'E:\Esp-fotos.csv'/*'D:\Boulot\L3\BASE_DE_DONNEES\PROJET\Esp-fotos.csv'*/
 DELIMITER ';'
 CSV HEADER;
 
--- NETTOYAGE DE LA TABLE
+------------------------------------------------ FONCTIONS ------------------------------------------------
+CREATE OR REPLACE FUNCTION parse_format(t text)
+RETURNS text[] AS $$
+DECLARE
+	-- 4 valeurs : résolution, taille, inutile, inutile
+	parsed text[];
+BEGIN
+	IF t IS NULL
+	THEN
+		RETURN NULL;
+	END IF;
+	-- Tous les caractères "blancs" sont remplacés par des espaces, on enlève ceux des extrémités
+	t := LOWER(TRIM(blank_to_space(t)));
+	parsed := regexp_matches(t, '^(((\d{2,4})[[:blank:]]*[x×][[:blank:]]*(\d{2,4}))[[:blank:]]*((\d{1,3}([\.\,]\d{1,2})?)[[:blank:]]*([kmg]o))?)?([[:blank:]]*\[.*\])?$');
+	IF parsed IS NULL -- Si le 1er parsing n'a pas marché
+	THEN
+		RETURN NULL;
+	ELSIF array_length(parsed, 1) != 9 -- Si le parsing a partiellement match. Le 1 représente la dimension (ici 1ère dimension).
+	THEN
+		RETURN NULL;
+	ELSE
+		RETURN parsed;
+	END IF;
+END;
+$$ LANGUAGE plpgsql;
+				
+CREATE OR REPLACE FUNCTION cote_to_id(cote text)
+RETURNS int AS $$
+BEGIN
+	RETURN CAST((regexp_split_to_array(TRIM(cote), 'MX-F-'))[2] AS int);
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION parse_editeur()
+RETURNS VOID AS $$
+DECLARE
+	trimmed_text CURSOR FOR SELECT DISTINCT((regexp_split_to_array(editeur, 'Responsable del archivo\s*:{0,1}\s*'))[2]) FROM imported_data;
+	editeur_line RECORD;
+BEGIN
+	OPEN trimmed_text;
+	LOOP
+	FETCH trimmed_text INTO editeur_line;
+		IF NOT FOUND THEN EXIT; END IF;
+		
+		RAISE NOTICE '%', editeur_line;
+	END LOOP;
+	CLOSE trimmed_text;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION trim_blank(t text)
+RETURNS text AS $$
+DECLARE
+	t_returned text;
+BEGIN
+	t_returned := regexp_replace(t, '^[\xC2\xA0\x20\x0A\xE2\x2006]*', '');
+	IF char_length(t_returned)=0
+	THEN
+		RETURN NULL;
+	ELSE
+		RETURN t_returned;
+	END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION blank_to_space(t text)
+RETURNS text AS $$
+BEGIN
+	RETURN regexp_replace(t, E'[\\xC2\\xA0\\x20\\x0A\\xE2\\x2006]', ' ', 'g');
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+/*CREATE OR REPLACE FUNCTION parse_format(format text, dt text)
+RETURNS text[] AS $$
+DECLARE
+	output text[]
+BEGIN
+	regexp_split_to_array(editeur, 'Responsable del archivo\s*:{0,1}\s*'))[2])
+END;
+$$ LANGUAGE plpgsql;*/				       
+
+
+------------------------------------------------ NETTOYAGE DE LA TABLE ------------------------------------------------
+
 
 ------------------------------------------------COTE------------------------------------------------
 
@@ -296,30 +381,6 @@ UPDATE imported_data SET format=regexp_replace(format, '^((\d{2,4})[[:blank:]]*[
 -- UPDATE imported_data SET format=NULL WHERE cote='MX-F-247';
 
 
-CREATE OR REPLACE FUNCTION parse_format(t text)
-RETURNS text[] AS $$
-DECLARE
-	-- 4 valeurs : résolution, taille, inutile, inutile
-	parsed text[];
-BEGIN
-	IF t IS NULL
-	THEN
-		RETURN NULL;
-	END IF;
-	-- Tous les caractères "blancs" sont remplacés par des espaces, on enlève ceux des extrémités
-	t := LOWER(TRIM(blank_to_space(t)));
-	parsed := regexp_matches(t, '^(((\d{2,4})[[:blank:]]*[x×][[:blank:]]*(\d{2,4}))[[:blank:]]*((\d{1,3}([\.\,]\d{1,2})?)[[:blank:]]*([kmg]o))?)?([[:blank:]]*\[.*\])?$');
-	IF parsed IS NULL -- Si le 1er parsing n'a pas marché
-	THEN
-		RETURN NULL;
-	ELSIF array_length(parsed, 1) != 9 -- Si le parsing a partiellement match. Le 1 représente la dimension (ici 1ère dimension).
-	THEN
-		RETURN NULL;
-	ELSE
-		RETURN parsed;
-	END IF;
-END;
-$$ LANGUAGE plpgsql;
 
 -- TODO : remove
 /*SELECT DISTINCT(format) FROM imported_data;
@@ -515,67 +576,6 @@ UPDATE imported_data SET publication=(SELECT __dummy FROM imported_data WHERE co
 SELECT cote, __dummy FROM imported_data WHERE __dummy IS NOT NULL;
 SELECT * FROM imported_data;
 SELECT COUNT(*) FROM imported_data;
-
--- Fonction utilitaire : extrait l'id de la cote (MX-F-<id>)
-CREATE OR REPLACE FUNCTION cote_to_id(cote text)
-RETURNS int AS $$
-BEGIN
-	RETURN CAST((regexp_split_to_array(TRIM(cote), 'MX-F-'))[2] AS int);
-END;
-$$ LANGUAGE plpgsql;
-
-SELECT localisation, editeur FROM imported_data;
-SELECT editeur FROM imported_data;
-
-CREATE OR REPLACE FUNCTION parse_editeur()
-RETURNS VOID AS $$
-DECLARE
-	trimmed_text CURSOR FOR SELECT DISTINCT((regexp_split_to_array(editeur, 'Responsable del archivo\s*:{0,1}\s*'))[2]) FROM imported_data;
-	editeur_line RECORD;
-BEGIN
-	OPEN trimmed_text;
-	LOOP
-	FETCH trimmed_text INTO editeur_line;
-		IF NOT FOUND THEN EXIT; END IF;
-		
-		RAISE NOTICE '%', editeur_line;
-	END LOOP;
-	CLOSE trimmed_text;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE OR REPLACE FUNCTION trim_blank(t text)
-RETURNS text AS $$
-DECLARE
-	t_returned text;
-BEGIN
-	t_returned := regexp_replace(t, '^[\xC2\xA0\x20\x0A\xE2\x2006]*', '');
-	IF char_length(t_returned)=0
-	THEN
-		RETURN NULL;
-	ELSE
-		RETURN t_returned;
-	END IF;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE OR REPLACE FUNCTION blank_to_space(t text)
-RETURNS text AS $$
-BEGIN
-	RETURN regexp_replace(t, E'[\\xC2\\xA0\\x20\\x0A\\xE2\\x2006]', ' ', 'g');
-END;
-$$ LANGUAGE plpgsql;
-
-
-
-/*CREATE OR REPLACE FUNCTION parse_format(format text, dt text)
-RETURNS text[] AS $$
-DECLARE
-	output text[]
-BEGIN
-	regexp_split_to_array(editeur, 'Responsable del archivo\s*:{0,1}\s*'))[2])
-END;
-$$ LANGUAGE plpgsql;*/
 
 -- Supprime le début de la ligne
 SELECT parse_editeur();
