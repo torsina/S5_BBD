@@ -363,8 +363,8 @@ UPDATE imported_data SET localisation='Montevideo' WHERE contexte_geographique='
 UPDATE imported_data SET localisation='Molins de Rei Cataluña' WHERE localisation='Molins de Rei España  Cataluña';
 UPDATE imported_data SET localisation='Montevideo' WHERE localisation='Montevideo uruguay';
 UPDATE imported_data SET localisation='Teatro romano de Merida' WHERE localisation='teatro romano de Mérida';
-UPDATE imported_data SET localisation='Punta Ballena (Maldonado)' WHERE localisation='Punta Ballena (Maldonado) Uruguay';
 UPDATE imported_data SET localisation=trim_blank(localisation);
+UPDATE imported_data SET localisation='Punta Ballena (Maldonado)' WHERE localisation='Punta Ballena (Maldonado) Uruguay';
 
 
 ------------------------------------------------DROITS------------------------------------------------
