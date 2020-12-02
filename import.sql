@@ -293,7 +293,7 @@ UPDATE imported_data SET format='[' || format || ']' WHERE cote='AS-AA1-01';
 
 UPDATE imported_data SET format=regexp_replace(format, '^((\d{2,4})[[:blank:]]*[x×][[:blank:]]*(\d{2,4}))[[:blank:]]*((\d{1,3}([\.\,]\d{1,2})?)[[:blank:]]*([kmg]o))?([[:blank:]]\[.*\])?$', '\2x\3 \5\7\8');
 -- Texte dans le format qui est le même que dans notes.
--- UPDATE imported_data SET format=NULL WHERE cote='MX-F-247';
+-- TODO : remove UPDATE imported_data SET format=NULL WHERE cote='MX-F-247';
 
 
 CREATE OR REPLACE FUNCTION parse_format(t text)
@@ -623,11 +623,11 @@ INSERT INTO responsable_scientifique VALUES (3, 'La Rochelle Université', 'Prof
 INSERT INTO editeur(nom_editeur) VALUES ('Editor Proyecto e-spectateur AAP 2020 '),('Editor Proyecto CollEx-Persée Archivos 3.0 AAP 2018 ');
 
 INSERT INTO responsable_archive(nom) VALUES
-('Familia de Maragrita Xirgu (fondo de los hermanos Xiru)'),('Albert Prats Prat'),('Departamento de Cultura de la Generalidad de Cataluña '),
+('Familia de Maragrita Xirgu (fondo de los hermanos Xiru)'),('Albert Prats'),('Departamento de Cultura de la Generalidad de Cataluña '),
 ('Fondo Margarita Xirgu del Instituto del Teatro de la Diputación de Barcelona'),('Foto Escena Catalana'),
-('MAE Barcelona'),('Arxiu Marta Prats Xirgu'),('Francesc Foguet i Boreu'),
-('Dr Sylvie Josserand Colla (Equipo Archivos-CRLA Institut des textes et manuscrits modernes CNRS-UMR8132)'),
-('La Vanguardia'), ('El Instituto del Teatro de la Diputación de Barcelona'),
+('MAE Barcelona'),('Arxiu Marta Prats Xirgu'),('Francesc Foguet i Boreu'),('Dr Sylvie Josserand Colla (Equipo Archivos-CRLA Institut des textes et manuscrits modernes CNRS-UMR8132)'),
+('La Vanguardia'), ('Familia Margarita Xirgu (Xavier Rius Xirgu Ester Xirgu Cortacans Natalia Valenzuela)'),
+('El Instituto del Teatro de la Diputación de Barcelona'),('Familia Margarita Xirgu (Fondo Jordi Rius Xirgu)'),
 ('Teatro de Barcelona'),('Amadeu Mariné Vadalaco'), ('Antonina Rodrigo'),('Antonio y Ramon Clapés'),('Biblioteca Sebastiá Juan Arbó'),
 ('Carmen M.Gual'),('Colección de escenografía del Instituto del Teatro de la Diputación de Barcelona'),
 ('Festival de Mérida'),('Foto Archivo Xavier Rius Xirgu'),('Fotos de su nieto Jaime Gutiérrez Morcillo'),
