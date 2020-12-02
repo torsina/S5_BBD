@@ -194,8 +194,14 @@ SELECT COUNT(*)=0 FROM imported_data WHERE dates !~ '^\d{4}-\d{2}-\d{2}$' AND da
 Titre pour "MX-F-20" actualisé (NULL -> 'Magarita Xirgu').
 On retire les caractères en trop avant et après le titre.
 */
-UPDATE imported_data SET titre='Magarita Xirgu' WHERE cote='MX-F-20';
+UPDATE imported_data SET titre='Margarita Xirgu' WHERE cote='MX-F-20';
+UPDATE imported_data SET titre='Miguel Xirgu' WHERE titre='Miguel xirgu';
+UPDATE imported_data SET titre='Margarita Xirgu' WHERE titre='Margariat Xirgu' or titre='Magarita Xirgu' or titre='Mrgarita Xirgu'
+or titre='Mararita Xirgu' or titre='Magararita xirgu' or titre='Margarita xirgu' or titre='Foto de Mragarita Xirgu';
+UPDATE imported_data SET titre='Figurina' WHERE titre='figurines';
 UPDATE imported_data SET titre=TRIM(titre);
+UPDATE imported_data SET titre=trim_blank(titre);
+					     
 ------------------------------------------------SOUS-TITRE------------------------------------------------
 
 -- On retire les caractères en trop avant et après le sous-titre.
