@@ -830,5 +830,41 @@ INSERT INTO responsable_archive(nom) VALUES
 ('Lluis Andú');
 		
 INSERT INTO support VALUES ('DIGITAL'),('PAPEL');
+
 INSERT INTO datatype VALUES ('imagen','DIGITAL'),('text','PAPEL');
+
+INSERT INTO pays(nom,lat,lon) VALUES 
+('España',40.463667, -3.749220),
+('Estados Unidos',37.090240,-95.712891),
+('Uruguay',-32.522779,-55.765835),
+('Argentina',-38.4212955,-63.587402499999996),
+('Chile',-31.7613365,-71.3187697),
+('Peru',-6.8699697,-75.0458515);
+
+INSERT INTO localisation(texte,id_pays) VALUES 
+('Teatro Solís de Montevideo',3),
+('Mérida',1),
+('Badalona',1),
+('EMAD: Escuela Municipal de Arte Dramático de Montevideo',3),
+('Plaza Margarida Xirgu Barcelona',1),
+('Granada',1),
+('Girona',1),
+('MAE Barcelona',1),
+('Punta Ballena',3),
+('Molins de Rei Cataluña',1),
+('Salamanca',1),
+('Instituto de Teatro de Barcelona',1),
+('Barcelona',1),
+('Montevideo',3),
+('Calle Margarida Xirgu de Badalona',1),
+('Teatro romano de Merida',1),
+('Sala Margarita Xirgu,Teatro Español, Madrid,',1),
+('Barcelona instituto del teatro',1),
+('Cataluña',1),
+('Fresno USA',2),
+('Madrid',1),
+('Barcelona MAE',1),
+('Valencia',1),
+('Teatro de la Diputación de Barcelona.',1),
+('Ciudad Real Museo Nacional Del teatro',1);
 
