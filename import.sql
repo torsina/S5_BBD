@@ -324,11 +324,12 @@ UPDATE imported_data SET localisation='Madrid' WHERE localisation='Madrid' OR lo
 UPDATE imported_data SET localisation='Mérida' WHERE localisation='Merida' OR localisation='Mérida' OR localisation='Merida España' OR localisation='Meridaa';
 UPDATE imported_data SET localisation=regexp_replace(localisation, '[[:blank:]]+España$', '');
 -- "MX-F-449" a une localisation qui est erronnée (c'est la description, dupliquée).
-UPDATE imported_data SET localisation=NULL WHERE localisation='figura de cera de Margarita Xirgu';
+UPDATE imported_data SET localisation=NULL WHERE localisation='figura de cera de Margarita Xirgu' 
+or localisation='España' or localisation='Uruguay';
 UPDATE imported_data SET localisation='Teatro Solís de Montevideo' WHERE contexte_geographique='Teatro Solís de Montevideo' and localisation=null;
 UPDATE imported_data SET localisation='Granada' WHERE contexte_geographique='Granada España' and localisation=null;
 UPDATE imported_data SET localisation='Sevilla' WHERE contexte_geographique='Sevilla' and localisation=null;
-UPDATE imported_data SET localisation='Molins de Rei' WHERE contexte_geographique='Molins de Rei' and localisation=null;
+UPDATE imported_data SET localisation='Molins de Rei' WHERE (contexte_geographique='Molins de Rei') and localisation=null;
 UPDATE imported_data SET localisation='Punta del Este' WHERE contexte_geographique='Punta del Este' and localisation=null;
 UPDATE imported_data SET localisation='intendencia Maldonado' WHERE contexte_geographique='intendencia Maldonado' and localisation=null;
 UPDATE imported_data SET localisation='Punta Ballena' WHERE contexte_geographique='Punta ballena Uruguay' and localisation=null;
@@ -353,6 +354,11 @@ UPDATE imported_data SET localisation='Montevideo' WHERE contexte_geographique='
 UPDATE imported_data SET localisation='Mérida' WHERE contexte_geographique='Mérida España' and localisation=null;
 UPDATE imported_data SET localisation='Valencia' WHERE contexte_geographique='Valencia' and localisation=null;
 UPDATE imported_data SET localisation='Montevideo' WHERE contexte_geographique='Uruguay | Montevideo' and localisation=null;
+UPDATE imported_data SET localisation='Molins de Rei Cataluña' WHERE localisation='Molins de Rei España  Cataluña';
+UPDATE imported_data SET localisation='Montevideo' WHERE localisation='Montevideo uruguay';
+UPDATE imported_data SET localisation='Teatro romano de Merida' WHERE localisation='teatro romano de Mérida';
+UPDATE imported_data SET localisation='Punta Ballena (Maldonado)' WHERE localisation='Punta Ballena (Maldonado) Uruguay';
+UPDATE imported_data SET localisation=trim_blank(localisation);
 
 
 ------------------------------------------------DROITS------------------------------------------------
