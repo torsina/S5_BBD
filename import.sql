@@ -317,7 +317,7 @@ Correction des erreurs pour certaines localisations.
 UPDATE imported_data SET localisation=TRIM(localisation);
 UPDATE imported_data SET localisation=NULL WHERE LOWER(localisation)='desconocido' OR LOWER(localisation)='indeterminado';
 UPDATE imported_data SET localisation='Punta Ballena' WHERE localisation=' Punta Ballena (Maldonado) Uruguay' OR localisation='Punta Ballena Uruguay';
-UPDATE imported_data SET localisation='Teatro Solís, Montevideo' WHERE localisation='Teatro Solís, Montevideo (Uruguay)';
+UPDATE imported_data SET localisation='Teatro Solís de Montevideo' WHERE localisation='Teatro Solís, Montevideo (Uruguay)';
 -- Suppression du point à la fin du texte
 UPDATE imported_data SET localisation='EMAD: Escuela Municipal de Arte Dramático de Montevideo' WHERE localisation='EMAD: Escuela Municipal de Arte Dramático de Montevideo.';
 UPDATE imported_data SET localisation='Madrid' WHERE localisation='Madrid' OR localisation='Madrid España';
@@ -325,6 +325,35 @@ UPDATE imported_data SET localisation='Mérida' WHERE localisation='Merida' OR l
 UPDATE imported_data SET localisation=regexp_replace(localisation, '[[:blank:]]+España$', '');
 -- "MX-F-449" a une localisation qui est erronnée (c'est la description, dupliquée).
 UPDATE imported_data SET localisation=NULL WHERE localisation='figura de cera de Margarita Xirgu';
+UPDATE imported_data SET localisation='Teatro Solís de Montevideo' WHERE contexte_geographique='Teatro Solís de Montevideo' and localisation=null;
+UPDATE imported_data SET localisation='Granada' WHERE contexte_geographique='Granada España' and localisation=null;
+UPDATE imported_data SET localisation='Sevilla' WHERE contexte_geographique='Sevilla' and localisation=null;
+UPDATE imported_data SET localisation='Molins de Rei' WHERE contexte_geographique='Molins de Rei' and localisation=null;
+UPDATE imported_data SET localisation='Punta del Este' WHERE contexte_geographique='Punta del Este' and localisation=null;
+UPDATE imported_data SET localisation='intendencia Maldonado' WHERE contexte_geographique='intendencia Maldonado' and localisation=null;
+UPDATE imported_data SET localisation='Punta Ballena' WHERE contexte_geographique='Punta ballena Uruguay' and localisation=null;
+UPDATE imported_data SET localisation='Plaza Margarida Xirgu Barcelona' WHERE contexte_geographique='Plaza Margarida Xirgu Barcelona' and localisation=null;
+UPDATE imported_data SET localisation='Colección de escenografía del Instituto del Teatro de la Diputación de Barcelona.' WHERE contexte_geographique='Colección de escenografía del Instituto del Teatro de la Diputación de Barcelona.' and localisation=null;
+UPDATE imported_data SET localisation='Buenos Aires' WHERE contexte_geographique='Buenos Aires Argentina' and localisation=null;
+UPDATE imported_data SET localisation='Madrid' WHERE contexte_geographique='Madrid España' and localisation=null;
+UPDATE imported_data SET localisation='Girona' WHERE contexte_geographique='Girona' and localisation=null;
+UPDATE imported_data SET localisation='Barcelona' WHERE contexte_geographique='Barcelona España' and localisation=null;
+UPDATE imported_data SET localisation='Guimera' WHERE contexte_geographique='Guimera' and localisation=null;
+UPDATE imported_data SET localisation='Zaragoza' WHERE contexte_geographique='España Zaragoza' and localisation=null;
+UPDATE imported_data SET localisation='Sala Margarita Xirgu,Teatro Español, Madrid' WHERE contexte_geographique='Sala Margarita Xirgu,Teatro Español, Madrid, España' and localisation=null;
+UPDATE imported_data SET localisation='Teatro Goya de Barcelona' WHERE contexte_geographique='teatro Goya de Barcelona' and localisation=null;
+UPDATE imported_data SET localisation='Montevideo' WHERE contexte_geographique='Montevideo' and localisation=null;
+UPDATE imported_data SET localisation='Puerto Rico' WHERE contexte_geographique='Puerto Rico' and localisation=null;
+UPDATE imported_data SET localisation='Teatro romano de Merida' WHERE contexte_geographique='Teatro romano de Merida' and localisation=null;
+UPDATE imported_data SET localisation='Museo de Badalona' WHERE contexte_geographique='Museo de Badalona' and localisation=null;
+UPDATE imported_data SET localisation='Badalona' WHERE contexte_geographique='Badalona España' and localisation=null;
+UPDATE imported_data SET localisation='Montevideo' WHERE contexte_geographique='Uruguay Montevideo' and localisation=null;
+UPDATE imported_data SET localisation='Cataluña' WHERE (contexte_geographique='España Cataluña' or contexte_geographique='Cataluña España') and localisation=null;
+UPDATE imported_data SET localisation='Montevideo' WHERE contexte_geographique='Uruguay Montevideo' and localisation=null;
+UPDATE imported_data SET localisation='Mérida' WHERE contexte_geographique='Mérida España' and localisation=null;
+UPDATE imported_data SET localisation='Valencia' WHERE contexte_geographique='Valencia' and localisation=null;
+UPDATE imported_data SET localisation='Montevideo' WHERE contexte_geographique='Uruguay | Montevideo' and localisation=null;
+
 
 ------------------------------------------------DROITS------------------------------------------------
 /*
