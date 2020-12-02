@@ -48,7 +48,7 @@ CREATE TABLE imported_data (
 );
 -- Importation du CSV. Pourquoi en 2020, ce logiciel n'accepte pas les chemins relatifs ????
 COPY imported_data
-FROM 'D:\Boulot\L3\BASE_DE_DONNEES\PROJET\Esp-fotos.csv'
+FROM 'E:\Esp-fotos.csv'--'D:\Boulot\L3\BASE_DE_DONNEES\PROJET\Esp-fotos.csv'
 DELIMITER ';'
 CSV HEADER;
 
@@ -56,7 +56,7 @@ CSV HEADER;
 CREATE OR REPLACE FUNCTION parse_format(t text)
 RETURNS text[] AS $$
 DECLARE
-	-- 4 valeurs : résolution, taille, inutile, inutile
+	-- 9 valeurs
 	parsed text[];
 BEGIN
 	IF t IS NULL
@@ -102,12 +102,26 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+/*
+Supprime les caractères blancs du début et de la fin d'une chaîne de caractères.
+
+Caractères supprimés :
+0xC2
+0xAO
+0x20 (espace)
+0x0A
+0xE2
+0x2006
+
+Ces caractères ont été détectés dans le fichier.
+*/
 CREATE OR REPLACE FUNCTION trim_blank(t text)
 RETURNS text AS $$
 DECLARE
 	t_returned text;
 BEGIN
 	t_returned := regexp_replace(t, '^[\xC2\xA0\x20\x0A\xE2\x2006]*', '');
+	t_returned := regexp_replace(t_returned, '[\xC2\xA0\x20\x0A\xE2\x2006]*$', '');
 	IF char_length(t_returned)=0
 	THEN
 		RETURN NULL;
@@ -117,6 +131,22 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+/*
+Remplace les caractères blancs d'une chaîne de caractères part un espace.
+
+Caractères supprimés :
+0xC2
+0xAO
+0x20 (espace)
+0x0A
+0xE2
+0x2006
+
+Caractère de remplacement :
+0x20 (espace)
+
+Ces caractères ont été détectés dans le fichier.
+*/
 CREATE OR REPLACE FUNCTION blank_to_space(t text)
 RETURNS text AS $$
 BEGIN
@@ -151,14 +181,21 @@ SELECT COUNT(DISTINCT cote)=1122 FROM imported_data WHERE cote ~ '\w{1,3}-\w{1,3
 
 -- On retire les caractères en trop avant et après le type.
 UPDATE imported_data SET type=TRIM(type);
-UPDATE imported_data SET type='Fotos' WHERE SUBSTRING(cote,0,5)='MX-F';
+/*
+On sait, par analyse, que tous les documents commençant par MX-F- sont du type "Fotos".
+On peut même partir du principe que
+MX = Margarita Xirgu
+F = Fotos
+
+Ici, on évite les incohérences/erreurs en forçant Fotos.
+*/
+UPDATE imported_data SET type='Fotos' WHERE cote LIKE 'MX-F-%';
 
 
 ------------------------------------------------DATATYPE------------------------------------------------
 
-
 /*
-On retire les caractères en trop avant et après le mot.
+On retire les caractères en trop avant et après le datatype.
 On passe datatype en minsucule pour uniformiser la casse, qui était différente.
 */
 UPDATE imported_data SET datatype=LOWER(TRIM(datatype));
@@ -166,7 +203,7 @@ UPDATE imported_data SET datatype=LOWER(TRIM(datatype));
 ------------------------------------------------DATES------------------------------------------------
 /*
 On retire les caractères en trop avant et après la date.
-Toutes les dates inconnues sont passées à "null".
+Toutes les dates inconnues sont passées à "NULL".
 Correction des erreurs pour certaines dates.
 Certains enregistrements avaient du texte invalide dans cette colonne.
 Ces textes sont des informations redondantes (déjà dans colonne notes).
@@ -223,7 +260,8 @@ UPDATE imported_data SET auteur='Antonio Bueno' WHERE auteur='Antoinio Bueno';
 UPDATE imported_data SET auteur='Amparo Climent Corbín' WHERE auteur LIKE 'Amparo Climent%';
 -- Problème de casse
 UPDATE imported_data SET auteur='Frederico Garcia Lorca' WHERE LOWER(auteur)='frederico garcia lorca';
-UPDATE imported_data SET auteur=regexp_replace(auteur, '\.$', ''); -- Certains enregistrements ont un auteur qui finit par ".". On le supprime.
+-- Certains enregistrements ont un auteur qui finit par ".". On le supprime.
+UPDATE imported_data SET auteur=regexp_replace(auteur, '\.$', '');
 UPDATE imported_data SET auteur='Revista Mundo Nuevo' WHERE LOWER(auteur)='nuevo mundo' OR LOWER(auteur)='nuevo mundo revista';
 
 ------------------------------------------------DESTINATAIRE------------------------------------------------
@@ -240,34 +278,37 @@ UPDATE imported_data SET sujet=TRIM(sujet);
 -- Un des sujets a des caractères blancs au début (codes ASCII 0xC2, 0xAO et 0x20), que TRIM n'arrive pas à enlever.
 UPDATE imported_data SET sujet=regexp_replace(sujet, '^[\xC2\xA0\x20]*', '');
 UPDATE imported_data SET sujet='Margarita xirgu' WHERE cote='MX-F-185';
-UPDATE imported_data SET sujet=null WHERE lower(sujet)='indeterminado' or sujet='Indeterminadp';
-UPDATE imported_data SET sujet='Cartel exposicion sobre Margarita Xirgu' WHERE (sujet)='cartel Margarita Xirgu';
-UPDATE imported_data SET sujet='Figurina' WHERE (sujet)='Figurines';
-UPDATE imported_data SET sujet='Foto de Margarita Xirgu' WHERE (sujet)='foto de Margarita xirgu' or sujet='Foto de Margarita xirgu' 
-or sujet='Foto de Margarita Xirgu' or sujet='Foto de Margarita Xiru' or sujet='foto deMargarita Xirgu' or sujet='Foto Margarita Xirgu'
-or sujet='Fotoe  de Margarita Xirgu';
-UPDATE imported_data SET sujet='Foto de Miguel Xirgu' WHERE (sujet)='foto de Miguel Xirgu' or sujet='Foto de Miguel xirgu' or sujet='Foto de Miquel Xirgu' or sujet='Miguel Xirgu';
-UPDATE imported_data SET sujet='Homenaje a Margarita Xirgu' WHERE (sujet)='Homenaje a Margarita Xirgu' 
-or sujet='homenaje a Margarita Xirgu' or sujet='Foto de Miquel Xirgu';
-UPDATE imported_data SET sujet='Margarita Xirgu' WHERE (sujet)='Magararita xirgu' or sujet='Margarita  Xirgu' or sujet='Margarita Xiirgu'
-or sujet='Margarita xirgu' or sujet='Magararita xirgu';
-UPDATE imported_data SET sujet='Margarita Xirgu Actuando' WHERE (sujet)='Margarita Xirgu actuando';
-UPDATE imported_data SET sujet='Margarita Xirgu de Elektra' WHERE (sujet)='Margarita Xirgu Elektra';
-UPDATE imported_data SET sujet='Medea Cartel' WHERE (sujet)='Medea';
-UPDATE imported_data SET sujet='Teatro Solis' WHERE (sujet)='Teatro Solís';
+-- Tout ce qui est indeterminé devient NULL
+UPDATE imported_data SET sujet=NULL WHERE LOWER(sujet)='indeterminado' OR sujet='Indeterminadp';
+UPDATE imported_data SET sujet='Cartel exposicion sobre Margarita Xirgu' WHERE sujet='cartel Margarita Xirgu';
+UPDATE imported_data SET sujet='Figurina' WHERE sujet='Figurines';
+UPDATE imported_data SET sujet='Foto de Margarita Xirgu' WHERE sujet='foto de Margarita xirgu' OR sujet='Foto de Margarita xirgu' 
+OR sujet='Foto de Margarita Xirgu' OR sujet='Foto de Margarita Xiru' OR sujet='foto deMargarita Xirgu' OR sujet='Foto Margarita Xirgu'
+OR sujet='Fotoe  de Margarita Xirgu';
+UPDATE imported_data SET sujet='Foto de Miguel Xirgu' WHERE sujet='foto de Miguel Xirgu' OR sujet='Foto de Miguel xirgu' OR sujet='Foto de Miquel Xirgu' OR sujet='Miguel Xirgu';
+UPDATE imported_data SET sujet='Homenaje a Margarita Xirgu' WHERE sujet='Homenaje a Margarita Xirgu' 
+OR sujet='homenaje a Margarita Xirgu' OR sujet='Foto de Miquel Xirgu';
+UPDATE imported_data SET sujet='Margarita Xirgu' WHERE sujet='Magararita xirgu' OR sujet='Margarita  Xirgu' OR sujet='Margarita Xiirgu'
+OR sujet='Margarita xirgu' OR sujet='Magararita xirgu';
+UPDATE imported_data SET sujet='Margarita Xirgu Actuando' WHERE sujet='Margarita Xirgu actuando';
+UPDATE imported_data SET sujet='Margarita Xirgu de Elektra' WHERE sujet='Margarita Xirgu Elektra';
+UPDATE imported_data SET sujet='Medea Cartel' WHERE sujet='Medea';
+UPDATE imported_data SET sujet='Teatro Solis' WHERE sujet='Teatro Solís';
 					     
 					     
 ------------------------------------------------DESCRIPTION------------------------------------------------
 
-/*
-On retire les caractères en trop avant et après la description.
-*/
-UPDATE imported_data SET description=TRIM(description);
+
 -- Caractères blancs au début (codes ASCII 0xC2, 0xAO, 0x20 et 0x0A), que TRIM n'arrive pas à enlever.
 UPDATE imported_data SET description=trim_blank(description);
+-- On retire les caractères en trop avant et après la description.
+UPDATE imported_data SET description=TRIM(description);
+-- Maintenant qu'on a supprimé des caractères blancs, on met à NULL les descriptions vides;
 UPDATE imported_data SET description=NULL WHERE char_length(description)=0;
+-- Certains descriptions commencent par des tirets (suivis de caractères blancs), on les supprime
 UPDATE imported_data SET description=regexp_replace(description, '^-[[:blank:]]*', '');
 
+-- TODO : remove
 -- SELECT description, COUNT(auteur_description) FROM imported_data GROUP BY description HAVING COUNT(DISTINCT auteur_description) != 1;
 -- SELECT * FROM imported_data WHERE description='Foto de Margarita Xirgu sacada en el "peristilo" del teatro romano de Mérida, caracterizada de Elektra';
 
@@ -427,25 +468,56 @@ SELECT regexp_replace('476 × 464231,5 ko [sjask56]', '^((\d{2,4})[[:blank:]]*[x
 SELECT regexp_replace(blank_to_space('33ko, 305 × 500'), '(\d{1,3}([\.\,]\d{1,2})?[[:blank:]]*([kmg]o)),?[[:blank:]]*((\d{2,4})[[:blank:]]*[x×][[:blank:]]*(\d{2,4}))[[:blank:]]*$', '\5x\6 \1');
 SELECT regexp_matches('411x640 jdz', '^((\d{2,4})[[:blank:]]*[x×][[:blank:]]*(\d{2,4}))[[:blank:]]+[a-z]*$');*/
 SELECT regexp_matches('[131 f., 139 p. numeradas 1-6, 5-6, 7-57, 2 pág. s.n., 58-116, 107, 117-137, 220 x 350 mm]', '^(((\d{2,4})[[:blank:]]*[x×][[:blank:]]*(\d{2,4}))[[:blank:]]*((\d{1,3}([\.\,]\d{1,2})?)[[:blank:]]*([kmg]o))?)?([[:blank:]]*\[.*\])?$');
-/*
-On retire les caractères en trop avant et après la langue.
-*/
-UPDATE imported_data SET langue=TRIM(LOWER(langue));
+
+------------------------------------------------LANGUE------------------------------------------------
+
+-- La langue est inutile, voir justification.
+
+
+-- TODO : remove
+-- On retire les caractères en trop avant et après la langue.
+-- UPDATE imported_data SET langue=TRIM(LOWER(langue));
+-- SELECT langue FROM imported_data WHERE langue IS NOT NULL;
+
+------------------------------------------------ETAT GENETIQUE------------------------------------------------
+
+-- L'état génétique est inutile, voir justification.
+
+-- TODO : remove
+-- On retire les caractères en trop avant et après l'état génétique.
+-- UPDATE imported_data SET etat_genetique=TRIM(etat_genetique);
+-- SELECT etat_genetique FROM imported_data WHERE etat_genetique IS NOT NULL;
+
+------------------------------------------------RELATIONS GENETIQUES------------------------------------------------
 
 /*
-On retire les caractères en trop avant et après l'état génétique..
-*/
-UPDATE imported_data SET etat_genetique=TRIM(etat_genetique);
-
-/*
-On retire les caractères en trop avant et après le mot ainsi que les "$".
+On retire les caractères en trop avant et après les relations génétiques ainsi que les "$".
 Correction des erreurs pour certaines relations génétiques.
+
+UPPER met en majuscule les lettres. Cela est primordial car certaines relations génétiques sont écrites : mx-f-XXXX
+au lieu de MX-F-XXXX.
 */
-UPDATE imported_data SET relations_genetiques=TRIM(relations_genetiques);
+UPDATE imported_data SET relations_genetiques=UPPER(TRIM(relations_genetiques));
 UPDATE imported_data SET relations_genetiques=REPLACE(relations_genetiques, '$', '');
-UPDATE imported_data SET relations_genetiques='MX-579/612/827/828/829/83/831/832/833/834/835/836' WHERE relations_genetiques='Mx-579-Mx-612/827/828/829/830/831/832/833/83/835/836';
-UPDATE imported_data SET relations_genetiques='Mx-603/651' WHERE relations_genetiques='MX-603/M-651' OR relations_genetiques='Mx-603/Mx651';
-UPDATE imported_data SET relations_genetiques='Mx-971/972/73/974/975/976/977/978' WHERE relations_genetiques='Mx-971/972/73/974/975/976/977978';
+UPDATE imported_data SET relations_genetiques=regexp_replace(LOWER(relations_genetiques), 'mx-(\d{3,4})/?', 'MX-F-\1', 'g');
+UPDATE imported_data SET relations_genetiques='221/222/223' WHERE relations_genetiques='221/222/222';
+UPDATE imported_data SET relations_genetiques='MX-F-221/MX-F-222/MX-F-223' WHERE relations_genetiques='221/222/223';
+UPDATE imported_data SET relations_genetiques='MX-F-579/MX-F-612/MX-F-827/MX-F-828/MX-F-829/MX-F-830/MX-F-831/MX-F-832/MX-F-833/MX-F-834/MX-F-835/MX-F-836' WHERE relations_genetiques='Mx-579-Mx-612/827/828/829/830/831/832/833/83/835/836';
+UPDATE imported_data SET relations_genetiques='MX-F-603/MX-F-651' WHERE relations_genetiques='MX-603/M-651' OR relations_genetiques='Mx-603/Mx651';
+UPDATE imported_data SET relations_genetiques='MX-F-971/MX-F-972/MX-F-973/MX-F-974/MX-F-975/MX-F-976/MX-F-977/MX-F-978' WHERE relations_genetiques='Mx-971/972/73/974/975/976/977978';
+-- UPDATE imported_data SET relations_genetiques='MX-F-579/MX-F-612/MX-F-827/MX-F-828/MX-F-829/MX-F-830/MX-F-831/MX-F-832/MX-F-833/MX-F-834/MX-F-835/MX-F-836' WHERE relations_genetiques='MX-579/612/827/828/829/83/831/832/833/834/835/836';
+UPDATE imported_data SET relations_genetiques='MX-F-133/MX-F-135/MX-F-136/MX-F-137/MX-F-138/MX-F-139MX-F-/140/MX-F-154/MX-F-426' WHERE relations_genetiques='Mx-133/Mx-135/Mx-136/-Mx-137/Mx-138/Mx-139/Mx-140/Mx-154/Mx-426';
+UPDATE imported_data SET relations_genetiques='MX-F-1000' WHERE relations_genetiques='Mx-1000';
+UPDATE imported_data SET relations_genetiques='MX-F-1082/MX-F-1083/MX-F-1084/MX-F-1085/MX-F-1086/MX-F-1087' WHERE relations_genetiques='Mx-1082/1083/1084/1085/1086/1087';
+UPDATE imported_data SET relations_genetiques='MX-F-164/MX-F-165/MX-F-168/MX-F-169/MX-F-170/MX-F-187/MX-F-188' WHERE relations_genetiques='Mx164/165/168/169/170/187/188';
+UPDATE imported_data SET relations_genetiques='MX-F-884/MX-F-885/MX-F-1004' WHERE relations_genetiques='MX-884/Mx-885/Mx-1004';
+UPDATE imported_data SET relations_genetiques='MX-F-1080/MX-F-1081/MX-F-1093/MX-F-1095/MX-F-1096' WHERE relations_genetiques='Mx-1080-81-93-95-96';
+UPDATE imported_data SET relations_genetiques='MX-F-164/MX-F-165/MX-F-168/MX-F-169/MX-F-170/MX-F-187/MX-F-188' WHERE relations_genetiques='mx164/165/168/169/170/187/188';
+UPDATE imported_data SET relations_genetiques='MX-F-950/MX-F-953' WHERE relations_genetiques='MX950/953';
+
+-- TODO : remove
+-- SELECT DISTINCT relations_genetiques FROM imported_data WHERE relations_genetiques !~ '(MX-F-\d{3,4}/?)+';
+-- SELECT regexp_matches('Mx-412/Mx-602-Mx-625/Mx-637/Mx-642', '(Mx-\d{1,4}/?)+');
 
 /*
 On retire les caractères en trop avant et après les autres relations.
