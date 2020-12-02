@@ -723,12 +723,12 @@ CREATE TABLE titre (
 	nom varchar(150)
 );
 								       
-DROP TABLE IF EXISTS description CASCADE;
+DROP TABLE IF EXISTS description, auteur_description CASCADE;
 CREATE TABLE description (
 	id_description serial PRIMARY KEY,
 	texte text,
-	id_auteur integer,
-	FOREIGN KEY (id_auteur) REFERENCES personne(id_personne)
+	id_personne integer,
+	FOREIGN KEY (id_personne) REFERENCES personne(id_personne)
 );
 
 DROP TABLE IF EXISTS sujet CASCADE;
@@ -752,6 +752,34 @@ CREATE TABLE taille_texte (
     valeur text NOT NULL
 );
 
+
+DROP TABLE IF EXISTS localisation, pays CASCADE;
+CREATE TABLE pays (
+	id_pays serial primary key,
+	nom varchar(25),
+	lat float,
+	long float
+);
+
+CREATE TABLE localisation (
+	id_localisation serial primary key,
+	texte varchar(200),
+	id_pays integer,
+	FOREIGN KEY (id_pays) REFERENCES pays(id_pays)
+);
+
+DROP TABLE IF EXISTS licence, droits CASCADE;
+CREATE TABLE licence (
+	id_licence serial primary key,
+	texte text
+);
+
+CREATE TABLE droits (
+	id_droit serial primary key,
+	texte text,
+	id_licence integer,
+	FOREIGN KEY (id_licence) REFERENCES licence(id_licence)
+);
 /*DROP TABLE IF EXISTS documents CASCADE;
 CREATE TABLE documents(
 	cote varchar(15) primary key,
