@@ -811,7 +811,7 @@ CREATE TABLE pays (
 	id_pays serial primary key,
 	nom varchar(25),
 	lat float,
-	long float
+	lon float
 );
 
 CREATE TABLE localisation (
