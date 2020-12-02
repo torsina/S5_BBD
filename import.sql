@@ -518,7 +518,7 @@ WHERE contexte_geographique='uruguay' or contexte_geographique='Punta del este'
 or contexte_geographique='Teatro Solís de Montevideo' or contexte_geographique='Punta del Este'
 or contexte_geographique='intendencia Maldonado' or contexte_geographique='Punta ballena Uruguay'
 or contexte_geographique='Montevideo' or contexte_geographique='Uruguay Montevideo'
-or contexte_geographique='Uruguay | Montevideo';
+or contexte_geographique='Uruguay | Montevideo' or contexte_geographique='Uruguay.';
 UPDATE imported_data SET contexte_geographique = 'España' 
 WHERE contexte_geographique='Merida España' or contexte_geographique='Merida' 
 or contexte_geographique='Merdia España' or contexte_geographique='Medirda'
