@@ -685,32 +685,7 @@ CREATE TABLE responsable_scientifique (
 	PRIMARY KEY (id_reponsable),
 	FOREIGN KEY (id_reponsable) REFERENCES personne(id_personne)
 );
-
-
-INSERT INTO personne(nom,prenom) VALUES ('Gil','Alan');
-INSERT INTO personne(nom,prenom) VALUES ('Chantraine Braillon','Cécile');
-INSERT INTO personne(nom,prenom) VALUES ('Idmhand','Fatiha');
-
-INSERT INTO responsable_scientifique VALUES (1, 'La Rochelle Université', 'Alumno', 'Master LEA Amérique');
-INSERT INTO responsable_scientifique VALUES (2, 'La Rochelle Université', 'Profesor', 'Equipo CRHIA');
-INSERT INTO responsable_scientifique VALUES (3, 'La Rochelle Université', 'Profesor', 'CRLA Institut des textes et manuscrits modernes CNRS-UMR8132');
-
-INSERT INTO editeur(nom_editeur) VALUES ('Editor Proyecto e-spectateur AAP 2020 '),('Editor Proyecto CollEx-Persée Archivos 3.0 AAP 2018 ');
-
-INSERT INTO responsable_archive(nom) VALUES
-('Familia de Maragrita Xirgu (fondo de los hermanos Xiru)'),('Albert Prats'),('Departamento de Cultura de la Generalidad de Cataluña '),
-('Fondo Margarita Xirgu del Instituto del Teatro de la Diputación de Barcelona'),('Foto Escena Catalana'),
-('MAE Barcelona'),('Arxiu Marta Prats Xirgu'),('Francesc Foguet i Boreu'),('Dr Sylvie Josserand Colla (Equipo Archivos-CRLA Institut des textes et manuscrits modernes CNRS-UMR8132)'),
-('La Vanguardia'), ('Familia Margarita Xirgu (Xavier Rius Xirgu Ester Xirgu Cortacans Natalia Valenzuela)'),
-('El Instituto del Teatro de la Diputación de Barcelona'),('Familia Margarita Xirgu (Fondo Jordi Rius Xirgu)'),
-('Teatro de Barcelona'),('Amadeu Mariné Vadalaco'), ('Antonina Rodrigo'),('Antonio y Ramon Clapés'),('Biblioteca Sebastiá Juan Arbó'),
-('Carmen M.Gual'),('Colección de escenografía del Instituto del Teatro de la Diputación de Barcelona'),
-('Festival de Mérida'),('Foto Archivo Xavier Rius Xirgu'),('Fotos de su nieto Jaime Gutiérrez Morcillo'),
-('José Antonio'),('Lluis Andú');
-								       
-								       
-								       ----------------------- GESTION DATATYPE et SUPPORT -----------------------
-
+						 
 DROP TABLE IF EXISTS support, datatype;
 CREATE TABLE support (
 	nom_support varchar(10) primary key
@@ -723,13 +698,13 @@ CREATE TABLE datatype (
 	FOREIGN KEY (nom_support) REFERENCES support(nom_support)
 );
 								       
-DROP TABLE IF EXISTS titre CASCADE;
+DROP TABLE IF EXISTS titre;
 CREATE TABLE titre (
 	id_titre serial primary key,
 	nom varchar(150)
 );
 								       
-DROP TABLE IF EXISTS description, auteur_description CASCADE;
+DROP TABLE IF EXISTS description CASCADE;
 CREATE TABLE description (
 	id_description serial PRIMARY KEY,
 	texte text,
@@ -786,6 +761,7 @@ CREATE TABLE droits (
 	id_licence integer,
 	FOREIGN KEY (id_licence) REFERENCES licence(id_licence)
 );
+
 /*DROP TABLE IF EXISTS documents CASCADE;
 CREATE TABLE documents(
 	cote varchar(15) primary key,
@@ -826,18 +802,33 @@ INSERT INTO responsable_scientifique VALUES (1, 'La Rochelle Université', 'Alum
 INSERT INTO responsable_scientifique VALUES (2, 'La Rochelle Université', 'Profesor', 'Equipo CRHIA');
 INSERT INTO responsable_scientifique VALUES (3, 'La Rochelle Université', 'Profesor', 'CRLA Institut des textes et manuscrits modernes CNRS-UMR8132');
 
-INSERT INTO editeur(nom_editeur) VALUES ('Editor Proyecto e-spectateur AAP 2020 '),('Editor Proyecto CollEx-Persée Archivos 3.0 AAP 2018 ');
+INSERT INTO editeur(nom_editeur) VALUES ('Editor Proyecto e-spectateur AAP 2020'),('Editor Proyecto CollEx-Persée Archivos 3.0 AAP 2018');
 
 INSERT INTO responsable_archive(nom) VALUES
-('Familia de Maragrita Xirgu (fondo de los hermanos Xiru)'),('Albert Prats Prat'),('Departamento de Cultura de la Generalidad de Cataluña '),
-('Fondo Margarita Xirgu del Instituto del Teatro de la Diputación de Barcelona'),('Foto Escena Catalana'),
-('MAE Barcelona'),('Arxiu Marta Prats Xirgu'),('Francesc Foguet i Boreu'),
+('Familia de Maragrita Xirgu (fondo de los hermanos Xiru)'),
+('Albert Prats Prat'),
+('Departamento de Cultura de la Generalidad de Cataluña'),
+('Fondo Margarita Xirgu del Instituto del Teatro de la Diputación de Barcelona'),
+('Foto Escena Catalana'),
+('MAE Barcelona'),
+('Arxiu Marta Prats Xirgu'),
+('Francesc Foguet i Boreu'),
 ('Dr Sylvie Josserand Colla (Equipo Archivos-CRLA Institut des textes et manuscrits modernes CNRS-UMR8132)'),
-('La Vanguardia'), ('El Instituto del Teatro de la Diputación de Barcelona'),
-('Teatro de Barcelona'),('Amadeu Mariné Vadalaco'), ('Antonina Rodrigo'),('Antonio y Ramon Clapés'),('Biblioteca Sebastiá Juan Arbó'),
-('Carmen M.Gual'),('Colección de escenografía del Instituto del Teatro de la Diputación de Barcelona'),
-('Festival de Mérida'),('Foto Archivo Xavier Rius Xirgu'),('Fotos de su nieto Jaime Gutiérrez Morcillo'),
-('José Antonio'),('Lluis Andú');
+('La Vanguardia'),
+('El Instituto del Teatro de la Diputación de Barcelona'),
+('Teatro de Barcelona'),
+('Amadeu Mariné Vadalaco'), 
+('Antonina Rodrigo'),
+('Antonio y Ramon Clapés'),
+('Biblioteca Sebastiá Juan Arbó'),
+('Carmen M.Gual'),
+('Colección de escenografía del Instituto del Teatro de la Diputación de Barcelona'),
+('Festival de Mérida'),
+('Foto Archivo Xavier Rius Xirgu'),
+('Fotos de su nieto Jaime Gutiérrez Morcillo'),
+('José Antonio'),
+('Lluis Andú');
 		
 INSERT INTO support VALUES ('DIGITAL'),('PAPEL');
 INSERT INTO datatype VALUES ('imagen','DIGITAL'),('text','PAPEL');
+
