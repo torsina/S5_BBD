@@ -833,6 +833,20 @@ CREATE TABLE droits (
 	id_licence integer,
 	FOREIGN KEY (id_licence) REFERENCES licence(id_licence)
 );
+						 
+DROP TABLE IF EXISTS publication;
+CREATE TABLE publication (
+	id_publication serial primary key,
+	url text,
+	details text,
+	derniere_visite timestamp
+);
+
+DROP TABLE IF EXISTS etat;
+CREATE TABLE etat (
+	id_etat serial primary key,
+	nom varchar(15)
+);						 
 
 /*DROP TABLE IF EXISTS documents CASCADE;
 CREATE TABLE documents(
@@ -940,3 +954,6 @@ INSERT INTO localisation(texte,id_pays) VALUES
 ('Teatro de la Diputación de Barcelona.',1),
 ('Ciudad Real Museo Nacional Del teatro',1);
 
+INSERT INTO etat(nom) VALUES
+('muy dañado'),('dañado'),('muy mediocre'),('mediocre'),('bueno');
+						 
