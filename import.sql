@@ -231,8 +231,14 @@ SELECT COUNT(*)=0 FROM imported_data WHERE dates !~ '^\d{4}-\d{2}-\d{2}$' AND da
 Titre pour "MX-F-20" actualisé (NULL -> 'Magarita Xirgu').
 On retire les caractères en trop avant et après le titre.
 */
-UPDATE imported_data SET titre='Magarita Xirgu' WHERE cote='MX-F-20';
+UPDATE imported_data SET titre='Margarita Xirgu' WHERE cote='MX-F-20';
+UPDATE imported_data SET titre='Miguel Xirgu' WHERE titre='Miguel xirgu';
+UPDATE imported_data SET titre='Margarita Xirgu' WHERE titre='Margariat Xirgu' or titre='Magarita Xirgu' or titre='Mrgarita Xirgu'
+or titre='Mararita Xirgu' or titre='Magararita xirgu' or titre='Margarita xirgu' or titre='Foto de Mragarita Xirgu';
+UPDATE imported_data SET titre='Figurina' WHERE titre='figurines';
 UPDATE imported_data SET titre=TRIM(titre);
+UPDATE imported_data SET titre=trim_blank(titre);
+					     
 ------------------------------------------------SOUS-TITRE------------------------------------------------
 
 -- On retire les caractères en trop avant et après le sous-titre.
@@ -365,11 +371,12 @@ UPDATE imported_data SET localisation='Madrid' WHERE localisation='Madrid' OR lo
 UPDATE imported_data SET localisation='Mérida' WHERE localisation='Merida' OR localisation='Mérida' OR localisation='Merida España' OR localisation='Meridaa';
 UPDATE imported_data SET localisation=regexp_replace(localisation, '[[:blank:]]+España$', '');
 -- "MX-F-449" a une localisation qui est erronnée (c'est la description, dupliquée).
-UPDATE imported_data SET localisation=NULL WHERE localisation='figura de cera de Margarita Xirgu';
+UPDATE imported_data SET localisation=NULL WHERE localisation='figura de cera de Margarita Xirgu' 
+or localisation='España' or localisation='Uruguay';
 UPDATE imported_data SET localisation='Teatro Solís de Montevideo' WHERE contexte_geographique='Teatro Solís de Montevideo' and localisation=null;
 UPDATE imported_data SET localisation='Granada' WHERE contexte_geographique='Granada España' and localisation=null;
 UPDATE imported_data SET localisation='Sevilla' WHERE contexte_geographique='Sevilla' and localisation=null;
-UPDATE imported_data SET localisation='Molins de Rei' WHERE contexte_geographique='Molins de Rei' and localisation=null;
+UPDATE imported_data SET localisation='Molins de Rei' WHERE (contexte_geographique='Molins de Rei') and localisation=null;
 UPDATE imported_data SET localisation='Punta del Este' WHERE contexte_geographique='Punta del Este' and localisation=null;
 UPDATE imported_data SET localisation='intendencia Maldonado' WHERE contexte_geographique='intendencia Maldonado' and localisation=null;
 UPDATE imported_data SET localisation='Punta Ballena' WHERE contexte_geographique='Punta ballena Uruguay' and localisation=null;
@@ -394,6 +401,11 @@ UPDATE imported_data SET localisation='Montevideo' WHERE contexte_geographique='
 UPDATE imported_data SET localisation='Mérida' WHERE contexte_geographique='Mérida España' and localisation=null;
 UPDATE imported_data SET localisation='Valencia' WHERE contexte_geographique='Valencia' and localisation=null;
 UPDATE imported_data SET localisation='Montevideo' WHERE contexte_geographique='Uruguay | Montevideo' and localisation=null;
+UPDATE imported_data SET localisation='Molins de Rei Cataluña' WHERE localisation='Molins de Rei España  Cataluña';
+UPDATE imported_data SET localisation='Montevideo' WHERE localisation='Montevideo uruguay';
+UPDATE imported_data SET localisation='Teatro romano de Merida' WHERE localisation='teatro romano de Mérida';
+UPDATE imported_data SET localisation=trim_blank(localisation);
+UPDATE imported_data SET localisation='Punta Ballena (Maldonado)' WHERE localisation='Punta Ballena (Maldonado) Uruguay';
 
 
 ------------------------------------------------DROITS------------------------------------------------
@@ -573,14 +585,34 @@ Correction des erreurs pour certaines zones géographiques.
 */
 UPDATE imported_data SET contexte_geographique = TRIM(contexte_geographique);
 UPDATE imported_data SET contexte_geographique = null WHERE LOWER(contexte_geographique)='desconocido' or LOWER(contexte_geographique)='indeterminado' or contexte_geographique='#VALUE!';
-UPDATE imported_data SET contexte_geographique = 'Uruguay' WHERE contexte_geographique='uruguay';
-UPDATE imported_data SET contexte_geographique = 'Punta del Este' WHERE contexte_geographique='Punta del este';
-UPDATE imported_data SET contexte_geographique = 'Mérida España' WHERE contexte_geographique='Merida España' or contexte_geographique='Merida' or contexte_geographique='Merdia España' or contexte_geographique='Medirda';
-UPDATE imported_data SET contexte_geographique = 'Madrid España' WHERE contexte_geographique='España Madrid';
-UPDATE imported_data SET contexte_geographique = 'España' WHERE contexte_geographique='Espagne';
-UPDATE imported_data SET contexte_geographique = 'Buenos Aires Argentina' WHERE contexte_geographique='Buenos Aires';
-UPDATE imported_data SET contexte_geographique = 'Barcelona España' WHERE contexte_geographique='Barcelona';
-UPDATE imported_data SET contexte_geographique = 'Badalona España' WHERE contexte_geographique='Badalona' or contexte_geographique='España Badalona';
+UPDATE imported_data SET contexte_geographique = 'Uruguay' 
+WHERE contexte_geographique='uruguay' or contexte_geographique='Punta del este'
+or contexte_geographique='Teatro Solís de Montevideo' or contexte_geographique='Punta del Este'
+or contexte_geographique='intendencia Maldonado' or contexte_geographique='Punta ballena Uruguay'
+or contexte_geographique='Montevideo' or contexte_geographique='Uruguay Montevideo'
+or contexte_geographique='Uruguay | Montevideo' or contexte_geographique='Uruguay.';
+UPDATE imported_data SET contexte_geographique = 'España' 
+WHERE contexte_geographique='Merida España' or contexte_geographique='Merida' 
+or contexte_geographique='Merdia España' or contexte_geographique='Medirda'
+or contexte_geographique='España Madrid' or contexte_geographique='Espagne'
+or contexte_geographique='Barcelona' or contexte_geographique='Badalona' 
+or contexte_geographique='España Badalona' or contexte_geographique='Barcelona'
+or contexte_geographique='Sevilla' or contexte_geographique='Molins de Rei'
+or contexte_geographique='Plaza Margarida Xirgu Barcelona' or contexte_geographique='Colección de escenografía del Instituto del Teatro de la Diputación de Barcelona.'
+or contexte_geographique='Madrid España' or contexte_geographique='Girona' or contexte_geographique='Barcelona España'
+or contexte_geographique='Guimera' or contexte_geographique='España Zaragoza' or contexte_geographique='Sala Margarita Xirgu,Teatro Español, Madrid, España'
+or contexte_geographique='teatro Goya de Barcelona' or contexte_geographique='Teatro romano de Merida'
+or contexte_geographique='Museo de Badalona' or contexte_geographique='Badalona España'
+or contexte_geographique='España Cataluña' or contexte_geographique='Cataluña España'
+or contexte_geographique='Mérida España' or contexte_geographique='Valencia'
+or contexte_geographique='Granada España';
+UPDATE imported_data SET contexte_geographique = 'Argentina' WHERE 
+contexte_geographique='Buenos Aires' or contexte_geographique='Buenos Aires Argentina';
+UPDATE imported_data SET contexte_geographique = 'Estados Unidos' WHERE contexte_geographique='Puerto Rico';
+UPDATE imported_data SET contexte_geographique = 'Chile' WHERE contexte_geographique='chile';
+UPDATE imported_data SET contexte_geographique = 'America Latina' WHERE contexte_geographique='Uruguay Argentina o Chile' or contexte_geographique='Hispanoameirca';
+UPDATE imported_data SET contexte_geographique=trim_blank(contexte_geographique);
+
 
 /*
 On retire les caractères en trop avant et après le mot.
@@ -725,32 +757,7 @@ CREATE TABLE responsable_scientifique (
 	PRIMARY KEY (id_reponsable),
 	FOREIGN KEY (id_reponsable) REFERENCES personne(id_personne)
 );
-
-
-INSERT INTO personne(nom,prenom) VALUES ('Gil','Alan');
-INSERT INTO personne(nom,prenom) VALUES ('Chantraine Braillon','Cécile');
-INSERT INTO personne(nom,prenom) VALUES ('Idmhand','Fatiha');
-
-INSERT INTO responsable_scientifique VALUES (1, 'La Rochelle Université', 'Alumno', 'Master LEA Amérique');
-INSERT INTO responsable_scientifique VALUES (2, 'La Rochelle Université', 'Profesor', 'Equipo CRHIA');
-INSERT INTO responsable_scientifique VALUES (3, 'La Rochelle Université', 'Profesor', 'CRLA Institut des textes et manuscrits modernes CNRS-UMR8132');
-
-INSERT INTO editeur(nom_editeur) VALUES ('Editor Proyecto e-spectateur AAP 2020 '),('Editor Proyecto CollEx-Persée Archivos 3.0 AAP 2018 ');
-
-INSERT INTO responsable_archive(nom) VALUES
-('Familia de Maragrita Xirgu (fondo de los hermanos Xiru)'),('Albert Prats'),('Departamento de Cultura de la Generalidad de Cataluña '),
-('Fondo Margarita Xirgu del Instituto del Teatro de la Diputación de Barcelona'),('Foto Escena Catalana'),
-('MAE Barcelona'),('Arxiu Marta Prats Xirgu'),('Francesc Foguet i Boreu'),('Dr Sylvie Josserand Colla (Equipo Archivos-CRLA Institut des textes et manuscrits modernes CNRS-UMR8132)'),
-('La Vanguardia'), ('Familia Margarita Xirgu (Xavier Rius Xirgu Ester Xirgu Cortacans Natalia Valenzuela)'),
-('El Instituto del Teatro de la Diputación de Barcelona'),('Familia Margarita Xirgu (Fondo Jordi Rius Xirgu)'),
-('Teatro de Barcelona'),('Amadeu Mariné Vadalaco'), ('Antonina Rodrigo'),('Antonio y Ramon Clapés'),('Biblioteca Sebastiá Juan Arbó'),
-('Carmen M.Gual'),('Colección de escenografía del Instituto del Teatro de la Diputación de Barcelona'),
-('Festival de Mérida'),('Foto Archivo Xavier Rius Xirgu'),('Fotos de su nieto Jaime Gutiérrez Morcillo'),
-('José Antonio'),('Lluis Andú');
-								       
-								       
-								       ----------------------- GESTION DATATYPE et SUPPORT -----------------------
-
+						 
 DROP TABLE IF EXISTS support, datatype;
 CREATE TABLE support (
 	nom_support varchar(10) primary key
@@ -763,7 +770,7 @@ CREATE TABLE datatype (
 	FOREIGN KEY (nom_support) REFERENCES support(nom_support)
 );
 								       
-DROP TABLE IF EXISTS titre CASCADE;
+DROP TABLE IF EXISTS titre;
 CREATE TABLE titre (
 	id_titre serial primary key,
 	nom varchar(150)
@@ -773,8 +780,8 @@ DROP TABLE IF EXISTS description CASCADE;
 CREATE TABLE description (
 	id_description serial PRIMARY KEY,
 	texte text,
-	id_auteur integer,
-	FOREIGN KEY (id_auteur) REFERENCES personne(id_personne)
+	id_personne integer,
+	FOREIGN KEY (id_personne) REFERENCES personne(id_personne)
 );
 
 DROP TABLE IF EXISTS sujet CASCADE;
@@ -796,6 +803,35 @@ DROP TABLE IF EXISTS taille_texte CASCADE;
 CREATE TABLE taille_texte (
     id_taille_texte serial PRIMARY KEY,
     valeur text NOT NULL
+);
+
+
+DROP TABLE IF EXISTS localisation, pays CASCADE;
+CREATE TABLE pays (
+	id_pays serial primary key,
+	nom varchar(25),
+	lat float,
+	long float
+);
+
+CREATE TABLE localisation (
+	id_localisation serial primary key,
+	texte varchar(200),
+	id_pays integer,
+	FOREIGN KEY (id_pays) REFERENCES pays(id_pays)
+);
+
+DROP TABLE IF EXISTS licence, droits CASCADE;
+CREATE TABLE licence (
+	id_licence serial primary key,
+	texte text
+);
+
+CREATE TABLE droits (
+	id_droit serial primary key,
+	texte text,
+	id_licence integer,
+	FOREIGN KEY (id_licence) REFERENCES licence(id_licence)
 );
 
 /*DROP TABLE IF EXISTS documents CASCADE;
@@ -838,18 +874,69 @@ INSERT INTO responsable_scientifique VALUES (1, 'La Rochelle Université', 'Alum
 INSERT INTO responsable_scientifique VALUES (2, 'La Rochelle Université', 'Profesor', 'Equipo CRHIA');
 INSERT INTO responsable_scientifique VALUES (3, 'La Rochelle Université', 'Profesor', 'CRLA Institut des textes et manuscrits modernes CNRS-UMR8132');
 
-INSERT INTO editeur(nom_editeur) VALUES ('Editor Proyecto e-spectateur AAP 2020 '),('Editor Proyecto CollEx-Persée Archivos 3.0 AAP 2018 ');
+INSERT INTO editeur(nom_editeur) VALUES ('Editor Proyecto e-spectateur AAP 2020'),('Editor Proyecto CollEx-Persée Archivos 3.0 AAP 2018');
 
 INSERT INTO responsable_archive(nom) VALUES
-('Familia de Maragrita Xirgu (fondo de los hermanos Xiru)'),('Albert Prats Prat'),('Departamento de Cultura de la Generalidad de Cataluña '),
-('Fondo Margarita Xirgu del Instituto del Teatro de la Diputación de Barcelona'),('Foto Escena Catalana'),
-('MAE Barcelona'),('Arxiu Marta Prats Xirgu'),('Francesc Foguet i Boreu'),
+('Familia de Maragrita Xirgu (fondo de los hermanos Xiru)'),
+('Albert Prats Prat'),
+('Departamento de Cultura de la Generalidad de Cataluña'),
+('Fondo Margarita Xirgu del Instituto del Teatro de la Diputación de Barcelona'),
+('Foto Escena Catalana'),
+('MAE Barcelona'),
+('Arxiu Marta Prats Xirgu'),
+('Francesc Foguet i Boreu'),
 ('Dr Sylvie Josserand Colla (Equipo Archivos-CRLA Institut des textes et manuscrits modernes CNRS-UMR8132)'),
-('La Vanguardia'), ('El Instituto del Teatro de la Diputación de Barcelona'),
-('Teatro de Barcelona'),('Amadeu Mariné Vadalaco'), ('Antonina Rodrigo'),('Antonio y Ramon Clapés'),('Biblioteca Sebastiá Juan Arbó'),
-('Carmen M.Gual'),('Colección de escenografía del Instituto del Teatro de la Diputación de Barcelona'),
-('Festival de Mérida'),('Foto Archivo Xavier Rius Xirgu'),('Fotos de su nieto Jaime Gutiérrez Morcillo'),
-('José Antonio'),('Lluis Andú');
+('La Vanguardia'),
+('El Instituto del Teatro de la Diputación de Barcelona'),
+('Teatro de Barcelona'),
+('Amadeu Mariné Vadalaco'), 
+('Antonina Rodrigo'),
+('Antonio y Ramon Clapés'),
+('Biblioteca Sebastiá Juan Arbó'),
+('Carmen M.Gual'),
+('Colección de escenografía del Instituto del Teatro de la Diputación de Barcelona'),
+('Festival de Mérida'),
+('Foto Archivo Xavier Rius Xirgu'),
+('Fotos de su nieto Jaime Gutiérrez Morcillo'),
+('José Antonio'),
+('Lluis Andú');
 		
 INSERT INTO support VALUES ('DIGITAL'),('PAPEL');
+
 INSERT INTO datatype VALUES ('imagen','DIGITAL'),('text','PAPEL');
+
+INSERT INTO pays(nom,lat,lon) VALUES 
+('España',40.463667, -3.749220),
+('Estados Unidos',37.090240,-95.712891),
+('Uruguay',-32.522779,-55.765835),
+('Argentina',-38.4212955,-63.587402499999996),
+('Chile',-31.7613365,-71.3187697),
+('Peru',-6.8699697,-75.0458515);
+
+INSERT INTO localisation(texte,id_pays) VALUES 
+('Teatro Solís de Montevideo',3),
+('Mérida',1),
+('Badalona',1),
+('EMAD: Escuela Municipal de Arte Dramático de Montevideo',3),
+('Plaza Margarida Xirgu Barcelona',1),
+('Granada',1),
+('Girona',1),
+('MAE Barcelona',1),
+('Punta Ballena',3),
+('Molins de Rei Cataluña',1),
+('Salamanca',1),
+('Instituto de Teatro de Barcelona',1),
+('Barcelona',1),
+('Montevideo',3),
+('Calle Margarida Xirgu de Badalona',1),
+('Teatro romano de Merida',1),
+('Sala Margarita Xirgu,Teatro Español, Madrid,',1),
+('Barcelona instituto del teatro',1),
+('Cataluña',1),
+('Fresno USA',2),
+('Madrid',1),
+('Barcelona MAE',1),
+('Valencia',1),
+('Teatro de la Diputación de Barcelona.',1),
+('Ciudad Real Museo Nacional Del teatro',1);
+
