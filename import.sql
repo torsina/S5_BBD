@@ -269,7 +269,7 @@ Correction des erreurs sur "MX-F-247", dupliqué de notes
 UPDATE imported_data SET format=TRIM(format);
 UPDATE imported_data SET format=NULL WHERE format='Indeterminado';
 -- On supprime les extensions de fichier (avec ou sans point) dans la colonne format car doublon et non consistent.
-UPDATE imported_data SET format=regexp_replace(LOWER(format), '[[:blank:]]*\.{0,1}(j[[:blank:]]{0,1}[p]?[e]?g|png|pdf)[[:blank:]]*$', '');
+UPDATE imported_data SET format=regexp_replace(LOWER(format), '\.?(j[[:blank:]]?[p]?[e]?g|png|pdf)', '');
 -- Si certains formats sont vides, on les met à NULL. Important après l'opération précédente.
 UPDATE imported_data SET format=NULL WHERE char_length(format)=0;
 -- Les formats de tailles de fichiers sont parfois incohérents : jko, lko, kpo pour ko.
@@ -284,12 +284,16 @@ UPDATE imported_data SET format=regexp_replace(blank_to_space(LOWER(format)), '^
 UPDATE imported_data SET format='456x640 28ko' WHERE cote='MX-F-813';
 -- Correction manuelle d'un format invalide
 UPDATE imported_data SET format='881x5991 1mo [0,5mpx]' WHERE cote='MX-F-622';
+-- L'enregistrement "MX-F-557" a pour format 350178 ce qui est erronné
+UPDATE imported_data set format='350x178' WHERE cote='MX-F-557';
+-- L'enregistrement "MX-F-503" a pour format 350178 ce qui est erronné
+UPDATE imported_data set format='350x257' WHERE cote='MX-F-503';
 -- Le seul document texte a un format très différent, on le stocke dans les données supplémentaires
 UPDATE imported_data SET format='[' || format || ']' WHERE cote='AS-AA1-01';
 
 UPDATE imported_data SET format=regexp_replace(format, '^((\d{2,4})[[:blank:]]*[x×][[:blank:]]*(\d{2,4}))[[:blank:]]*((\d{1,3}([\.\,]\d{1,2})?)[[:blank:]]*([kmg]o))?([[:blank:]]\[.*\])?$', '\2x\3 \5\7\8');
 -- Texte dans le format qui est le même que dans notes.
-UPDATE imported_data SET format=NULL WHERE cote='MX-F-247';
+-- UPDATE imported_data SET format=NULL WHERE cote='MX-F-247';
 
 
 CREATE OR REPLACE FUNCTION parse_format(t text)
@@ -304,12 +308,11 @@ BEGIN
 	END IF;
 	-- Tous les caractères "blancs" sont remplacés par des espaces, on enlève ceux des extrémités
 	t := LOWER(TRIM(blank_to_space(t)));
-	parsed := regexp_matches(t, '^((\d{2,4})[[:blank:]]*[x×][[:blank:]]*(\d{2,4}))[[:blank:]]*((\d{1,3}([\.\,]\d{1,2})?)[[:blank:]]*([kmg]o))?([[:blank:]]\[.*\])?$');
+	parsed := regexp_matches(t, '^(((\d{2,4})[[:blank:]]*[x×][[:blank:]]*(\d{2,4}))[[:blank:]]*((\d{1,3}([\.\,]\d{1,2})?)[[:blank:]]*([kmg]o))?)?([[:blank:]]*\[.*\])?$');
 	IF parsed IS NULL -- Si le 1er parsing n'a pas marché
 	THEN
-		-- parsed = array_append(parsed, 'a');
 		RETURN NULL;
-	ELSIF array_length(parsed, 1) != 8 -- Si le parsing a partiellement match
+	ELSIF array_length(parsed, 1) != 9 -- Si le parsing a partiellement match. Le 1 représente la dimension (ici 1ère dimension).
 	THEN
 		RETURN NULL;
 	ELSE
@@ -331,6 +334,7 @@ SELECT regexp_replace('476 × 464231,5 ko [sjask56]', '^((\d{2,4})[[:blank:]]*[x
 /*SELECT regexp_replace('go', '(([a-z]k)|(k[a-z])|(?![gmk])[a-z])o', 'ko');
 SELECT regexp_replace(blank_to_space('33ko, 305 × 500'), '(\d{1,3}([\.\,]\d{1,2})?[[:blank:]]*([kmg]o)),?[[:blank:]]*((\d{2,4})[[:blank:]]*[x×][[:blank:]]*(\d{2,4}))[[:blank:]]*$', '\5x\6 \1');
 SELECT regexp_matches('411x640 jdz', '^((\d{2,4})[[:blank:]]*[x×][[:blank:]]*(\d{2,4}))[[:blank:]]+[a-z]*$');*/
+SELECT regexp_matches('[131 f., 139 p. numeradas 1-6, 5-6, 7-57, 2 pág. s.n., 58-116, 107, 117-137, 220 x 350 mm]', '^(((\d{2,4})[[:blank:]]*[x×][[:blank:]]*(\d{2,4}))[[:blank:]]*((\d{1,3}([\.\,]\d{1,2})?)[[:blank:]]*([kmg]o))?)?([[:blank:]]*\[.*\])?$');
 /*
 On retire les caractères en trop avant et après la langue.
 */
