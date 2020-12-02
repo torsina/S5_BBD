@@ -802,6 +802,51 @@ CREATE TABLE taille_texte (
     valeur text NOT NULL
 );
 
+
+
+DROP TABLE IF EXISTS localisation, pays CASCADE;
+CREATE TABLE pays (
+	id_pays serial primary key,
+	nom varchar(25),
+	lat float,
+	lon float
+);
+
+CREATE TABLE localisation (
+	id_localisation serial primary key,
+	texte varchar(200),
+	id_pays integer,
+	FOREIGN KEY (id_pays) REFERENCES pays(id_pays)
+);
+
+DROP TABLE IF EXISTS licence, droits CASCADE;
+CREATE TABLE licence (
+	id_licence serial primary key,
+	texte text
+);
+
+CREATE TABLE droits (
+	id_droit serial primary key,
+	texte text,
+	id_licence integer,
+	FOREIGN KEY (id_licence) REFERENCES licence(id_licence)
+);
+						 
+DROP TABLE IF EXISTS publication;
+CREATE TABLE publication (
+	id_publication serial primary key,
+	url text,
+	details text,
+	derniere_visite timestamp
+);
+
+DROP TABLE IF EXISTS etat;
+CREATE TABLE etat (
+	id_etat serial primary key,
+	nom varchar(15)
+);						 
+
+
 /*DROP TABLE IF EXISTS documents CASCADE;
 CREATE TABLE documents(
 	cote varchar(15) primary key,
@@ -857,3 +902,42 @@ INSERT INTO responsable_archive(nom) VALUES
 		
 INSERT INTO support VALUES ('DIGITAL'),('PAPEL');
 INSERT INTO datatype VALUES ('imagen','DIGITAL'),('text','PAPEL');
+
+
+INSERT INTO pays(nom,lat,lon) VALUES 
+('España',40.463667, -3.749220),
+('Estados Unidos',37.090240,-95.712891),
+('Uruguay',-32.522779,-55.765835),
+('Argentina',-38.4212955,-63.587402499999996),
+('Chile',-31.7613365,-71.3187697),
+('Peru',-6.8699697,-75.0458515);
+
+INSERT INTO localisation(texte,id_pays) VALUES 
+('Teatro Solís de Montevideo',3),
+('Mérida',1),
+('Badalona',1),
+('EMAD: Escuela Municipal de Arte Dramático de Montevideo',3),
+('Plaza Margarida Xirgu Barcelona',1),
+('Granada',1),
+('Girona',1),
+('MAE Barcelona',1),
+('Punta Ballena',3),
+('Molins de Rei Cataluña',1),
+('Salamanca',1),
+('Instituto de Teatro de Barcelona',1),
+('Barcelona',1),
+('Montevideo',3),
+('Calle Margarida Xirgu de Badalona',1),
+('Teatro romano de Merida',1),
+('Sala Margarita Xirgu,Teatro Español, Madrid,',1),
+('Barcelona instituto del teatro',1),
+('Cataluña',1),
+('Fresno USA',2),
+('Madrid',1),
+('Barcelona MAE',1),
+('Valencia',1),
+('Teatro de la Diputación de Barcelona.',1),
+('Ciudad Real Museo Nacional Del teatro',1);
+
+INSERT INTO etat(nom) VALUES
+('muy dañado'),('dañado'),('muy mediocre'),('mediocre'),('bueno');
