@@ -99,7 +99,7 @@ FROM 'E:\Esp-fotos.csv'--'D:\Boulot\L3\BASE_DE_DONNEES\PROJET\Esp-fotos.csv'
 DELIMITER ';'
 CSV HEADER;
 
-COPY imported_data
+COPY imported_en
 FROM 'E:\Ang-fotos.csv'--'D:\Boulot\L3\BASE_DE_DONNEES\PROJET\Ang-fotos.csv'
 DELIMITER ';'
 CSV HEADER;
