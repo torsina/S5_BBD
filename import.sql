@@ -697,7 +697,7 @@ On retire les caractères en trop avant et après le mot ainsi que le "$".
 Correction d'une date pour une future utilisation
 */
 UPDATE imported_data SET date_creation_notice = TRIM(blank_to_space(date_creation_notice));
-UPDATE imported_data SET date_creation_notice = TRIM(BOTH '$' FROM date_analyse);
+UPDATE imported_data SET date_creation_notice = TRIM(BOTH '$' FROM date_creation_notice);
 UPDATE imported_data SET date_creation_notice = '2015-01-01/2019-01-01' WHERE date_creation_notice = '2015/2019';
 
 /*
