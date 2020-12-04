@@ -46,9 +46,61 @@ CREATE TABLE imported_data (
 	auteur_transcription text,
 	__dummy text
 );
+
+DROP TABLE IF EXISTS imported_en;
+
+CREATE TABLE imported_en (
+	cote text,
+	type text,
+	datatype text,
+	dates text,
+	titre text,
+	sous_titre text,
+	auteur text,
+	destinataire text,
+	sujet text,
+	description text,
+	notes text,
+	resume text,
+	editeur text,
+	localisation text,
+	droits text,
+	ayants_droit text,
+	format text,
+	langue text,
+	etat_genetique text,
+	relations_genetiques text,
+	autres_ressources_relation text,
+	nature_document text,
+	support text,
+	etat_general text,
+	publication text,
+	representation text,
+	contexte_geographique text,
+	lieu_expedition text,
+	type_publication text,
+	titre_publication text,
+	lieu_publication text,
+	numero_publication text,
+	periodicite text,
+	directeur_publication text,
+	auteur_analyse text,
+	date_analyse text,
+	auteur_description text,
+	date_creation_notice text,
+	auteur_revision text,
+	date_revision_notice text,
+	auteur_transcription text,
+	__dummy text
+);
 -- Importation du CSV. Pourquoi en 2020, ce logiciel n'accepte pas les chemins relatifs ????
 COPY imported_data
 FROM 'E:\Esp-fotos.csv'--'D:\Boulot\L3\BASE_DE_DONNEES\PROJET\Esp-fotos.csv'
+DELIMITER ';'
+CSV HEADER;
+
+COPY imported_data
+FROM 'E:\Ang-fotos.csv'--'D:\Boulot\L3\BASE_DE_DONNEES\PROJET\Ang-fotos.csv'
 DELIMITER ';'
 CSV HEADER;
 
@@ -561,7 +613,7 @@ UPDATE imported_data SET publication = TRIM(blank_to_space(publication));
 SELECT publication FROM imported_data WHERE cote='MX-F-306';
 
 -- TODO : remove
-SELECT regexp_replace(blank_to_space('http://margaritaxirgu.es/002.jpg   Link'), '(https?://.+?)[[:blank:]]*+', 'a', 'ng'); -- : https://photooos.google.com/share/a3ln  https://photos.google.com/share/Aln'),
+-- SELECT regexp_replace(blank_to_space('http://margaritaxirgu.es/002.jpg   Link'), '(https?://.+?)[[:blank:]]*+', 'a', 'ng'); -- : https://photooos.google.com/share/a3ln  https://photos.google.com/share/Aln'),
 
 SELECT regexp_replace(blank_to_space('https://margaritaxirgu.es/002.jpg Link :  http://margaritaxirgu.es/002.jpg'), '(https?://[^[:blank:]]+)[[:blank:]]*([^(http)]*)', '[\1] (\2) ', 'g'); -- : https://photooos.google.com/share/a3ln  https://photos.google.com/share/Aln'),
 SELECT 'http://margaritaxirgu.es/002.jpg' ~ '(http://[^[:blank:]])';
