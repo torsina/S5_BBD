@@ -611,10 +611,16 @@ UPDATE imported_data SET etat_general=TRIM(LOWER(blank_to_space(etat_general)));
 -- Français -> Espagnol
 UPDATE imported_data SET etat_general='mediocre' WHERE LOWER(etat_general)='médiocre';
 UPDATE imported_data SET etat_general=NULL WHERE LOWER(etat_general)='indeterminado';
+UPDATE imported_en SET etat_general=trim_blank(LOWER(blank_to_space(etat_general)));
+UPDATE imported_en SET etat_general='very poor' WHERE LOWER(etat_general)='muy poor';
+UPDATE imported_en SET etat_general='good' WHERE LOWER(etat_general)='bueno';
+UPDATE imported_en SET etat_general='poor' WHERE LOWER(etat_general)='mediocre' or LOWER(etat_general)='médiocre';
+UPDATE imported_en SET etat_general=null WHERE LOWER(etat_general)='unspecified';							
 
 
 -- On retire les caractères en trop avant et après la publication.
 UPDATE imported_data SET publication = TRIM(blank_to_space(publication));
+UPDATE imported_en SET publication = TRIM(blank_to_space(publication));
 SELECT publication FROM imported_data WHERE cote='MX-F-306';
 
 -- TODO : remove
@@ -632,16 +638,47 @@ On retire les caractères en trop avant et après le mot.
 On passe les zones géographiques indéfinies à "NULL".
 Correction des erreurs pour certaines zones géographiques.
 */
-UPDATE imported_data SET contexte_geographique = TRIM(blank_to_space(contexte_geographique));
+UPDATE imported_data SET contexte_geographique = trim_blank((contexte_geographique));
 UPDATE imported_data SET contexte_geographique = NULL WHERE LOWER(contexte_geographique)='desconocido' or LOWER(contexte_geographique)='indeterminado' or contexte_geographique='#VALUE!';
-UPDATE imported_data SET contexte_geographique = 'Uruguay' WHERE contexte_geographique='uruguay';
-UPDATE imported_data SET contexte_geographique = 'Punta del Este' WHERE contexte_geographique='Punta del este';
-UPDATE imported_data SET contexte_geographique = 'Mérida España' WHERE contexte_geographique='Merida España' OR contexte_geographique='Merida' OR contexte_geographique='Merdia España' OR contexte_geographique='Medirda';
-UPDATE imported_data SET contexte_geographique = 'Madrid España' WHERE contexte_geographique='España Madrid';
-UPDATE imported_data SET contexte_geographique = 'España' WHERE contexte_geographique='Espagne';
-UPDATE imported_data SET contexte_geographique = 'Buenos Aires Argentina' WHERE contexte_geographique='Buenos Aires';
-UPDATE imported_data SET contexte_geographique = 'Barcelona España' WHERE contexte_geographique='Barcelona';
-UPDATE imported_data SET contexte_geographique = 'Badalona España' WHERE contexte_geographique='Badalona' OR contexte_geographique='España Badalona';
+UPDATE imported_data SET contexte_geographique = 'Uruguay' WHERE contexte_geographique='uruguay' 
+or contexte_geographique='Punta del este' or contexte_geographique='Teatro Solís de Montevideo' or contexte_geographique='intendencia Maldonado' or contexte_geographique='Punta ballena Uruguay'
+or contexte_geographique='Montevideo' or contexte_geographique='Uruguay.' or contexte_geographique='Uruguay Montevideo' or contexte_geographique='Punta del Este'
+or contexte_geographique='Uruguay | Montevideo';
+UPDATE imported_data SET contexte_geographique = 'España' WHERE contexte_geographique='Merida España' OR contexte_geographique='Merida' 
+OR contexte_geographique='Merdia España' OR contexte_geographique='Medirda' or contexte_geographique='España Madrid' or contexte_geographique='Espagne'
+or contexte_geographique='Barcelona' or contexte_geographique='Badalona' OR contexte_geographique='España Badalona'
+OR contexte_geographique='Granada España' OR contexte_geographique='Sevilla' OR contexte_geographique='Molins de Rei' OR contexte_geographique='Plaza Margarida Xirgu Barcelona'
+OR contexte_geographique='Colección de escenografía del Instituto del Teatro de la Diputación de Barcelona.' OR contexte_geographique='Madrid España'
+or contexte_geographique='Girona' or contexte_geographique='Barcelona España' or contexte_geographique='Guimera'
+or contexte_geographique='España Zaragoza' or contexte_geographique='Sala Margarita Xirgu,Teatro Español, Madrid, España' or contexte_geographique='Teatro romano de Merida' or contexte_geographique='teatro Goya de Barcelona'
+or contexte_geographique='Teatro romano de Merida' or contexte_geographique='Museo de Badalona' or contexte_geographique='Badalona España' or contexte_geographique='España Cataluña'
+or contexte_geographique='Cataluña España' or contexte_geographique='Valencia' or contexte_geographique='Plaza Margarida Xirgu Barcelona';
+UPDATE imported_data SET contexte_geographique = 'Argentina' WHERE contexte_geographique='Buenos Aires' or contexte_geographique='Buenos Aires Argentina';
+UPDATE imported_data SET contexte_geographique = 'Chile' WHERE contexte_geographique='chile';
+UPDATE imported_data SET contexte_geographique = 'Hispanoamerica' WHERE contexte_geographique='Hispanoameirca' or contexte_geographique='America Latina' or contexte_geographique='Uruguay Argentina o Chile';
+UPDATE imported_data SET contexte_geographique = 'Estados Unidos' WHERE contexte_geographique='Puerto Rico';
+
+
+UPDATE imported_en SET contexte_geographique = trim_blank((contexte_geographique));
+UPDATE imported_en SET contexte_geographique = NULL WHERE LOWER(contexte_geographique)='desconocido' 
+or LOWER(contexte_geographique)='indeterminado' or contexte_geographique='#VALUE!' or LOWER(contexte_geographique)='undetermined';
+UPDATE imported_en SET contexte_geographique = 'Spain' WHERE contexte_geographique='Barcelona'
+or contexte_geographique='Merdida' or contexte_geographique='Granada Spain' or contexte_geographique='Colección de escenografía del Instituto del theatrede la Diputación de Barcelona.'
+or contexte_geographique='Badalona' or contexte_geographique='Molins de Rei' or contexte_geographique='Sevilla' or contexte_geographique='Plaza Margarida Xirgu Barcelona'
+or contexte_geographique='Merdia Spain' or contexte_geographique='Cataluña Spain' or contexte_geographique='Merida Spain' or contexte_geographique='Guimera'
+or contexte_geographique='Girona' or contexte_geographique='Spain Badalona' or contexte_geographique='Barcelona Spain' or contexte_geographique='Barcelona'
+or contexte_geographique='Museo de Badalona' or contexte_geographique='Spain Madrid' or contexte_geographique='Spain Cataluña' or contexte_geographique='Spain Zaragoza'
+or contexte_geographique='Madrid Spain' or contexte_geographique='Valencia' or contexte_geographique='theatreGoya de Barcelona' or contexte_geographique='Badalona Spain'
+or contexte_geographique='Margarita Xirgu Room,,theatreEspañol, Madrid, Spain' or contexte_geographique='Medirda'
+or contexte_geographique='Roman theater of Merida' or contexte_geographique='Merida';
+UPDATE imported_en SET contexte_geographique = 'Uruguay' WHERE contexte_geographique='Uruguay.' or contexte_geographique='Punta del Este'
+or contexte_geographique='intendencia Maldonado' or contexte_geographique='Punta ballena Uruguay' or contexte_geographique='theatreSolís de Montevideo'
+or contexte_geographique='uruguay' or contexte_geographique='Montevideo' or contexte_geographique='Punta del este'
+or contexte_geographique='Uruguay Montevideo' or contexte_geographique='' or contexte_geographique='Uruguay | Montevideo';
+UPDATE imported_en SET contexte_geographique = 'Chile' WHERE contexte_geographique='chile';
+UPDATE imported_en SET contexte_geographique = 'Argentina' WHERE contexte_geographique='Buenos Aires Argentina' or contexte_geographique='Buenos Aires';
+UPDATE imported_en SET contexte_geographique = 'USA' WHERE contexte_geographique='Puerto Rico';
+UPDATE imported_en SET contexte_geographique = 'Latin America' WHERE contexte_geographique='Uruguay Argentina or Chile';
 
 /*
 On retire les caractères en trop avant et après le mot.
@@ -682,6 +719,7 @@ UPDATE imported_data SET directeur_publication = TRIM(blank_to_space(directeur_p
 On retire les caractères en trop avant et après le mot.
 */
 UPDATE imported_data SET auteur_analyse = TRIM(blank_to_space(auteur_analyse));
+UPDATE imported_en SET auteur_analyse = TRIM(blank_to_space(auteur_analyse));
 
 /*
 On retire les caractères en trop avant et après le mot ainsi que le "$".
@@ -690,14 +728,18 @@ Correction d'une date pour une future utilisation
 UPDATE imported_data SET date_analyse = TRIM(blank_to_space(date_analyse));
 UPDATE imported_data SET date_analyse = TRIM(BOTH '$' FROM date_analyse);
 UPDATE imported_data SET date_analyse = '2015-01-01/2019-01-01' WHERE date_analyse = '2015/2019';
-
+UPDATE imported_en SET date_analyse = TRIM(blank_to_space(date_analyse));
+UPDATE imported_en SET date_analyse = TRIM(BOTH '$' FROM date_analyse);
+UPDATE imported_en SET date_analyse = '2015-01-01/2019-01-01' WHERE date_analyse = '2015/2019';
+							  
 /*
 On retire les caractères en trop avant et après le mot.
 Correction des erreurs pour certains noms (convention: nom puis prénom).
 */
 UPDATE imported_data SET auteur_description = TRIM(blank_to_space(auteur_description));
 UPDATE imported_data SET auteur_description = 'Gil Alan' WHERE auteur_description = 'Alan Gil';
-
+UPDATE imported_en SET auteur_description = TRIM(blank_to_space(auteur_description));
+UPDATE imported_en SET auteur_description = 'Gil Alan' WHERE auteur_description = 'Alan Gil';
 /*
 On retire les caractères en trop avant et après le mot ainsi que le "$".
 Correction d'une date pour une future utilisation
@@ -705,7 +747,10 @@ Correction d'une date pour une future utilisation
 UPDATE imported_data SET date_creation_notice = TRIM(blank_to_space(date_creation_notice));
 UPDATE imported_data SET date_creation_notice = TRIM(BOTH '$' FROM date_creation_notice);
 UPDATE imported_data SET date_creation_notice = '2015-01-01/2019-01-01' WHERE date_creation_notice = '2015/2019';
-
+UPDATE imported_en SET date_creation_notice = TRIM(blank_to_space(date_creation_notice));
+UPDATE imported_en SET date_creation_notice = TRIM(BOTH '$' FROM date_creation_notice);
+UPDATE imported_en SET date_creation_notice = '2015-01-01/2019-01-01' WHERE date_creation_notice = '2015/2019';
+								  
 /*
 On retire les caractères en trop avant et après le mot.
 */
@@ -719,7 +764,10 @@ UPDATE imported_data SET date_revision_notice = TRIM(blank_to_space(date_revisio
 ALTER TABLE imported_data 
 	ALTER date_revision_notice DROP DEFAULT,
 	ALTER date_revision_notice TYPE timestamp USING date_revision_notice::timestamp;
-
+ALTER TABLE imported_en 
+	ALTER date_revision_notice DROP DEFAULT,
+	ALTER date_revision_notice TYPE timestamp USING date_revision_notice::timestamp;
+								    
 /*
 On retire les caractères en trop avant et après le mot.
 */
