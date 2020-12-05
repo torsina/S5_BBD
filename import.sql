@@ -164,6 +164,7 @@ Caractères supprimés :
 0x0A
 0xE2
 0x2006
+0x0D
 
 Ces caractères ont été détectés dans le fichier.
 */
@@ -172,8 +173,10 @@ RETURNS text AS $$
 DECLARE
 	t_returned text;
 BEGIN
-	t_returned := regexp_replace(t, '^[\xC2\xA0\x20\x0A\xE2\x2006\x0D]*', '');
-	t_returned := regexp_replace(t_returned, '[\xC2\xA0\x20\x0A\xE2\x2006\x0D]*$', '');
+	-- Remplacement en début de chaîne de caractères
+	t_returned := regexp_replace(t, '^[\xC2\xA0\x20\x0A\xE2\x2006\x0D]+', '');
+	-- Remplacement en fin de chaîne de caractères
+	t_returned := regexp_replace(t_returned, '[\xC2\xA0\x20\x0A\xE2\x2006\x0D]+$', '');
 	IF char_length(t_returned)=0
 	THEN
 		RETURN NULL;
@@ -193,6 +196,7 @@ Caractères supprimés :
 0x0A
 0xE2
 0x2006
+0x0D
 
 Caractère de remplacement :
 0x20 (espace)
@@ -202,7 +206,7 @@ Ces caractères ont été détectés dans le fichier.
 CREATE OR REPLACE FUNCTION blank_to_space(t text)
 RETURNS text AS $$
 BEGIN
-	RETURN regexp_replace(t, E'[\\xC2\\xA0\\x20\\x0A\\xE2\\x2006\\x0D]*', ' ', 'g');
+	RETURN regexp_replace(t, E'[\\xC2\\xA0\\x20\\x0A\\xE2\\x2006\\x0D]+', ' ', 'g');
 END;
 $$ LANGUAGE plpgsql;
 
@@ -224,14 +228,16 @@ UPDATE imported_data SET __dummy=blank_to_space(__dummy);
 
 -- On retire les caractères en trop avant et après la cote.
 UPDATE imported_data SET cote=TRIM(cote);
+UPDATE imported_en SET cote=TRIM(cote);
 
 -- Test, on vérifie que toutes les cotes sont uniques et qu'elles vérifient bien le bon format.
-SELECT COUNT(DISTINCT cote)=1122 FROM imported_data WHERE cote ~ '\w{1,3}-\w{1,3}-\w{1,3}';
+-- SELECT COUNT(DISTINCT cote)=1122 FROM imported_data WHERE cote ~ '\w{1,3}-\w{1,3}-\w{1,3}';
 
 ------------------------------------------------TYPE------------------------------------------------
 
 -- On retire les caractères en trop avant et après le type.
 UPDATE imported_data SET type=TRIM(blank_to_space(type));
+UPDATE imported_en SET type=TRIM(blank_to_space(type));
 /*
 On sait, par analyse, que tous les documents commençant par MX-F- sont du type "Fotos".
 On peut même partir du principe que
@@ -968,3 +974,5 @@ INSERT INTO localisation(texte,id_pays) VALUES
 
 INSERT INTO etat(nom) VALUES
 ('muy dañado'),('dañado'),('muy mediocre'),('mediocre'),('bueno');
+
+SELECT DISTINCT(A.type, B.type) FROM imported_data A INNER JOIN imported_en B ON A.cote=B.cote WHERE A.type != B.type;
