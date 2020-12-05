@@ -239,6 +239,8 @@ UPDATE imported_en SET cote=TRIM(cote);
 UPDATE imported_data SET type=TRIM(blank_to_space(type));
 UPDATE imported_en SET type=TRIM(blank_to_space(type));
 /*
+Pour les données en espagnol :
+
 On sait, par analyse, que tous les documents commençant par MX-F- sont du type "Fotos".
 On peut même partir du principe que
 MX = Margarita Xirgu
@@ -256,9 +258,12 @@ On retire les caractères en trop avant et après le datatype.
 On passe datatype en minsucule pour uniformiser la casse, qui était différente.
 */
 UPDATE imported_data SET datatype=LOWER(TRIM(blank_to_space(datatype)));
+UPDATE imported_en SET datatype=LOWER(TRIM(blank_to_space(datatype)));
 
 ------------------------------------------------DATES------------------------------------------------
 /*
+Pour les données en espagnol :
+
 On retire les caractères en trop avant et après la date.
 Toutes les dates inconnues sont passées à "NULL".
 Correction des erreurs pour certaines dates.
@@ -279,6 +284,13 @@ UPDATE imported_data SET dates='1910-1925' WHERE cote='MX-F-30';
 UPDATE imported_data SET dates='1992-2020' WHERE cote='MX-F-1058'; -- '19920-2020' -> '1992-2020'
 UPDATE imported_data SET dates=regexp_replace(dates, '\.$', ''); -- Certains enregistrements ont une date qui finit par ".". On le supprime.
 
+/*
+Pour les données en anglais :
+
+Ce sont des doublons (parfois erronnés) de la colonne date des données espagnoles.
+*/
+UPDATE imported_en SET dates=NULL;
+
 -- Test, vérifie que tous les enregistrements sont au bon format.
 SELECT COUNT(*)=0 FROM imported_data WHERE dates !~ '^\d{4}-\d{2}-\d{2}$' AND dates !~ '^\d{4}$' AND dates !~ '^\d{4}-\d{4}$';
 
@@ -290,6 +302,26 @@ On retire les caractères en trop avant et après le titre.
 */
 UPDATE imported_data SET titre='Magarita Xirgu' WHERE cote='MX-F-20';
 UPDATE imported_data SET titre=TRIM(blank_to_space(titre));
+-- Faute : Mragarrita -> Margarita
+UPDATE imported_data SET titre='Caricatura Margarita Xirgu' WHERE titre='Caricatura Mragarrita Xirgu';
+
+UPDATE imported_en SET titre=TRIM(blank_to_space(titre));
+-- Problème : d au lieu de t dans les données. S majuscule/minuscule à street.
+UPDATE imported_en SET titre='Margarita Xirgu Badalona Street' WHERE LOWER(titre)='margarida xirgu de badalona street';
+-- Plein de fautes, espace manquant
+UPDATE imported_en SET titre='Drawing from a representation' WHERE titre='Draw from a represatation' OR titre='Draw froma represatation';
+-- On remplace acting par performing
+UPDATE imported_en SET titre=regexp_replace(LOWER(titre), 'acting', 'performing');
+-- On remplace mragarita par Margarita
+UPDATE imported_en SET titre=regexp_replace(LOWER(titre), 'mragarita', 'Margarita');
+UPDATE imported_en SET titre='Brochures and documents' WHERE titre='brochures and document' OR titre='folletos y documentos';
+UPDATE imported_en SET titre='sculpture' WHERE titre='escultura';
+-- Un texte en espagnol s'est retrouvé dans les titres anglais
+UPDATE imported_en SET titre='"only a theater actress" estela medina. national theatre of catalonia' WHERE titre='"solo una actriz de teatro" estela medina. teatre nacional de cataluña';
+-- Le titre anglais carmen est le même que le titre espagnol
+DELETE FROM imported_en WHERE titre='carmen';
+-- Le titre anglais calle xirgu est le même que le titre espagnol
+DELETE FROM imported_en WHERE titre='calle xirgu';
 ------------------------------------------------SOUS-TITRE------------------------------------------------
 
 -- On retire les caractères en trop avant et après le sous-titre.
@@ -303,6 +335,8 @@ SELECT COUNT(sous_titre)=1 FROM imported_data;
 ------------------------------------------------AUTEUR------------------------------------------------
 
 /*
+Pour les données en espagnol :
+
 On retire les caractères en trop avant et après l'auteur.
 On passe à "NULL" tous les auteurs inconnus
 */
@@ -320,6 +354,24 @@ UPDATE imported_data SET auteur='Frederico Garcia Lorca' WHERE LOWER(auteur)='fr
 -- Certains enregistrements ont un auteur qui finit par ".". On le supprime.
 UPDATE imported_data SET auteur=regexp_replace(auteur, '\.$', '');
 UPDATE imported_data SET auteur='Revista Mundo Nuevo' WHERE LOWER(auteur)='nuevo mundo' OR LOWER(auteur)='nuevo mundo revista';
+
+/*
+Pour les données en anglais :
+*/
+UPDATE imported_en SET auteur=TRIM(blank_to_space(auteur));
+UPDATE imported_en SET auteur=NULL WHERE LOWER(auteur)='undetermined';
+-- Il manque une partie du nom de famille
+UPDATE imported_en SET auteur='Amparo Climent Corbín.' WHERE auteur='Amparo Climent.';
+-- Un nom de famille a été traduit et un autre contient une faute
+UPDATE imported_en SET auteur='Antonio Bueno' WHERE auteur='Antonio Good' OR auteur='Antoinio Bueno';
+-- On corrige la casse
+UPDATE imported_en SET auteur='Frederico Garcia Lorca' WHERE LOWER(auteur)='frederico garcia lorca';
+-- On corrige la casse et on traduit revista en magazine
+UPDATE imported_en SET auteur='Revista Mundo magazine' WHERE LOWER(auteur) LIKE 'nuevo mundo%';
+-- On supprime les points à la fin
+UPDATE imported_en SET auteur=regexp_replace(auteur, '\.$', '');
+-- On supprime tous les enregistrements qui sont similaires à ceux des données espagnoles
+UPDATE imported_en B SET auteur=NULL WHERE B.auteur=(SELECT A.auteur FROM imported_data A WHERE B.cote=A.cote);
 
 ------------------------------------------------DESTINATAIRE------------------------------------------------
 
@@ -975,4 +1027,4 @@ INSERT INTO localisation(texte,id_pays) VALUES
 INSERT INTO etat(nom) VALUES
 ('muy dañado'),('dañado'),('muy mediocre'),('mediocre'),('bueno');
 
-SELECT DISTINCT(A.type, B.type) FROM imported_data A INNER JOIN imported_en B ON A.cote=B.cote WHERE A.type != B.type;
+
