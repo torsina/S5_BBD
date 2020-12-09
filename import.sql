@@ -1178,7 +1178,7 @@ CREATE TABLE revision (
 ------------------------------------------------ MISE EN PLACE DES INSERTIONS ------------------------------------------------		
 							   
 						 
-INSERT INTO personne(nom,prenom) VALUES ('Gil','Alan');
+/*INSERT INTO personne(nom,prenom) VALUES ('Gil','Alan');
 INSERT INTO personne(nom,prenom) VALUES ('Chantraine Braillon','Cécile');
 INSERT INTO personne(nom,prenom) VALUES ('Idmhand','Fatiha');
 
@@ -1239,6 +1239,6 @@ INSERT INTO localisation(texte,id_pays) VALUES
 ('Ciudad Real Museo Nacional Del teatro',1);
 
 INSERT INTO etat(nom) VALUES
-('muy dañado'),('dañado'),('muy mediocre'),('mediocre'),('bueno');
+('muy dañado'),('dañado'),('muy mediocre'),('mediocre'),('bueno');*/
 
 
