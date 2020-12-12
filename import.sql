@@ -1075,4 +1075,4 @@ INSERT INTO localisation(texte,id_pays) VALUES
 INSERT INTO etat(nom) VALUES
 ('muy dañado'),('dañado'),('muy mediocre'),('mediocre'),('bueno');
 
-
+SELECT DISTINCT(auteur_description) FROM imported_en;
