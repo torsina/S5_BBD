@@ -1380,19 +1380,18 @@ CREATE TABLE langue
 DROP TABLE IF EXISTS personne CASCADE;
 CREATE TABLE personne
 (
-    id_personne serial PRIMARY KEY,
+    id_personne serial primary key,
     nom         varchar(25),
     prenom      varchar(25)
 );
 
 DROP TABLE IF EXISTS type CASCADE;
-
 CREATE TABLE type
 (
     id_type serial,
-	code    VARCHAR(3),
-    nom     VARCHAR(50),
-	PRIMARY KEY(id_type, code),
+    nom     varchar(50),
+	code	varchar(3),
+	PRIMARY KEY(id_type,code),
 	FOREIGN KEY (code) REFERENCES langue(code)
 );
 
@@ -1400,9 +1399,9 @@ DROP TABLE IF EXISTS datatype CASCADE;
 CREATE TABLE datatype
 (
     id_datatype serial,
-	code        VARCHAR(3),
-    nom         VARCHAR(10),
-	PRIMARY KEY(id_datatype, code),
+    nom         varchar(10),
+	code	varchar(3),
+	PRIMARY KEY(id_datatype,code),
 	FOREIGN KEY (code) REFERENCES langue(code)
 );
 
@@ -1410,64 +1409,59 @@ DROP TABLE IF EXISTS titre CASCADE;
 CREATE TABLE titre
 (
     id_titre serial,
-	code     VARCHAR(3),
-    nom      VARCHAR(150),
-	PRIMARY KEY(id_titre, code),
+    nom      varchar(150),
+	code	varchar(3),
+	PRIMARY KEY(id_titre,code),
 	FOREIGN KEY (code) REFERENCES langue(code)
 );
-
 
 DROP TABLE IF EXISTS sous_titre CASCADE;
 CREATE TABLE sous_titre
 (
     id_sous_titre serial,
-	code          VARCHAR(3),
-    nom           TEXT,
-	PRIMARY KEY(id_sous_titre, code),
+    nom           text,
+	code	varchar(3),
+	PRIMARY KEY(id_sous_titre,code),
 	FOREIGN KEY (code) REFERENCES langue(code)
 );
-
 
 DROP TABLE IF EXISTS auteur CASCADE;
 CREATE TABLE auteur
 (
     id_auteur serial,
-	code      VARCHAR(3),
-    nom       VARCHAR(50),
-	PRIMARY KEY(id_auteur, code),
+    nom       varchar(50),
+	code	varchar(3),
+	PRIMARY KEY(id_auteur,code),
 	FOREIGN KEY (code) REFERENCES langue(code)
 );
-
 
 DROP TABLE IF EXISTS destinataire CASCADE;
 CREATE TABLE destinataire
 (
     id_destinataire serial,
-	code            VARCHAR(3),
-    nom             TEXT,
-	PRIMARY KEY(id_destinataire, code),
+    nom             text,
+	code	varchar(3),
+	PRIMARY KEY(id_destinataire,code),
 	FOREIGN KEY (code) REFERENCES langue(code)
 );
-
 
 DROP TABLE IF EXISTS sujet CASCADE;
 CREATE TABLE sujet
 (
     id_sujet serial,
-	code     VARCHAR(3),
-    nom      TEXT,
-	PRIMARY KEY(id_sujet, code),
+    nom      text,
+	code	varchar(3),
+	PRIMARY KEY(id_sujet,code),
 	FOREIGN KEY (code) REFERENCES langue(code)
 );
-
 
 DROP TABLE IF EXISTS description CASCADE;
 CREATE TABLE description
 (
     id_description serial,
-	code           VARCHAR(3),
-    texte          TEXT,
-	PRIMARY KEY(id_description, code),
+    texte          text,
+	code	varchar(3),
+	PRIMARY KEY(id_description,code),
 	FOREIGN KEY (code) REFERENCES langue(code)
 );
 
@@ -1475,8 +1469,10 @@ DROP TABLE IF EXISTS auteur_description CASCADE;
 CREATE TABLE auteur_description
 (
     id_description integer,
+	code		varchar(3),
     id_personne    integer,
-    /*FOREIGN KEY (id_description) REFERENCES description(id_description),*/
+	PRIMARY KEY(id_description,id_personne),
+    FOREIGN KEY (id_description,code) REFERENCES description(id_description,code),
     FOREIGN KEY (id_personne) REFERENCES personne (id_personne)
 );
 
@@ -1497,11 +1493,10 @@ CREATE TABLE document
 DROP TABLE IF EXISTS notes CASCADE;
 CREATE TABLE notes
 (
-    id_document VARCHAR(15),
-	code        VARCHAR(3),
-    texte       TEXT,
+    id_document varchar(15),
+    texte       text,
     id_auteur   integer,
-	PRIMARY KEY(id_document, code),
+	code	varchar(3),
 	FOREIGN KEY (code) REFERENCES langue(code),
     FOREIGN KEY (id_auteur) REFERENCES personne (id_personne),
     FOREIGN KEY (id_document) REFERENCES document (id_document)
@@ -1510,123 +1505,90 @@ CREATE TABLE notes
 DROP TABLE IF EXISTS resume CASCADE;
 CREATE TABLE resume
 (
-    id_document VARCHAR(15),
-	code        VARCHAR(3),
-    texte       TEXT,
-	PRIMARY KEY(id_document, code),
+    id_document varchar(15),
+    texte       text,
+	code	varchar(3),
 	FOREIGN KEY (code) REFERENCES langue(code),
     FOREIGN KEY (id_document) REFERENCES document (id_document)
 );
 
-DROP TABLE IF EXISTS responsable_archive_es,responsable_archive_en CASCADE;
-CREATE TABLE responsable_archive_es
+DROP TABLE IF EXISTS responsable_archive CASCADE;
+CREATE TABLE responsable_archive
 (
-    id_reponsable_archive serial primary key,
-    nom                   varchar(150)
+    id_reponsable_archive serial,
+    nom                   varchar(150),
+	code	varchar(3),
+	PRIMARY KEY(id_reponsable_archive,code),
+	FOREIGN KEY (code) REFERENCES langue(code)
 );
 
-CREATE TABLE responsable_archive_en
-(
-    id_reponsable_archive serial primary key,
-    nom                   varchar(150)
-);
-
-DROP TABLE IF EXISTS responsable_scientifique_es,responsable_scientifique_en CASCADE;
-CREATE TABLE responsable_scientifique_es
+DROP TABLE IF EXISTS responsable_scientifique CASCADE;
+CREATE TABLE responsable_scientifique
 (
     id_reponsable integer,
     localisation  varchar(150),
     statut        varchar(150),
     poste         varchar(150),
-    PRIMARY KEY (id_reponsable),
+	code	varchar(3),
+	FOREIGN KEY (code) REFERENCES langue(code),
+    PRIMARY KEY(id_reponsable,code),
     FOREIGN KEY (id_reponsable) REFERENCES personne (id_personne)
 );
 
-CREATE TABLE responsable_scientifique_en
+DROP TABLE IF EXISTS editeur CASCADE;
+CREATE TABLE editeur
 (
-    id_reponsable integer,
-    localisation  varchar(150),
-    statut        varchar(150),
-    poste         varchar(150),
-    PRIMARY KEY (id_reponsable),
-    FOREIGN KEY (id_reponsable) REFERENCES personne (id_personne)
+    id_editeur  serial,
+    nom_editeur varchar(150),
+	code	varchar(3),
+	PRIMARY KEY(id_editeur,code),
+	FOREIGN KEY (code) REFERENCES langue(code)
 );
 
-DROP TABLE IF EXISTS editeur_es,editeur_en CASCADE;
-CREATE TABLE editeur_es
+DROP TABLE IF EXISTS contexte_geo CASCADE;
+CREATE TABLE contexte_geo
 (
-    id_editeur  serial primary key,
-    nom_editeur varchar(150)
-);
-
-CREATE TABLE editeur_en
-(
-    id_editeur  serial primary key,
-    nom_editeur varchar(150)
-);
-
-DROP TABLE IF EXISTS contexte_geo_es,contexte_geo_en CASCADE;
-CREATE TABLE contexte_geo_es
-(
-    id_contexte_geo serial primary key,
+    id_contexte_geo serial ,
     nom             varchar(30),
     lat             float,
-    lon             float
+    lon             float,
+	code	varchar(3),
+	PRIMARY KEY(id_contexte_geo,code),
+	FOREIGN KEY (code) REFERENCES langue(code)
 );
 
-CREATE TABLE contexte_geo_en
+DROP TABLE IF EXISTS localisation CASCADE;
+CREATE TABLE localisation
 (
-    id_contexte_geo serial primary key,
-    nom             varchar(30),
-    lat             float,
-    lon             float
-);
-
-DROP TABLE IF EXISTS localisation_es,localisation_en CASCADE;
-CREATE TABLE localisation_es
-(
-    id_localisation serial primary key,
+    id_localisation serial,
     nom             varchar(300),
     id_contexte_geo integer DEFAULT null,
+	code	varchar(3),
+	PRIMARY KEY(id_localisation,code),
+	FOREIGN KEY (code) REFERENCES langue(code),
     FOREIGN KEY (id_contexte_geo) REFERENCES contexte_geo_es (id_contexte_geo)
 );
 
-CREATE TABLE localisation_en
+DROP TABLE IF EXISTS licence CASCADE;
+CREATE TABLE licence
 (
-    id_localisation serial primary key,
-    nom             varchar(300),
-    id_contexte_geo integer DEFAULT null,
-    FOREIGN KEY (id_contexte_geo) REFERENCES contexte_geo_en (id_contexte_geo)
+    id_licence serial,
+    texte      text,
+	code	varchar(3),
+	PRIMARY KEY(id_licence,code),
+	FOREIGN KEY (code) REFERENCES langue(code)
 );
 
-DROP TABLE IF EXISTS licence_es,licence_en CASCADE;
-CREATE TABLE licence_es
+DROP TABLE IF EXISTS droits CASCADE;
+CREATE TABLE droits
 (
-    id_licence serial primary key,
-    texte      text
-);
-
-CREATE TABLE licence_en
-(
-    id_licence serial primary key,
-    texte      text
-);
-
-DROP TABLE IF EXISTS droits_es,droits_en CASCADE;
-CREATE TABLE droits_es
-(
-    id_droit   serial primary key,
+    id_droit   serial,
     texte      text,
     id_licence integer,
+	code	varchar(3),
+	PRIMARY KEY(id_droit,code),
+	FOREIGN KEY (code) REFERENCES langue(code),
     FOREIGN KEY (id_licence) REFERENCES licence_es (id_licence)
-);
-
-CREATE TABLE droits_en
-(
-    id_droit   serial primary key,
-    texte      text,
-    id_licence integer,
-    FOREIGN KEY (id_licence) REFERENCES licence_en (id_licence)
 );
 
 DROP TABLE IF EXISTS etat_genetique CASCADE;
@@ -1653,64 +1615,46 @@ CREATE TABLE nature_document
     FOREIGN KEY (id_document) REFERENCES document (id_document)
 );
 
-DROP TABLE IF EXISTS support_es,support_en CASCADE;
-CREATE TABLE support_es
+DROP TABLE IF EXISTS support CASCADE;
+CREATE TABLE support
 (
     id_document varchar(15),
     nom         varchar(7) NOT NULL,
     CHECK (nom = 'DIGITAL' or nom = 'PAPEL'),
+	code	varchar(3),
+	FOREIGN KEY (code) REFERENCES langue(code),
     FOREIGN KEY (id_document) REFERENCES document (id_document)
 );
 
-CREATE TABLE support_en
+DROP TABLE IF EXISTS etat CASCADE;
+CREATE TABLE etat
+(
+	id_etat serial,
+	nom varchar(15),
+	code	varchar(3),
+	PRIMARY KEY(id_etat,code),
+	FOREIGN KEY (code) REFERENCES langue(code)
+);
+
+DROP TABLE IF EXISTS etat_general CASCADE;
+CREATE TABLE etat_general
 (
     id_document varchar(15),
-    nom         varchar(7) NOT NULL
-        CHECK (nom = 'DIGITAL' or nom = 'PAPER'),
-    FOREIGN KEY (id_document) REFERENCES document (id_document)
-);
-
-DROP TABLE IF EXISTS etat_es, etat_en CASCADE;
-CREATE TABLE etat_es
-(
-	nom varchar(15) primary key
-);
-
-CREATE TABLE etat_en
-(
-	nom varchar(15) primary key
-);
-
-DROP TABLE IF EXISTS etat_general_es,etat_general_en CASCADE;
-CREATE TABLE etat_general_es
-(
-    id_document varchar(15),
-    nom         varchar(15),
+    id_etat         integer,
+	code		varchar(3),
+	PRIMARY KEY(id_document,code),
     FOREIGN KEY (id_document) REFERENCES document (id_document),
-	FOREIGN KEY (nom) REFERENCES etat_es(nom)
+	FOREIGN KEY (id_etat,code) REFERENCES etat(id_etat,code)
 );
 
-CREATE TABLE etat_general_en
-(
-    id_document varchar(15),
-    nom         varchar(15),
-    FOREIGN KEY (id_document) REFERENCES document (id_document),
-	FOREIGN KEY (nom) REFERENCES etat_en(nom)
-);
-
-DROP TABLE IF EXISTS publication_es,publication_en CASCADE;
-CREATE TABLE publication_es
+DROP TABLE IF EXISTS publication CASCADE;
+CREATE TABLE publication
 (
     id_document varchar(15),
     texte       text,
-    FOREIGN KEY (id_document) REFERENCES document (id_document)
-);
-
-CREATE TABLE publication_en
-(
-    id_document varchar(15),
-    texte       text,
-    FOREIGN KEY (id_document) REFERENCES document (id_document)
+    FOREIGN KEY (id_document) REFERENCES document (id_document),
+	code	varchar(3),
+	FOREIGN KEY (code) REFERENCES langue(code)
 );
 
 DROP TABLE IF EXISTS representation CASCADE;
