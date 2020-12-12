@@ -1853,7 +1853,6 @@ INSERT INTO etat(nom) VALUES
 ('muy dañado'),('dañado'),('muy mediocre'),('mediocre'),('bueno');
 
 SELECT DISTINCT(auteur_description) FROM imported_en;
-=======
 ('Peru',-6.8699697,-75.0458515),
 ('Hispanoamerica',null,null);
 
