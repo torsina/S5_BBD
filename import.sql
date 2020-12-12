@@ -1491,366 +1491,6 @@ CREATE TABLE auteur_description
     FOREIGN KEY (id_personne) REFERENCES personne (id_personne)
 );
 
-DROP TABLE IF EXISTS document;
-CREATE TABLE document
-(
-    id_document          varchar(15) primary key,
-    dates_debut          timestamp,
-    dates_fin            timestamp,
-    relations_genetiques text,
-    format               varchar(15),
-    id_auteur_analyse    integer,
-    data_analyse         timestamp NOT NULL DEFAULT NOW(),
-    data_creation_notice timestamp          DEFAULT NULL,
-    FOREIGN KEY (id_auteur_analyse) REFERENCES personne (id_personne)
-);
-
-DROP TABLE IF EXISTS notes CASCADE;
-CREATE TABLE notes
-(
-    id_document varchar(15),
-    texte       text,
-    id_auteur   integer,
-    FOREIGN KEY (id_auteur) REFERENCES personne (id_personne),
-    FOREIGN KEY (id_document) REFERENCES document (id_document)
-);
-
-DROP TABLE IF EXISTS resume_es,resume_en CASCADE;
-CREATE TABLE resume_es
-(
-    id_document varchar(15),
-    texte       text,
-    FOREIGN KEY (id_document) REFERENCES document (id_document)
-);
-
-CREATE TABLE resume_en
-(
-    id_document varchar(15),
-    texte       text,
-    FOREIGN KEY (id_document) REFERENCES document (id_document)
-);
-
-DROP TABLE IF EXISTS responsable_archive_es,responsable_archive_en CASCADE;
-CREATE TABLE responsable_archive_es
-(
-    id_reponsable_archive serial primary key,
-    nom                   varchar(150)
-);
-
-CREATE TABLE responsable_archive_en
-(
-    id_reponsable_archive serial primary key,
-    nom                   varchar(150)
-);
-
-DROP TABLE IF EXISTS responsable_scientifique_es,responsable_scientifique_en CASCADE;
-CREATE TABLE responsable_scientifique_es
-(
-    id_reponsable integer,
-    localisation  varchar(150),
-    statut        varchar(150),
-    poste         varchar(150),
-    PRIMARY KEY (id_reponsable),
-    FOREIGN KEY (id_reponsable) REFERENCES personne (id_personne)
-);
-
-CREATE TABLE responsable_scientifique_en
-(
-    id_reponsable integer,
-    localisation  varchar(150),
-    statut        varchar(150),
-    poste         varchar(150),
-    PRIMARY KEY (id_reponsable),
-    FOREIGN KEY (id_reponsable) REFERENCES personne (id_personne)
-);
-
-DROP TABLE IF EXISTS editeur_es,editeur_en CASCADE;
-CREATE TABLE editeur_es
-(
-    id_editeur  serial primary key,
-    nom_editeur varchar(150)
-);
-
-CREATE TABLE editeur_en
-(
-    id_editeur  serial primary key,
-    nom_editeur varchar(150)
-);
-
-DROP TABLE IF EXISTS contexte_geo_es,contexte_geo_en CASCADE;
-CREATE TABLE contexte_geo_es
-(
-    id_contexte_geo serial primary key,
-    nom             varchar(30),
-    lat             float,
-    lon             float
-);
-
-CREATE TABLE contexte_geo_en
-(
-    id_contexte_geo serial primary key,
-    nom             varchar(30),
-    lat             float,
-    lon             float
-);
-
-DROP TABLE IF EXISTS localisation_es,localisation_en CASCADE;
-CREATE TABLE localisation_es
-(
-    id_localisation serial primary key,
-    nom             varchar(20),
-    id_contexte_geo integer NOT NULL,
-    FOREIGN KEY (id_contexte_geo) REFERENCES contexte_geo_es (id_contexte_geo)
-);
-
-CREATE TABLE localisation_en
-(
-    id_localisation serial primary key,
-    nom             varchar(20),
-    id_contexte_geo integer NOT NULL,
-    FOREIGN KEY (id_contexte_geo) REFERENCES contexte_geo_en (id_contexte_geo)
-);
-
-DROP TABLE IF EXISTS licence_es,licence_en CASCADE;
-CREATE TABLE licence_es
-(
-    id_licence serial primary key,
-    texte      text
-);
-
-CREATE TABLE licence_en
-(
-    id_licence serial primary key,
-    texte      text
-);
-
-DROP TABLE IF EXISTS droits_es,droits_en CASCADE;
-CREATE TABLE droits_es
-(
-    id_droit   serial primary key,
-    texte      text,
-    id_licence integer,
-    FOREIGN KEY (id_licence) REFERENCES licence_es (id_licence)
-);
-
-CREATE TABLE droits_en
-(
-    id_droit   serial primary key,
-    texte      text,
-    id_licence integer,
-    FOREIGN KEY (id_licence) REFERENCES licence_en (id_licence)
-);
-
-DROP TABLE IF EXISTS etat_genetique CASCADE;
-CREATE TABLE etat_genetique
-(
-    id_document varchar(15),
-    texte       text,
-    FOREIGN KEY (id_document) REFERENCES document (id_document)
-);
-
-DROP TABLE IF EXISTS autres_relations CASCADE;
-CREATE TABLE autres_relations
-(
-    id_document varchar(15),
-    texte       text,
-    FOREIGN KEY (id_document) REFERENCES document (id_document)
-);
-
-DROP TABLE IF EXISTS nature_document CASCADE;
-CREATE TABLE nature_document
-(
-    id_document varchar(15),
-    nom         varchar(10),
-    FOREIGN KEY (id_document) REFERENCES document (id_document)
-);
-
-DROP TABLE IF EXISTS support_es,support_en CASCADE;
-CREATE TABLE support_es
-(
-    id_document varchar(15),
-    nom         varchar(7) NOT NULL,
-    CHECK (nom = 'digital' or nom = 'papel'),
-    FOREIGN KEY (id_document) REFERENCES document (id_document)
-);
-
-CREATE TABLE support_en
-(
-    id_document varchar(15),
-    nom         varchar(7) NOT NULL
-        CHECK (nom = 'digital' or nom = 'paper'),
-    FOREIGN KEY (id_document) REFERENCES document (id_document)
-);
-
-DROP TABLE IF EXISTS etat_general_es,etat_general_en CASCADE;
-CREATE TABLE etat_general_es
-(
-    id_document varchar(15),
-    nom         varchar(7) NOT NULL,
-    CHECK (nom = 'muy dañado' or nom = 'dañado' or nom = 'muy mediocre' or nom = 'mediocre' or nom = 'bueno'),
-    FOREIGN KEY (id_document) REFERENCES document (id_document)
-);
-
-CREATE TABLE etat_general_en
-(
-    id_document varchar(15),
-    nom         varchar(7) NOT NULL,
-    CHECK (nom = 'very damaged' or nom = 'damaged' or nom = 'very poor' or nom = 'poor' or nom = 'good'),
-    FOREIGN KEY (id_document) REFERENCES document (id_document)
-);
-
-DROP TABLE IF EXISTS publication_es,publication_en CASCADE;
-CREATE TABLE publication_es
-(
-    id_document varchar(15),
-    texte       text,
-    FOREIGN KEY (id_document) REFERENCES document (id_document)
-);
-
-CREATE TABLE publication_en
-(
-    id_document varchar(15),
-    texte       text,
-    FOREIGN KEY (id_document) REFERENCES document (id_document)
-);
-
-DROP TABLE IF EXISTS representation CASCADE;
-CREATE TABLE representation
-(
-    id_document    varchar(15) primary key,
-    representation boolean NOT NULL DEFAULT false,
-    FOREIGN KEY (id_document) REFERENCES document (id_document)
-);
-
-DROP TABLE IF EXISTS revision CASCADE;
-CREATE TABLE revision
-(
-    id_document          varchar(15),
-    date_revision_notice timestamp,
-    id_personne          integer,
-    FOREIGN KEY (id_document) REFERENCES document (id_document),
-    FOREIGN KEY (id_personne) REFERENCES personne (id_personne)
-);DROP TABLE IF EXISTS personne CASCADE;
-CREATE TABLE personne
-(
-    id_personne serial primary key,
-    nom         varchar(25),
-    prenom      varchar(25)
-);
-
-DROP TABLE IF EXISTS type_es,type_en CASCADE;
-CREATE TABLE type_es
-(
-    id_type serial primary key,
-    nom     varchar(50)
-);
-
-CREATE TABLE type_en
-(
-    id_type serial primary key,
-    nom     varchar(50)
-);
-
-DROP TABLE IF EXISTS datatype_es,datatype_en CASCADE;
-CREATE TABLE datatype_es
-(
-    id_datatype serial primary key,
-    nom         varchar(10)
-);
-
-CREATE TABLE datatype_en
-(
-    id_datatype serial primary key,
-    nom         varchar(10)
-);
-
-DROP TABLE IF EXISTS titre_es,titre_en CASCADE;
-CREATE TABLE titre_es
-(
-    id_titre serial primary key,
-    nom      varchar(150)
-);
-
-CREATE TABLE titre_en
-(
-    id_titre serial primary key,
-    nom      varchar(150)
-);
-
-DROP TABLE IF EXISTS sous_titre_es,sous_titre_en CASCADE;
-CREATE TABLE sous_titre_es
-(
-    id_sous_titre serial primary key,
-    nom           text
-);
-
-CREATE TABLE sous_titre_en
-(
-    id_sous_titre serial primary key,
-    nom           text
-);
-
-DROP TABLE IF EXISTS auteur_es,auteur_en CASCADE;
-CREATE TABLE auteur_es
-(
-    id_auteur serial primary key,
-    nom       varchar(50)
-);
-
-CREATE TABLE auteur_en
-(
-    id_auteur serial primary key,
-    nom       varchar(50)
-);
-
-DROP TABLE IF EXISTS destinataire_es,destinataire_en CASCADE;
-CREATE TABLE destinataire_es
-(
-    id_destinataire serial primary key,
-    nom             text
-);
-
-CREATE TABLE destinataire_en
-(
-    id_destinataire serial primary key,
-    nom             text
-);
-
-DROP TABLE IF EXISTS sujet_es,sujet_en CASCADE;
-CREATE TABLE sujet_es
-(
-    id_sujet serial primary key,
-    nom      text
-);
-
-CREATE TABLE sujet_en
-(
-    id_sujet serial primary key,
-    nom      text
-);
-
-DROP TABLE IF EXISTS description_es,description_en CASCADE;
-CREATE TABLE description_es
-(
-    id_description serial primary key,
-    texte          text
-);
-
-CREATE TABLE description_en
-(
-    id_description serial primary key,
-    texte          text
-);
-
-DROP TABLE IF EXISTS auteur_description CASCADE;
-CREATE TABLE auteur_description
-(
-    id_description integer,
-    id_personne    integer,
-    /*FOREIGN KEY (id_description) REFERENCES description(id_description),*/
-    FOREIGN KEY (id_personne) REFERENCES personne (id_personne)
-);
-
 DROP TABLE IF EXISTS document CASCADE;
 CREATE TABLE document
 (
@@ -1858,10 +1498,10 @@ CREATE TABLE document
     dates_debut          timestamp,
     dates_fin            timestamp,
     relations_genetiques text,
-    format               varchar(15),
+    format               varchar(100),
     id_auteur_analyse    integer,
-    data_analyse         timestamp NOT NULL DEFAULT NOW(),
-    data_creation_notice timestamp          DEFAULT NULL,
+    date_analyse         timestamp NOT NULL DEFAULT NOW(),
+    date_creation_notice timestamp          DEFAULT NULL,
     FOREIGN KEY (id_auteur_analyse) REFERENCES personne (id_personne)
 );
 
@@ -1958,7 +1598,7 @@ DROP TABLE IF EXISTS localisation_es,localisation_en CASCADE;
 CREATE TABLE localisation_es
 (
     id_localisation serial primary key,
-    nom             varchar(20),
+    nom             varchar(300),
     id_contexte_geo integer DEFAULT null,
     FOREIGN KEY (id_contexte_geo) REFERENCES contexte_geo_es (id_contexte_geo)
 );
@@ -1966,7 +1606,7 @@ CREATE TABLE localisation_es
 CREATE TABLE localisation_en
 (
     id_localisation serial primary key,
-    nom             varchar(20),
+    nom             varchar(300),
     id_contexte_geo integer DEFAULT null,
     FOREIGN KEY (id_contexte_geo) REFERENCES contexte_geo_en (id_contexte_geo)
 );
@@ -2094,70 +1734,11 @@ CREATE TABLE revision
 
 
 ------------------------------------------------ MISE EN PLACE DES INSERTIONS ------------------------------------------------
-
-
-/*INSERT INTO personne(nom,prenom) VALUES ('Gil','Alan');
-INSERT INTO personne(nom,prenom) VALUES ('Chantraine Braillon','Cécile');
-INSERT INTO personne(nom,prenom) VALUES ('Idmhand','Fatiha');
-
-INSERT INTO responsable_scientifique VALUES (1, 'La Rochelle Université', 'Alumno', 'Master LEA Amérique');
-INSERT INTO responsable_scientifique VALUES (2, 'La Rochelle Université', 'Profesor', 'Equipo CRHIA');
-INSERT INTO responsable_scientifique VALUES (3, 'La Rochelle Université', 'Profesor', 'CRLA Institut des textes et manuscrits modernes CNRS-UMR8132');
-
-INSERT INTO editeur(nom_editeur) VALUES ('Editor Proyecto e-spectateur AAP 2020 '),('Editor Proyecto CollEx-Persée Archivos 3.0 AAP 2018 ');
-
-INSERT INTO responsable_archive(nom) VALUES
-('Familia de Maragrita Xirgu (fondo de los hermanos Xiru)'),('Albert Prats Prat'),('Departamento de Cultura de la Generalidad de Cataluña '),
-('Fondo Margarita Xirgu del Instituto del Teatro de la Diputación de Barcelona'),('Foto Escena Catalana'),
-('MAE Barcelona'),('Arxiu Marta Prats Xirgu'),('Francesc Foguet i Boreu'),
-('Dr Sylvie Josserand Colla (Equipo Archivos-CRLA Institut des textes et manuscrits modernes CNRS-UMR8132)'),
-('La Vanguardia'), ('El Instituto del Teatro de la Diputación de Barcelona'),
-('Teatro de Barcelona'),('Amadeu Mariné Vadalaco'), ('Antonina Rodrigo'),('Antonio y Ramon Clapés'),('Biblioteca Sebastiá Juan Arbó'),
-('Carmen M.Gual'),('Colección de escenografía del Instituto del Teatro de la Diputación de Barcelona'),
-('Festival de Mérida'),('Foto Archivo Xavier Rius Xirgu'),('Fotos de su nieto Jaime Gutiérrez Morcillo'),
-('José Antonio'),('Lluis Andú');
-
-INSERT INTO support VALUES ('DIGITAL'),('PAPEL');
-INSERT INTO datatype VALUES ('imagen','DIGITAL'),('text','PAPEL');
-
-
-INSERT INTO pays(nom,lat,lon) VALUES
-('España',40.463667, -3.749220),
-('Estados Unidos',37.090240,-95.712891),
-('Uruguay',-32.522779,-55.765835),
-('Argentina',-38.4212955,-63.587402499999996),
-('Chile',-31.7613365,-71.3187697),
-('Peru',-6.8699697,-75.0458515);
-
-INSERT INTO localisation(texte,id_pays) VALUES
-('Teatro Solís de Montevideo',3),
-('Mérida',1),
-('Badalona',1),
-('EMAD: Escuela Municipal de Arte Dramático de Montevideo',3),
-('Plaza Margarida Xirgu Barcelona',1),
-('Granada',1),
-('Girona',1),
-('MAE Barcelona',1),
-('Punta Ballena',3),
-('Molins de Rei Cataluña',1),
-('Salamanca',1),
-('Instituto de Teatro de Barcelona',1),
-('Barcelona',1),
-('Montevideo',3),
-('Calle Margarida Xirgu de Badalona',1),
-('Teatro romano de Merida',1),
-('Sala Margarita Xirgu,Teatro Español, Madrid,',1),
-('Barcelona instituto del teatro',1),
-('Cataluña',1),
-('Fresno USA',2),
-('Madrid',1),
-('Barcelona MAE',1),
-('Valencia',1),
-('Teatro de la Diputación de Barcelona.',1),
-('Ciudad Real Museo Nacional Del teatro',1);
-
-INSERT INTO etat(nom) VALUES
-('muy dañado'),('dañado'),('muy mediocre'),('mediocre'),('bueno');*/
+INSERT INTO personne(nom,prenom) VALUES 
+('Gil','Alan'),
+('Chantraine Braillon','Cécile'),
+('Dalmagro','María Cristina'),
+('Idmhand','Fatiha');
 
 INSERT INTO type_es(nom) (SELECT DISTINCT(type) FROM imported_data WHERE type is not null);
 INSERT INTO type_en(nom) (SELECT DISTINCT(type) FROM imported_en WHERE type is not null);
@@ -2177,10 +1758,88 @@ INSERT INTO auteur_en(nom) (SELECT DISTINCT(auteur) FROM imported_en WHERE auteu
 INSERT INTO destinataire_es(nom) (SELECT DISTINCT(destinataire) FROM imported_data WHERE destinataire is not null);
 INSERT INTO destinataire_en(nom) (SELECT DISTINCT(destinataire) FROM imported_en WHERE destinataire is not null);
 
+INSERT INTO sujet_es(nom) (SELECT DISTINCT(sujet) FROM imported_data WHERE sujet is not null);
+INSERT INTO sujet_en(nom) (SELECT DISTINCT(sujet) FROM imported_en WHERE sujet is not null);
+
+INSERT INTO description_es(texte) (SELECT DISTINCT(description) FROM imported_data WHERE description is not null);
+INSERT INTO description_en(texte) (SELECT DISTINCT(description) FROM imported_en WHERE description is not null);
+
+-- AUTEUR DESCRIPTION ??
+
+-- DOCUMENT ?? A REVOIR POUR INTEGRER CLES ETRANGERES
+INSERT INTO document(id_document,dates_debut,dates_fin,relations_genetiques,format,date_analyse,date_creation_notice) 
+(SELECT cote,
+ TO_TIMESTAMP(trim_blank(SUBSTRING(dates,0,5)),'YYYY-MM-DD')::timestamp without time zone,
+ TO_TIMESTAMP(trim_blank(SUBSTRING(dates,6,4)),'YYYY-MM-DD')::timestamp without time zone,
+ relations_genetiques,
+ format,
+ TO_TIMESTAMP(trim_blank(date_analyse),'YYYY-MM-DD')::timestamp without time zone,
+ TO_TIMESTAMP(trim_blank(date_creation_notice),'YYYY-MM-DD')::timestamp without time zone
+ FROM imported_data);
 
 
-SELECT DISTINCT(auteur_analyse) FROM imported_data WHERE auteur_analyse is not null;
-SELECT DISTINCT(auteur_analyse) FROM imported_en WHERE auteur_analyse is not null;
+SELECT * from document;
+-- NOTES ??
 
-SELECT * FROM sous_titre_es;
-SELECT * FROM sous_titre_en;
+-- RESUME ??
+
+-- RESPONSABLE ARCHIVE ??
+
+INSERT INTO responsable_scientifique_es VALUES
+(1, 'La Rochelle Université', 'Alumno', 'Master LEA Amérique'),
+(4, 'Université de Poitiers', 'Profesor', 'CRLA Institut des textes et manuscrits modernes CNRS-UMR8132'),
+(2, 'La Rochelle Université', 'Profesor', 'Equipo CRHIA');
+
+INSERT INTO responsable_scientifique_en VALUES
+(1, 'La Rochelle Université', 'Student', 'Master LEA Amérique'),
+(4, 'Université de Poitiers', 'Professor', 'CRLA Institut des textes et manuscrits modernes CNRS-UMR8132'),
+(2, 'La Rochelle Université', 'Professor', 'Equipo CRHIA');
+
+INSERT INTO editeur_es(nom_editeur) VALUES
+('Editor Proyecto e-spectateur AAP 2020'),
+('Editor Proyecto CollEx-Persée Archivos 3.0 AAP 2018');
+
+INSERT INTO editeur_en(nom_editeur) VALUES
+('Editor Project e-spectateur, AAP 2020'),
+('Editor Project CollEx-Persée Files 3.0, AAP 2018');
+
+INSERT INTO contexte_geo_es(nom,lat,lon) VALUES
+('España',40.463667, -3.749220),
+('Estados Unidos',37.090240,-95.712891),
+('Uruguay',-32.522779,-55.765835),
+('Argentina',-38.4212955,-63.587402499999996),
+('Chile',-31.7613365,-71.3187697),
+('Peru',-6.8699697,-75.0458515),
+('Hispanoamerica',null,null);
+
+INSERT INTO contexte_geo_en(nom,lat,lon) VALUES
+('Spain',40.463667, -3.749220),
+('USA',37.090240,-95.712891),
+('Uruguay',-32.522779,-55.765835),
+('Argentina',-38.4212955,-63.587402499999996),
+('Chile',-31.7613365,-71.3187697),
+('Peru',-6.8699697,-75.0458515),
+('Latin America',null,null);
+
+INSERT INTO localisation_es(nom) (SELECT DISTINCT(localisation) FROM imported_data WHERE localisation is not null);
+INSERT INTO localisation_en(nom) (SELECT DISTINCT(localisation) FROM imported_en WHERE localisation is not null);
+
+-- LICENCE ??
+
+-- DROITS ??
+
+-- ETAT GENETIQUE ??
+
+-- AUTRES RELATIONS ??
+
+-- NATURE DOCUMENT ??
+
+-- SUPPORT ??
+
+-- ETAT_GENERAL ??
+
+-- PUBLICATION ??
+
+-- REPRESENTATION ??
+
+-- REVISION ??
