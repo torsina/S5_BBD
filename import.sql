@@ -1370,6 +1370,12 @@ WHERE format ~ '(.*)(\d+\s*[x×X]\s*\d+)(.*)';
 
 
 ------------------------------------------------ CRÉATION DES TABLES ------------------------------------------------
+DROP TABLE IF EXISTS langue CASCADE;
+CREATE TABLE langue
+(
+	code varchar(3) primary key
+);
+
 DROP TABLE IF EXISTS personne CASCADE;
 CREATE TABLE personne
 (
