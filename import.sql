@@ -1661,7 +1661,7 @@ DROP TABLE IF EXISTS nature_document CASCADE;
 CREATE TABLE nature_document
 (
     id_document varchar(15),
-    nom         varchar(10),
+    nom         varchar(25),
     FOREIGN KEY (id_document) REFERENCES document (id_document)
 );
 
@@ -1670,7 +1670,7 @@ CREATE TABLE support_es
 (
     id_document varchar(15),
     nom         varchar(7) NOT NULL,
-    CHECK (nom = 'digital' or nom = 'papel'),
+    CHECK (nom = 'DIGITAL' or nom = 'PAPEL'),
     FOREIGN KEY (id_document) REFERENCES document (id_document)
 );
 
@@ -1678,25 +1678,36 @@ CREATE TABLE support_en
 (
     id_document varchar(15),
     nom         varchar(7) NOT NULL
-        CHECK (nom = 'digital' or nom = 'paper'),
+        CHECK (nom = 'DIGITAL' or nom = 'PAPER'),
     FOREIGN KEY (id_document) REFERENCES document (id_document)
+);
+
+DROP TABLE IF EXISTS etat_es, etat_en CASCADE;
+CREATE TABLE etat_es
+(
+	nom varchar(15) primary key
+);
+
+CREATE TABLE etat_en
+(
+	nom varchar(15) primary key
 );
 
 DROP TABLE IF EXISTS etat_general_es,etat_general_en CASCADE;
 CREATE TABLE etat_general_es
 (
     id_document varchar(15),
-    nom         varchar(7) NOT NULL,
-    CHECK (nom = 'muy dañado' or nom = 'dañado' or nom = 'muy mediocre' or nom = 'mediocre' or nom = 'bueno'),
-    FOREIGN KEY (id_document) REFERENCES document (id_document)
+    nom         varchar(15),
+    FOREIGN KEY (id_document) REFERENCES document (id_document),
+	FOREIGN KEY (nom) REFERENCES etat_es(nom)
 );
 
 CREATE TABLE etat_general_en
 (
     id_document varchar(15),
-    nom         varchar(7) NOT NULL,
-    CHECK (nom = 'very damaged' or nom = 'damaged' or nom = 'very poor' or nom = 'poor' or nom = 'good'),
-    FOREIGN KEY (id_document) REFERENCES document (id_document)
+    nom         varchar(15),
+    FOREIGN KEY (id_document) REFERENCES document (id_document),
+	FOREIGN KEY (nom) REFERENCES etat_en(nom)
 );
 
 DROP TABLE IF EXISTS publication_es,publication_en CASCADE;
@@ -1832,13 +1843,44 @@ INSERT INTO localisation_en(nom) (SELECT DISTINCT(localisation) FROM imported_en
 
 -- AUTRES RELATIONS ??
 
--- NATURE DOCUMENT ??
+INSERT INTO nature_document
+(SELECT cote,nature_document FROM imported_data
+WHERE nature_document is not null);
 
--- SUPPORT ??
+INSERT INTO support_es
+(SELECT cote,UPPER(support) FROM imported_data
+WHERE support is not null);
+INSERT INTO support_en
+(SELECT cote,UPPER(support) FROM imported_en
+ WHERE support is not null);
 
--- ETAT_GENERAL ??
+INSERT INTO etat_es VALUES
+('muy dañado'),
+('dañado'),
+('muy mediocre'),
+('mediocre'),
+('bueno');
+INSERT INTO etat_en VALUES
+('badly damaged'),
+('very poor'),
+('poor'),
+('good');
 
--- PUBLICATION ??
+INSERT INTO etat_general_es
+(SELECT cote,TRIM(LOWER(etat_general)) FROM imported_data
+WHERE etat_general is not null);
+INSERT INTO etat_general_en
+(SELECT cote,TRIM(LOWER(etat_general)) FROM imported_en
+WHERE etat_general is not null);
+
+INSERT INTO publication_es
+(SELECT cote,TRIM(publication) FROM imported_data
+WHERE publication is not null);
+INSERT INTO publication_en
+(SELECT cote,TRIM(publication) FROM imported_en
+WHERE publication is not null);
+
+SELECT * FROM publication_es WHERE texte is null;
 
 -- REPRESENTATION ??
 
