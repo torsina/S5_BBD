@@ -1382,13 +1382,13 @@ DROP TABLE IF EXISTS type_es,type_en CASCADE;
 CREATE TABLE type_es
 (
     id_type serial primary key,
-    nom     varchar(10)
+    nom     varchar(50)
 );
 
 CREATE TABLE type_en
 (
     id_type serial primary key,
-    nom     varchar(10)
+    nom     varchar(50)
 );
 
 DROP TABLE IF EXISTS datatype_es,datatype_en CASCADE;
@@ -1408,13 +1408,13 @@ DROP TABLE IF EXISTS titre_es,titre_en CASCADE;
 CREATE TABLE titre_es
 (
     id_titre serial primary key,
-    nom      varchar(50)
+    nom      varchar(150)
 );
 
 CREATE TABLE titre_en
 (
     id_titre serial primary key,
-    nom      varchar(50)
+    nom      varchar(150)
 );
 
 DROP TABLE IF EXISTS sous_titre_es,sous_titre_en CASCADE;
@@ -1799,4 +1799,28 @@ INSERT INTO localisation(texte,id_pays) VALUES
 INSERT INTO etat(nom) VALUES
 ('muy dañado'),('dañado'),('muy mediocre'),('mediocre'),('bueno');*/
 
+INSERT INTO type_es(nom) (SELECT DISTINCT(type) FROM imported_data WHERE type is not null);
+INSERT INTO type_en(nom) (SELECT DISTINCT(type) FROM imported_en WHERE type is not null);
 
+INSERT INTO datatype_es(nom) (SELECT DISTINCT(datatype) FROM imported_data WHERE datatype is not null);
+INSERT INTO datatype_en(nom) (SELECT DISTINCT(datatype) FROM imported_en WHERE datatype is not null);
+
+INSERT INTO titre_es(nom) (SELECT DISTINCT(titre) FROM imported_data WHERE titre is not null);
+INSERT INTO titre_en(nom) (SELECT DISTINCT(titre) FROM imported_en WHERE titre is not null);
+
+INSERT INTO sous_titre_es(nom) (SELECT DISTINCT(sous_titre) FROM imported_data WHERE sous_titre is not null);
+INSERT INTO sous_titre_en(nom) (SELECT DISTINCT(sous_titre) FROM imported_en WHERE sous_titre is not null);
+
+INSERT INTO auteur_es(nom) (SELECT DISTINCT(auteur) FROM imported_data WHERE auteur is not null);
+INSERT INTO auteur_en(nom) (SELECT DISTINCT(auteur) FROM imported_en WHERE auteur is not null);
+
+INSERT INTO destinataire_es(nom) (SELECT DISTINCT(destinataire) FROM imported_data WHERE destinataire is not null);
+INSERT INTO destinataire_en(nom) (SELECT DISTINCT(destinataire) FROM imported_en WHERE destinataire is not null);
+
+
+
+SELECT DISTINCT(auteur_analyse) FROM imported_data WHERE auteur_analyse is not null;
+SELECT DISTINCT(auteur_analyse) FROM imported_en WHERE auteur_analyse is not null;
+
+SELECT * FROM sous_titre_es;
+SELECT * FROM sous_titre_en;
