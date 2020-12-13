@@ -1369,6 +1369,9 @@ WHERE format ~ '(.*)(\d+\s*[x×X]\s*\d+)(.*)';
 --regexp_matches(format, '.*(\d+\s*[x×]\s*\d+).*')
 
 
+-- [\(\|] ([\w[:blank:]]+)
+SELECT regexp_matches(editeur, '(^Responsable del archivo[[:blank:]]+([\w[:blank:]-]+)(([eE]ditor)|[,\(\|]?).*$)') FROM imported_data;
+
 ------------------------------------------------ CRÉATION DES TABLES ------------------------------------------------
 DROP TABLE IF EXISTS langue CASCADE;
 CREATE TABLE langue
@@ -1562,11 +1565,11 @@ CREATE TABLE localisation
 (
     id_localisation serial,
     nom             varchar(300),
-    id_contexte_geo integer DEFAULT null,
+    id_contexte_geo integer DEFAULT NULL,
 	code	varchar(3),
 	PRIMARY KEY(id_localisation,code),
 	FOREIGN KEY (code) REFERENCES langue(code),
-    FOREIGN KEY (id_contexte_geo) REFERENCES contexte_geo_es (id_contexte_geo)
+    FOREIGN KEY (id_contexte_geo) REFERENCES contexte_geo (id_contexte_geo)
 );
 
 DROP TABLE IF EXISTS licence CASCADE;
@@ -1785,8 +1788,7 @@ INSERT INTO etat(nom) VALUES
 ('muy dañado'),('dañado'),('muy mediocre'),('mediocre'),('bueno');
 
 SELECT DISTINCT(auteur_description) FROM imported_en;
-('Peru',-6.8699697,-75.0458515),
-('Hispanoamerica',null,null);
+
 
 INSERT INTO contexte_geo_en(nom,lat,lon) VALUES
 ('Spain',40.463667, -3.749220),
@@ -1796,6 +1798,7 @@ INSERT INTO contexte_geo_en(nom,lat,lon) VALUES
 ('Chile',-31.7613365,-71.3187697),
 ('Peru',-6.8699697,-75.0458515),
 ('Latin America',null,null);
+-- TODO : garder ('Hispanoamerica',null,null);
 
 INSERT INTO localisation_es(nom) (SELECT DISTINCT(localisation) FROM imported_data WHERE localisation is not null);
 INSERT INTO localisation_en(nom) (SELECT DISTINCT(localisation) FROM imported_en WHERE localisation is not null);
