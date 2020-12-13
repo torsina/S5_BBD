@@ -623,6 +623,8 @@ UPDATE imported_data
 SET editeur=REPLACE(editeur,
                     'Responsable del archivo  Fondo Margarita Xirgu del Instituto del Teatro de la Diputación de Barcelona.Editor Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)',
                     'Responsable del archivo Fondo Margarita Xirgu del Instituto del Teatro de la Diputación de Barcelona.Editor Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)');
+UPDATE imported_data SET editeur=regexp_replace(editeur, '[:blank:]*[eE]ditor[:blank:]*', ' Editor ');
+
 UPDATE imported_data
 SET editeur=TRIM(blank_to_space(editeur));
 
@@ -1369,7 +1371,7 @@ WHERE format ~ '(.*)(\d+\s*[x×X]\s*\d+)(.*)';
 --regexp_matches(format, '.*(\d+\s*[x×]\s*\d+).*')
 
 
--- [\(\|] ([\w[:blank:]]+)
+-- 
 SELECT regexp_matches(editeur, '(^Responsable del archivo[[:blank:]]+([\w[:blank:]-]+)(([eE]ditor)|[,\(\|]?).*$)') FROM imported_data;
 
 ------------------------------------------------ CRÉATION DES TABLES ------------------------------------------------
