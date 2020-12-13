@@ -1682,25 +1682,87 @@ CREATE TABLE revision
 
 
 ------------------------------------------------ MISE EN PLACE DES INSERTIONS ------------------------------------------------
+INSERT INTO langue VALUES
+('SPA'),('ENG');
+
 INSERT INTO personne(nom,prenom) VALUES 
 ('Gil','Alan'),
 ('Chantraine Braillon','Cécile'),
 ('Dalmagro','María Cristina'),
 ('Idmhand','Fatiha');
 
-INSERT INTO type_es(nom) (SELECT DISTINCT(type) FROM imported_data WHERE type is not null);
-INSERT INTO type_en(nom) (SELECT DISTINCT(type) FROM imported_en WHERE type is not null);
+INSERT INTO type(nom,code)
+(SELECT DISTINCT(type),'SPA' FROM imported_data WHERE type IS NOT null);
+INSERT INTO type(id_type,nom,code)
+(SELECT DiSTINCT(B.id_type), C.type,'ENG' FROM imported_data A JOIN type B On B.nom=A.type JOIN imported_en C ON A.cote=C.cote WHERE C.type IS NOT null);
 
-INSERT INTO datatype_es(nom) (SELECT DISTINCT(datatype) FROM imported_data WHERE datatype is not null);
-INSERT INTO datatype_en(nom) (SELECT DISTINCT(datatype) FROM imported_en WHERE datatype is not null);
+INSERT INTO datatype(nom,code)
+(SELECT DISTINCT(datatype),'SPA' FROM imported_data WHERE datatype IS NOT null);
+INSERT INTO datatype(id_datatype,nom,code)
+(SELECT DISTINCT(B.id_datatype), C.datatype,'ENG' FROM imported_data A
+ JOIN datatype B On B.nom=A.datatype JOIN imported_en C ON A.cote=C.cote WHERE C.datatype IS NOT null AND C.datatype!='imagen');
+ 
+SELECT DISTINCT(B.id_datatype), C.datatype,'ENG' FROM imported_data A
+JOIN datatype B On B.nom=A.datatype JOIN imported_en C ON A.cote=C.cote WHERE C.datatype IS NOT null AND C.datatype!='imagen'
 
-INSERT INTO titre_es(nom) (SELECT DISTINCT(titre) FROM imported_data WHERE titre is not null);
-INSERT INTO titre_en(nom) (SELECT DISTINCT(titre) FROM imported_en WHERE titre is not null);
+INSERT INTO titre(nom,code)
+(SELECT DISTINCT(titre),'SPA' FROM imported_data WHERE titre IS NOT null);
+/*INSERT INTO titre(id_titre,nom,code)
+(SELECT DISTINCT(B.id_titre), C.titre,'ENG' FROM imported_data A
+ JOIN titre B On B.nom=A.titre JOIN imported_en C ON A.cote=C.cote WHERE C.titre IS NOT null);*/
+ 
+ INSERT INTO responsable_scientifique VALUES
+(1, 'La Rochelle Université', 'Alumno', 'Master LEA Amérique', 'SPA'),
+(4, 'Université de Poitiers', 'Profesor', 'CRLA Institut des textes et manuscrits modernes CNRS-UMR8132', 'SPA'),
+(2, 'La Rochelle Université', 'Profesor', 'Equipo CRHIA', 'SPA'),
+(1, 'La Rochelle Université', 'Student', 'Master LEA Amérique', 'ENG'),
+(4, 'Université de Poitiers', 'Professor', 'CRLA Institut des textes et manuscrits modernes CNRS-UMR8132', 'ENG'),
+(2, 'La Rochelle Université', 'Professor', 'Equipo CRHIA', 'ENG');
 
-INSERT INTO sous_titre_es(nom) (SELECT DISTINCT(sous_titre) FROM imported_data WHERE sous_titre is not null);
-INSERT INTO sous_titre_en(nom) (SELECT DISTINCT(sous_titre) FROM imported_en WHERE sous_titre is not null);
+INSERT INTO editeur(id_editeur,nom_editeur,code) VALUES
+(1,'Editor Proyecto e-spectateur AAP 2020', 'SPA'),
+(2,'Editor Proyecto CollEx-Persée Archivos 3.0 AAP 2018', 'SPA'),
+(1,'Editor Project e-spectateur, AAP 2020', 'ENG'),
+(2,'Editor Project CollEx-Persée Files 3.0, AAP 2018', 'ENG');
 
-INSERT INTO auteur_es(nom) (SELECT DISTINCT(auteur) FROM imported_data WHERE auteur is not null);
+INSERT INTO contexte_geo VALUES
+(1,'España',40.463667, -3.749220, 'SPA'),
+(2,'Estados Unidos',37.090240,-95.712891, 'SPA'),
+(3,'Uruguay',-32.522779,-55.765835, 'SPA'),
+(4,'Argentina',-38.4212955,-63.587402499999996, 'SPA'),
+(5,'Chile',-31.7613365,-71.3187697, 'SPA'),
+(6,'Peru',-6.8699697,-75.0458515, 'SPA'),
+(7,'Hispanoamerica',null,null, 'SPA'),
+(1,'Spain',40.463667, -3.749220, 'ENG'),
+(2,'USA',37.090240,-95.712891, 'ENG'),
+(3,'Uruguay',-32.522779,-55.765835, 'ENG'),
+(4,'Argentina',-38.4212955,-63.587402499999996, 'ENG'),
+(5,'Chile',-31.7613365,-71.3187697, 'ENG'),
+(6,'Peru',-6.8699697,-75.0458515, 'ENG'),
+(7,'Latin America',null,null, 'ENG');
+
+INSERT INTO etat VALUES
+(1,'muy dañado', 'SPA'),
+(2,'dañado', 'SPA'),
+(3,'muy mediocre', 'SPA'),
+(4,'mediocre', 'SPA'),
+(5,'bueno', 'SPA'),
+(1,'badly damaged', 'ENG'),
+(2,'damaged', 'ENG'),
+(3,'very poor', 'ENG'),
+(4,'poor', 'ENG'),
+(5,'good', 'ENG');
+
+SELECT DISTINCT(A.titre), C.titre,'ENG' FROM imported_data A
+JOIN imported_en C ON A.cote=C.cote
+JOIN titre B On B.nom=A.titre ORDER BY (A.titre);
+
+
+
+SELECT DISTINCT(titre) FROM imported_en;
+SELECT * FROM titre;
+
+/*INSERT INTO auteur_es(nom) (SELECT DISTINCT(auteur) FROM imported_data WHERE auteur is not null);
 INSERT INTO auteur_en(nom) (SELECT DISTINCT(auteur) FROM imported_en WHERE auteur is not null);
 
 INSERT INTO destinataire_es(nom) (SELECT DISTINCT(destinataire) FROM imported_data WHERE destinataire is not null);
@@ -1732,75 +1794,6 @@ SELECT * from document;
 -- RESUME ??
 
 -- RESPONSABLE ARCHIVE ??
-
-INSERT INTO responsable_scientifique_es VALUES
-(1, 'La Rochelle Université', 'Alumno', 'Master LEA Amérique'),
-(4, 'Université de Poitiers', 'Profesor', 'CRLA Institut des textes et manuscrits modernes CNRS-UMR8132'),
-(2, 'La Rochelle Université', 'Profesor', 'Equipo CRHIA');
-
-INSERT INTO responsable_scientifique_en VALUES
-(1, 'La Rochelle Université', 'Student', 'Master LEA Amérique'),
-(4, 'Université de Poitiers', 'Professor', 'CRLA Institut des textes et manuscrits modernes CNRS-UMR8132'),
-(2, 'La Rochelle Université', 'Professor', 'Equipo CRHIA');
-
-INSERT INTO editeur_es(nom_editeur) VALUES
-('Editor Proyecto e-spectateur AAP 2020'),
-('Editor Proyecto CollEx-Persée Archivos 3.0 AAP 2018');
-
-INSERT INTO editeur_en(nom_editeur) VALUES
-('Editor Project e-spectateur, AAP 2020'),
-('Editor Project CollEx-Persée Files 3.0, AAP 2018');
-
-INSERT INTO contexte_geo_es(nom,lat,lon) VALUES
-('España',40.463667, -3.749220),
-('Estados Unidos',37.090240,-95.712891),
-('Uruguay',-32.522779,-55.765835),
-('Argentina',-38.4212955,-63.587402499999996),
-('Chile',-31.7613365,-71.3187697),
-('Peru',-6.8699697,-75.0458515);
-
-INSERT INTO localisation(texte,id_pays) VALUES 
-('Teatro Solís de Montevideo',3),
-('Mérida',1),
-('Badalona',1),
-('EMAD: Escuela Municipal de Arte Dramático de Montevideo',3),
-('Plaza Margarida Xirgu Barcelona',1),
-('Granada',1),
-('Girona',1),
-('MAE Barcelona',1),
-('Punta Ballena',3),
-('Molins de Rei Cataluña',1),
-('Salamanca',1),
-('Instituto de Teatro de Barcelona',1),
-('Barcelona',1),
-('Montevideo',3),
-('Calle Margarida Xirgu de Badalona',1),
-('Teatro romano de Merida',1),
-('Sala Margarita Xirgu,Teatro Español, Madrid,',1),
-('Barcelona instituto del teatro',1),
-('Cataluña',1),
-('Fresno USA',2),
-('Madrid',1),
-('Barcelona MAE',1),
-('Valencia',1),
-('Teatro de la Diputación de Barcelona.',1),
-('Ciudad Real Museo Nacional Del teatro',1);
-
-INSERT INTO etat(nom) VALUES
-('muy dañado'),('dañado'),('muy mediocre'),('mediocre'),('bueno');
-
-SELECT DISTINCT(auteur_description) FROM imported_en;
-
-
-INSERT INTO contexte_geo_en(nom,lat,lon) VALUES
-('Spain',40.463667, -3.749220),
-('USA',37.090240,-95.712891),
-('Uruguay',-32.522779,-55.765835),
-('Argentina',-38.4212955,-63.587402499999996),
-('Chile',-31.7613365,-71.3187697),
-('Peru',-6.8699697,-75.0458515),
-('Latin America',null,null);
--- TODO : garder ('Hispanoamerica',null,null);
 
 INSERT INTO localisation_es(nom) (SELECT DISTINCT(localisation) FROM imported_data WHERE localisation is not null);
 INSERT INTO localisation_en(nom) (SELECT DISTINCT(localisation) FROM imported_en WHERE localisation is not null);
@@ -1855,3 +1848,4 @@ SELECT * FROM publication_es WHERE texte is null;
 -- REPRESENTATION ??
 
 -- REVISION ??
+*/
