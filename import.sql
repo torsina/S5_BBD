@@ -623,7 +623,7 @@ UPDATE imported_data
 SET editeur=REPLACE(editeur,
                     'Responsable del archivo  Fondo Margarita Xirgu del Instituto del Teatro de la Diputación de Barcelona.Editor Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)',
                     'Responsable del archivo Fondo Margarita Xirgu del Instituto del Teatro de la Diputación de Barcelona.Editor Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)');
-UPDATE imported_data SET editeur=regexp_replace(editeur, '[:blank:]*[eE]ditor[:blank:]*', ' Editor ');
+UPDATE imported_data SET editeur=regexp_replace(editeur, '[:blank:]*[eE]ditor[:blank:]*', ' # ');
 
 UPDATE imported_data
 SET editeur=TRIM(blank_to_space(editeur));
@@ -1371,9 +1371,6 @@ WHERE format ~ '(.*)(\d+\s*[x×X]\s*\d+)(.*)';
 --regexp_matches(format, '.*(\d+\s*[x×]\s*\d+).*')
 
 
--- 
-SELECT regexp_matches(editeur, '(^Responsable del archivo[[:blank:]]+([\w[:blank:]-]+)(([eE]ditor)|[,\(\|]?).*$)') FROM imported_data;
-
 ------------------------------------------------ CRÉATION DES TABLES ------------------------------------------------
 DROP TABLE IF EXISTS langue CASCADE;
 CREATE TABLE langue
@@ -1703,7 +1700,7 @@ INSERT INTO datatype(id_datatype,nom,code)
  JOIN datatype B On B.nom=A.datatype JOIN imported_en C ON A.cote=C.cote WHERE C.datatype IS NOT null AND C.datatype!='imagen');
  
 SELECT DISTINCT(B.id_datatype), C.datatype,'ENG' FROM imported_data A
-JOIN datatype B On B.nom=A.datatype JOIN imported_en C ON A.cote=C.cote WHERE C.datatype IS NOT null AND C.datatype!='imagen'
+JOIN datatype B On B.nom=A.datatype JOIN imported_en C ON A.cote=C.cote WHERE C.datatype IS NOT null AND C.datatype!='imagen';
 
 INSERT INTO titre(nom,code)
 (SELECT DISTINCT(titre),'SPA' FROM imported_data WHERE titre IS NOT null);
