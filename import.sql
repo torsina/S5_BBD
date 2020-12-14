@@ -1568,7 +1568,7 @@ CREATE TABLE localisation
 	code	varchar(3),
 	PRIMARY KEY(id_localisation,code),
 	FOREIGN KEY (code) REFERENCES langue(code),
-    FOREIGN KEY (id_contexte_geo) REFERENCES contexte_geo (id_contexte_geo)
+    FOREIGN KEY (id_contexte_geo,code) REFERENCES contexte_geo (id_contexte_geo,code)
 );
 
 DROP TABLE IF EXISTS licence CASCADE;
