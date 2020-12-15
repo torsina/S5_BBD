@@ -576,6 +576,14 @@ On retire les caractères en trop avant et après les notes.
 */
 UPDATE imported_data
 SET notes=TRIM(blank_to_space(notes));
+UPDATE imported_data
+SET notes=null
+WHERE LOWER(notes)='indeterminado';
+UPDATE imported_en
+SET notes=TRIM(blank_to_space(notes));
+UPDATE imported_en
+SET notes=null
+WHERE LOWER(notes)='undetermined';
 
 ------------------------------------------------RESUME------------------------------------------------
 
