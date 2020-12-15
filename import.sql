@@ -1708,6 +1708,41 @@ INSERT INTO titre(nom,code)
 (SELECT DISTINCT(B.id_titre), C.titre,'ENG' FROM imported_data A
  JOIN titre B On B.nom=A.titre JOIN imported_en C ON A.cote=C.cote WHERE C.titre IS NOT null);*/
  
+DROP TABLE IF EXISTS table_insert;
+CREATE TABLE table_insert
+(
+	texte varchar(150)
+);
+
+INSERT INTO table_insert
+(SELECT ((regexp_matches(editeur, '^Responsable del archivo[[:blank:]]+([\w[:blank:]-]+)[,\(\|#]?(.*)$'))[1]) as colonne1 FROM imported_data);
+UPDATE table_insert
+SET texte=null
+WHERE TRIM(texte)='spectateur AAP 2020'
+or TRIM(texte)=''
+or (texte)='ecto e-';
+UPDATE table_insert
+SET texte=REPLACE(texte, ' spectateur AAP 2020 ', '');
+UPDATE table_insert
+SET texte=REPLACE(texte, 'spectateur AAP 2020 ', '');
+UPDATE table_insert
+SET texte=TRIM(texte);
+UPDATE table_insert
+SET texte=null
+WHERE (texte)='ecto e-';
+
+ 
+INSERT INTO responsable_archive(nom,code)
+(SELECT DISTINCT(texte),'SPA' FROM table_insert WHERE texte IS NOT NULL);
+DELETE FROM table_insert;
+
+INSERT INTO table_insert
+(SELECT ((regexp_matches(editeur, '^Responsible for the file: [[:blank:]]+([\w[:blank:]-]+)[,\(\|#]?(.*)$'))[1]) as colonne1 FROM imported_en);
+
+
+SELECT DISTINCT(texte) FROM table_insert ORDER BY texte;
+
+ 
  INSERT INTO responsable_scientifique VALUES
 (1, 'La Rochelle Université', 'Alumno', 'Master LEA Amérique', 'SPA'),
 (4, 'Université de Poitiers', 'Profesor', 'CRLA Institut des textes et manuscrits modernes CNRS-UMR8132', 'SPA'),
@@ -1749,100 +1784,3 @@ INSERT INTO etat VALUES
 (3,'very poor', 'ENG'),
 (4,'poor', 'ENG'),
 (5,'good', 'ENG');
-
-SELECT DISTINCT(A.titre), C.titre,'ENG' FROM imported_data A
-JOIN imported_en C ON A.cote=C.cote
-JOIN titre B On B.nom=A.titre ORDER BY (A.titre);
-
-
-
-SELECT DISTINCT(titre) FROM imported_en;
-SELECT * FROM titre;
-
-/*INSERT INTO auteur_es(nom) (SELECT DISTINCT(auteur) FROM imported_data WHERE auteur is not null);
-INSERT INTO auteur_en(nom) (SELECT DISTINCT(auteur) FROM imported_en WHERE auteur is not null);
-
-INSERT INTO destinataire_es(nom) (SELECT DISTINCT(destinataire) FROM imported_data WHERE destinataire is not null);
-INSERT INTO destinataire_en(nom) (SELECT DISTINCT(destinataire) FROM imported_en WHERE destinataire is not null);
-
-INSERT INTO sujet_es(nom) (SELECT DISTINCT(sujet) FROM imported_data WHERE sujet is not null);
-INSERT INTO sujet_en(nom) (SELECT DISTINCT(sujet) FROM imported_en WHERE sujet is not null);
-
-INSERT INTO description_es(texte) (SELECT DISTINCT(description) FROM imported_data WHERE description is not null);
-INSERT INTO description_en(texte) (SELECT DISTINCT(description) FROM imported_en WHERE description is not null);
-
--- AUTEUR DESCRIPTION ??
-
--- DOCUMENT ?? A REVOIR POUR INTEGRER CLES ETRANGERES
-INSERT INTO document(id_document,dates_debut,dates_fin,relations_genetiques,format,date_analyse,date_creation_notice) 
-(SELECT cote,
- TO_TIMESTAMP(trim_blank(SUBSTRING(dates,0,5)),'YYYY-MM-DD')::timestamp without time zone,
- TO_TIMESTAMP(trim_blank(SUBSTRING(dates,6,4)),'YYYY-MM-DD')::timestamp without time zone,
- relations_genetiques,
- format,
- TO_TIMESTAMP(trim_blank(date_analyse),'YYYY-MM-DD')::timestamp without time zone,
- TO_TIMESTAMP(trim_blank(date_creation_notice),'YYYY-MM-DD')::timestamp without time zone
- FROM imported_data);
-
-
-SELECT * from document;
--- NOTES ??
-
--- RESUME ??
-
--- RESPONSABLE ARCHIVE ??
-
-INSERT INTO localisation_es(nom) (SELECT DISTINCT(localisation) FROM imported_data WHERE localisation is not null);
-INSERT INTO localisation_en(nom) (SELECT DISTINCT(localisation) FROM imported_en WHERE localisation is not null);
-
--- LICENCE ??
-
--- DROITS ??
-
--- ETAT GENETIQUE ??
-
--- AUTRES RELATIONS ??
-
-INSERT INTO nature_document
-(SELECT cote,nature_document FROM imported_data
-WHERE nature_document is not null);
-
-INSERT INTO support_es
-(SELECT cote,UPPER(support) FROM imported_data
-WHERE support is not null);
-INSERT INTO support_en
-(SELECT cote,UPPER(support) FROM imported_en
- WHERE support is not null);
-
-INSERT INTO etat_es VALUES
-('muy dañado'),
-('dañado'),
-('muy mediocre'),
-('mediocre'),
-('bueno');
-INSERT INTO etat_en VALUES
-('badly damaged'),
-('very poor'),
-('poor'),
-('good');
-
-INSERT INTO etat_general_es
-(SELECT cote,TRIM(LOWER(etat_general)) FROM imported_data
-WHERE etat_general is not null);
-INSERT INTO etat_general_en
-(SELECT cote,TRIM(LOWER(etat_general)) FROM imported_en
-WHERE etat_general is not null);
-
-INSERT INTO publication_es
-(SELECT cote,TRIM(publication) FROM imported_data
-WHERE publication is not null);
-INSERT INTO publication_en
-(SELECT cote,TRIM(publication) FROM imported_en
-WHERE publication is not null);
-
-SELECT * FROM publication_es WHERE texte is null;
-
--- REPRESENTATION ??
-
--- REVISION ??
-*/
