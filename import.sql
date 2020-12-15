@@ -1382,21 +1382,6 @@ WHERE format ~ '(.*)(\d+\s*[x×X]\s*\d+)(.*)';
 
 
 ------------------------------------------------ CRÉATION DES TABLES ------------------------------------------------
-DROP TABLE IF EXISTS document CASCADE;
-CREATE TABLE document
-(
-    id_document          varchar(15) primary key,
-    dates_debut          timestamp,
-    dates_fin            timestamp,
-    relations_genetiques text,
-	representation boolean NOT NULL DEFAULT false,
-    format               varchar(100),
-    id_auteur_analyse    integer,
-    date_analyse         timestamp NOT NULL DEFAULT NOW(),
-    date_creation_notice timestamp          DEFAULT NULL,
-    FOREIGN KEY (id_auteur_analyse) REFERENCES personne (id_personne)
-);
-
 DROP TABLE IF EXISTS langue CASCADE;
 CREATE TABLE langue
 (
@@ -1429,6 +1414,42 @@ CREATE TABLE datatype
     nom         varchar(10),
 	code	varchar(3),
 	PRIMARY KEY(id_datatype,code),
+	FOREIGN KEY (code) REFERENCES langue(code)
+);
+
+DROP TABLE IF EXISTS document CASCADE;
+CREATE TABLE document
+(
+    id_document          varchar(15) primary key,
+    dates		         varchar(10),
+    relations_genetiques text,
+	representation boolean NOT NULL DEFAULT false,
+    format               varchar(100),
+    id_auteur_analyse    integer,
+    date_analyse         timestamp NOT NULL DEFAULT NOW(),
+    date_creation_notice timestamp          DEFAULT NULL,
+    FOREIGN KEY (id_auteur_analyse) REFERENCES personne (id_personne)
+);
+
+DROP TABLE IF EXISTS document_type CASCADE;
+CREATE TABLE document_type
+(
+    id_document varchar(15),
+	code		varchar(3),
+    id_type  	integer,
+	PRIMARY KEY(id_document,code),
+	FOREIGN KEY (id_type,code) REFERENCES type(id_type,code),
+	FOREIGN KEY (code) REFERENCES langue(code)
+);
+
+DROP TABLE IF EXISTS document_datatype CASCADE;
+CREATE TABLE document_datatype
+(
+    id_document varchar(15),
+	code		varchar(3),
+    id_datatype integer,
+	PRIMARY KEY(id_document,code),
+	FOREIGN KEY (id_datatype,code) REFERENCES datatype(id_datatype,code),
 	FOREIGN KEY (code) REFERENCES langue(code)
 );
 
@@ -1675,8 +1696,6 @@ CREATE TABLE revision
 INSERT INTO langue VALUES
 ('SPA'),('ENG'),('FRA');
 
----------------- DOCUMENT ----------------
-
 ---------------- PERSONNE ----------------
 INSERT INTO personne(nom,prenom) VALUES 
 ('Gil','Alan'),
@@ -1696,6 +1715,12 @@ INSERT INTO datatype(nom,code)
 INSERT INTO datatype(id_datatype,nom,code)
 (SELECT DISTINCT(B.id_datatype), C.datatype,'ENG' FROM imported_data A
  JOIN datatype B On B.nom=A.datatype JOIN imported_en C ON A.cote=C.cote WHERE C.datatype IS NOT null AND C.datatype!='imagen');
+
+---------------- DOCUMENT ----------------
+
+---------------- DOCUMENT_TYPE ----------------
+
+---------------- DOCUMENT_DATATYPE ----------------
 
 ---------------- TITRE ----------------
 INSERT INTO titre(nom,id_document,code)
