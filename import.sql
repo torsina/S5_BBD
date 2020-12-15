@@ -1389,6 +1389,7 @@ CREATE TABLE document
     dates_debut          timestamp,
     dates_fin            timestamp,
     relations_genetiques text,
+	representation boolean NOT NULL DEFAULT false,
     format               varchar(100),
     id_auteur_analyse    integer,
     date_analyse         timestamp NOT NULL DEFAULT NOW(),
@@ -1483,34 +1484,34 @@ CREATE TABLE sujet
 DROP TABLE IF EXISTS description CASCADE;
 CREATE TABLE description
 (
-    id_description serial,
+    id_document varchar(15),
     texte          text,
 	code	varchar(3),
-	PRIMARY KEY(id_description,code),
+	PRIMARY KEY(id_document,code),
 	FOREIGN KEY (code) REFERENCES langue(code)
 );
 
-DROP TABLE IF EXISTS auteur_description CASCADE;
+/*DROP TABLE IF EXISTS auteur_description CASCADE;
 CREATE TABLE auteur_description
 (
     id_description integer,
 	code		varchar(3),
-    id_personne    integer,
+    nom       varchar(50),
 	PRIMARY KEY(id_description,id_personne),
     FOREIGN KEY (id_description,code) REFERENCES description(id_description,code),
-    FOREIGN KEY (id_personne) REFERENCES personne (id_personne)
-);
+    FOREIGN KEY (nom) REFERENCES auteur(nom)
+);*/
 
 DROP TABLE IF EXISTS notes CASCADE;
 CREATE TABLE notes
 (
     id_document varchar(15),
     texte       text,
-    id_auteur   integer,
+    nom       varchar(50),
 	code	varchar(3),
 	FOREIGN KEY (code) REFERENCES langue(code),
-    FOREIGN KEY (id_auteur) REFERENCES personne (id_personne),
-    FOREIGN KEY (id_document) REFERENCES document (id_document)
+    FOREIGN KEY (nom,code) REFERENCES auteur (nom,code)
+    --FOREIGN KEY (id_document) REFERENCES document (id_document)
 );
 
 DROP TABLE IF EXISTS resume CASCADE;
@@ -1621,41 +1622,31 @@ CREATE TABLE autres_relations
 DROP TABLE IF EXISTS nature_document CASCADE;
 CREATE TABLE nature_document
 (
-    id_document varchar(15),
+    id_nature_document serial,
     nom         varchar(25),
-    FOREIGN KEY (id_document) REFERENCES document (id_document)
+	code		varchar(3),
+	PRIMARY KEY(id_nature_document,code),
+    FOREIGN KEY (code) REFERENCES langue(code)
 );
 
 DROP TABLE IF EXISTS support CASCADE;
 CREATE TABLE support
 (
-    id_document varchar(15),
+    id_support 	serial,
     nom         varchar(7) NOT NULL,
-    CHECK (nom = 'DIGITAL' or nom = 'PAPEL'),
-	code	varchar(3),
-	FOREIGN KEY (code) REFERENCES langue(code),
-    FOREIGN KEY (id_document) REFERENCES document (id_document)
-);
-
-DROP TABLE IF EXISTS etat CASCADE;
-CREATE TABLE etat
-(
-	id_etat serial,
-	nom varchar(15),
-	code	varchar(3),
-	PRIMARY KEY(id_etat,code),
+	code		varchar(3),
+	PRIMARY KEY(id_support,code),
 	FOREIGN KEY (code) REFERENCES langue(code)
 );
 
 DROP TABLE IF EXISTS etat_general CASCADE;
 CREATE TABLE etat_general
 (
-    id_document varchar(15),
-    id_etat         integer,
-	code		varchar(3),
-	PRIMARY KEY(id_document,code),
-    FOREIGN KEY (id_document) REFERENCES document (id_document),
-	FOREIGN KEY (id_etat,code) REFERENCES etat(id_etat,code)
+    id_etat_general serial,
+    nom         varchar(15),
+	code		varchar(3) NOT NULL,
+	PRIMARY KEY(id_etat_general,code),
+	FOREIGN KEY (code) REFERENCES langue(code)
 );
 
 DROP TABLE IF EXISTS publication CASCADE;
@@ -1663,17 +1654,9 @@ CREATE TABLE publication
 (
     id_document varchar(15),
     texte       text,
-    FOREIGN KEY (id_document) REFERENCES document (id_document),
-	code	varchar(3),
+	code	varchar(3) NOT NULL,
 	FOREIGN KEY (code) REFERENCES langue(code)
-);
-
-DROP TABLE IF EXISTS representation CASCADE;
-CREATE TABLE representation
-(
-    id_document    varchar(15) primary key,
-    representation boolean NOT NULL DEFAULT false,
-    FOREIGN KEY (id_document) REFERENCES document (id_document)
+	--FOREIGN KEY (id_document) REFERENCES document (id_document)
 );
 
 DROP TABLE IF EXISTS revision CASCADE;
@@ -1682,7 +1665,7 @@ CREATE TABLE revision
     id_document          varchar(15),
     date_revision_notice timestamp,
     id_personne          integer,
-    FOREIGN KEY (id_document) REFERENCES document (id_document),
+    --FOREIGN KEY (id_document) REFERENCES document (id_document),
     FOREIGN KEY (id_personne) REFERENCES personne (id_personne)
 );
 
@@ -1745,12 +1728,25 @@ INSERT INTO sujet(nom,id_document,code)
 (SELECT DISTINCT(sujet),cote,'ENG' FROM imported_en WHERE sujet IS NOT null);
 
 ---------------- DESCRIPTION ----------------
+INSERT INTO description(texte,id_document,code)
+(SELECT DISTINCT(description),cote,'SPA' FROM imported_data WHERE description IS NOT null);
+INSERT INTO description(texte,id_document,code)
+(SELECT DISTINCT(description),cote,'ENG' FROM imported_en WHERE description IS NOT null);
 
 ---------------- AUTEUR_DESCRIPTION ----------------
 
 ---------------- NOTES ----------------
+INSERT INTO notes(texte,id_document,nom,code)
+(SELECT DISTINCT(A.notes),A.cote,B.nom,'SPA' FROM imported_data A
+JOIN auteur B ON B.nom=A.auteur
+WHERE notes IS NOT null);
+INSERT INTO notes(texte,id_document,nom,code)
+(SELECT DISTINCT(A.notes),A.cote,B.nom,'ENG' FROM imported_en A
+JOIN auteur B ON B.nom=A.auteur
+WHERE notes IS NOT null);
 
 ---------------- RESUME ----------------
+/* AUCUNE ENTRÉE */
 
 ---------------- RESPONSABLE_ARCHIVE ----------------
 DROP TABLE IF EXISTS table_insert;
@@ -1763,9 +1759,7 @@ INSERT INTO table_insert
 (SELECT ((regexp_matches(editeur, '^Responsable del archivo[[:blank:]]+([\w[:blank:]-]+)[,\(\|#]?(.*)$'))[1]) as colonne1 FROM imported_data);
 UPDATE table_insert
 SET texte=null
-WHERE TRIM(texte)='spectateur AAP 2020'
-or TRIM(texte)=''
-or (texte)='ecto e-';
+WHERE TRIM(texte)='spectateur AAP 2020' or TRIM(texte)='';
 UPDATE table_insert
 SET texte=REPLACE(texte, ' spectateur AAP 2020 ', '');
 UPDATE table_insert
@@ -1775,17 +1769,31 @@ SET texte=TRIM(texte);
 UPDATE table_insert
 SET texte=null
 WHERE (texte)='ecto e-';
-
+UPDATE table_insert
+SET texte=null
+WHERE (texte)='ndeterminado';
+UPDATE table_insert
+SET texte=null
+WHERE (texte)='Indeterminado';
+UPDATE table_insert
+SET texte=null
+WHERE (texte)='Indeterminadoecto e-';
  
 INSERT INTO responsable_archive(nom,code)
 (SELECT DISTINCT(texte),'SPA' FROM table_insert WHERE texte IS NOT NULL);
-DELETE FROM table_insert;
 
+DELETE FROM table_insert;
 INSERT INTO table_insert
 (SELECT ((regexp_matches(editeur, '^Responsible for the file: [[:blank:]]+([\w[:blank:]-]+)[,\(\|#]?(.*)$'))[1]) as colonne1 FROM imported_en);
 
+UPDATE table_insert
+SET texte=TRIM(texte);
+UPDATE table_insert
+SET texte=null
+WHERE (texte)='Undetermined';
 
-SELECT DISTINCT(texte) FROM table_insert ORDER BY texte;
+INSERT INTO responsable_archive(nom,code)
+(SELECT DISTINCT(texte),'ENG' FROM table_insert WHERE texte IS NOT NULL);
 
 ---------------- RESPONSABLE_SCIENTIFIQUE ----------------
  INSERT INTO responsable_scientifique VALUES
@@ -1831,11 +1839,22 @@ INSERT INTO contexte_geo VALUES
 ---------------- AUTRES_RELATIONS ----------------
 
 ---------------- NATURE_DOCUMENT ----------------
+INSERT INTO nature_document(nom,code)
+(SELECT DISTINCT(nature_document),'SPA' FROM imported_data WHERE nature_document IS NOT null);
+INSERT INTO nature_document(id_nature_document,nom,code) VALUES
+(1,'FREE TAPESTRY SHEETS', 'ENG'),
+(2,'PDF', 'ENG'),
+(3,'PNG', 'ENG'),
+(4,'JPG', 'ENG');
 
 ---------------- SUPPORT ----------------
+INSERT INTO support(nom,code)
+(SELECT DISTINCT(support),'SPA' FROM imported_data WHERE support IS NOT null); 
+INSERT INTO support(id_support,nom,code) VALUES
+(1,'PAPER','ENG'), (2,'DIGITAL','ENG');
 
----------------- ETAT ----------------
-INSERT INTO etat VALUES
+---------------- ETAT_GENERAL ----------------
+INSERT INTO etat_general(id_etat_general,nom,code) VALUES
 (1,'muy dañado', 'SPA'),
 (2,'dañado', 'SPA'),
 (3,'muy mediocre', 'SPA'),
@@ -1847,10 +1866,10 @@ INSERT INTO etat VALUES
 (4,'poor', 'ENG'),
 (5,'good', 'ENG');
 
----------------- ETAT_GENERAL ----------------
-
 ---------------- PUBLICATION ----------------
-
----------------- REPRESENTATION ----------------
+INSERT INTO publication(texte,id_document,code)
+(SELECT DISTINCT(publication),cote,'SPA' FROM imported_data WHERE publication IS NOT null);
+INSERT INTO publication(texte,id_document,code)
+(SELECT DISTINCT(publication),cote,'ENG' FROM imported_en WHERE publication IS NOT null);
 
 ---------------- REVISION ----------------
