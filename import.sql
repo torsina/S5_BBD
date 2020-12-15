@@ -1374,6 +1374,20 @@ WHERE format ~ '(.*)(\d+\s*[x×X]\s*\d+)(.*)';
 
 
 ------------------------------------------------ CRÉATION DES TABLES ------------------------------------------------
+DROP TABLE IF EXISTS document CASCADE;
+CREATE TABLE document
+(
+    id_document          varchar(15) primary key,
+    dates_debut          timestamp,
+    dates_fin            timestamp,
+    relations_genetiques text,
+    format               varchar(100),
+    id_auteur_analyse    integer,
+    date_analyse         timestamp NOT NULL DEFAULT NOW(),
+    date_creation_notice timestamp          DEFAULT NULL,
+    FOREIGN KEY (id_auteur_analyse) REFERENCES personne (id_personne)
+);
+
 DROP TABLE IF EXISTS langue CASCADE;
 CREATE TABLE langue
 (
@@ -1412,50 +1426,49 @@ CREATE TABLE datatype
 DROP TABLE IF EXISTS titre CASCADE;
 CREATE TABLE titre
 (
-    id_titre serial,
+    id_document varchar(15),
     nom      varchar(150),
 	code	varchar(3),
-	PRIMARY KEY(id_titre,code),
+	PRIMARY KEY(id_document,code),
 	FOREIGN KEY (code) REFERENCES langue(code)
 );
 
 DROP TABLE IF EXISTS sous_titre CASCADE;
 CREATE TABLE sous_titre
 (
-    id_sous_titre serial,
+    id_document varchar(15),
     nom           text,
 	code	varchar(3),
-	PRIMARY KEY(id_sous_titre,code),
+	PRIMARY KEY(id_document,code),
 	FOREIGN KEY (code) REFERENCES langue(code)
 );
 
 DROP TABLE IF EXISTS auteur CASCADE;
 CREATE TABLE auteur
 (
-    id_auteur serial,
     nom       varchar(50),
 	code	varchar(3),
-	PRIMARY KEY(id_auteur,code),
+	PRIMARY KEY(nom,code),
 	FOREIGN KEY (code) REFERENCES langue(code)
 );
 
 DROP TABLE IF EXISTS destinataire CASCADE;
 CREATE TABLE destinataire
 (
-    id_destinataire serial,
+	id_document varchar(15),
     nom             text,
 	code	varchar(3),
-	PRIMARY KEY(id_destinataire,code),
+	PRIMARY KEY(id_document,code),
 	FOREIGN KEY (code) REFERENCES langue(code)
 );
 
 DROP TABLE IF EXISTS sujet CASCADE;
 CREATE TABLE sujet
 (
-    id_sujet serial,
+    id_document varchar(15),
     nom      text,
 	code	varchar(3),
-	PRIMARY KEY(id_sujet,code),
+	PRIMARY KEY(id_document,code),
 	FOREIGN KEY (code) REFERENCES langue(code)
 );
 
@@ -1478,20 +1491,6 @@ CREATE TABLE auteur_description
 	PRIMARY KEY(id_description,id_personne),
     FOREIGN KEY (id_description,code) REFERENCES description(id_description,code),
     FOREIGN KEY (id_personne) REFERENCES personne (id_personne)
-);
-
-DROP TABLE IF EXISTS document CASCADE;
-CREATE TABLE document
-(
-    id_document          varchar(15) primary key,
-    dates_debut          timestamp,
-    dates_fin            timestamp,
-    relations_genetiques text,
-    format               varchar(100),
-    id_auteur_analyse    integer,
-    date_analyse         timestamp NOT NULL DEFAULT NOW(),
-    date_creation_notice timestamp          DEFAULT NULL,
-    FOREIGN KEY (id_auteur_analyse) REFERENCES personne (id_personne)
 );
 
 DROP TABLE IF EXISTS notes CASCADE;
@@ -1681,35 +1680,71 @@ CREATE TABLE revision
 
 
 ------------------------------------------------ MISE EN PLACE DES INSERTIONS ------------------------------------------------
+---------------- LANGUE ----------------
 INSERT INTO langue VALUES
-('SPA'),('ENG');
+('SPA'),('ENG'),('FRA');
 
+---------------- DOCUMENT ----------------
+
+---------------- PERSONNE ----------------
 INSERT INTO personne(nom,prenom) VALUES 
 ('Gil','Alan'),
 ('Chantraine Braillon','Cécile'),
 ('Dalmagro','María Cristina'),
 ('Idmhand','Fatiha');
 
+---------------- TYPE ----------------
 INSERT INTO type(nom,code)
 (SELECT DISTINCT(type),'SPA' FROM imported_data WHERE type IS NOT null);
 INSERT INTO type(id_type,nom,code)
 (SELECT DiSTINCT(B.id_type), C.type,'ENG' FROM imported_data A JOIN type B On B.nom=A.type JOIN imported_en C ON A.cote=C.cote WHERE C.type IS NOT null);
 
+---------------- DATATYPE ----------------
 INSERT INTO datatype(nom,code)
 (SELECT DISTINCT(datatype),'SPA' FROM imported_data WHERE datatype IS NOT null);
 INSERT INTO datatype(id_datatype,nom,code)
 (SELECT DISTINCT(B.id_datatype), C.datatype,'ENG' FROM imported_data A
  JOIN datatype B On B.nom=A.datatype JOIN imported_en C ON A.cote=C.cote WHERE C.datatype IS NOT null AND C.datatype!='imagen');
- 
-SELECT DISTINCT(B.id_datatype), C.datatype,'ENG' FROM imported_data A
-JOIN datatype B On B.nom=A.datatype JOIN imported_en C ON A.cote=C.cote WHERE C.datatype IS NOT null AND C.datatype!='imagen';
 
-INSERT INTO titre(nom,code)
-(SELECT DISTINCT(titre),'SPA' FROM imported_data WHERE titre IS NOT null);
-/*INSERT INTO titre(id_titre,nom,code)
-(SELECT DISTINCT(B.id_titre), C.titre,'ENG' FROM imported_data A
- JOIN titre B On B.nom=A.titre JOIN imported_en C ON A.cote=C.cote WHERE C.titre IS NOT null);*/
- 
+---------------- TITRE ----------------
+INSERT INTO titre(nom,id_document,code)
+(SELECT DISTINCT(titre),cote,'SPA' FROM imported_data WHERE titre IS NOT null);
+INSERT INTO titre(nom,id_document,code)
+(SELECT DISTINCT(titre),cote,'ENG' FROM imported_en WHERE titre IS NOT null);
+
+---------------- SOUS_TITRE ----------------
+INSERT INTO sous_titre(nom,id_document,code)
+(SELECT DISTINCT(sous_titre),cote,'SPA' FROM imported_data WHERE sous_titre IS NOT null);
+INSERT INTO sous_titre(nom,id_document,code)
+(SELECT DISTINCT(sous_titre),cote,'ENG' FROM imported_en WHERE sous_titre IS NOT null);
+
+---------------- AUTEUR ----------------
+INSERT INTO auteur(nom,code)
+(SELECT DISTINCT(auteur),'SPA' FROM imported_data WHERE auteur IS NOT null);
+INSERT INTO auteur(nom,code)
+(SELECT DISTINCT(auteur),'ENG' FROM imported_en WHERE auteur IS NOT null);
+
+---------------- DESTINATAIRE ----------------
+INSERT INTO destinataire(nom,id_document,code)
+(SELECT DISTINCT(destinataire),cote,'SPA' FROM imported_data WHERE destinataire IS NOT null);
+INSERT INTO destinataire(nom,id_document,code)
+(SELECT DISTINCT(destinataire),cote,'ENG' FROM imported_en WHERE destinataire IS NOT null);
+
+---------------- SUJET ----------------
+INSERT INTO sujet(nom,id_document,code)
+(SELECT DISTINCT(sujet),cote,'SPA' FROM imported_data WHERE sujet IS NOT null);
+INSERT INTO sujet(nom,id_document,code)
+(SELECT DISTINCT(sujet),cote,'ENG' FROM imported_en WHERE sujet IS NOT null);
+
+---------------- DESCRIPTION ----------------
+
+---------------- AUTEUR_DESCRIPTION ----------------
+
+---------------- NOTES ----------------
+
+---------------- RESUME ----------------
+
+---------------- RESPONSABLE_ARCHIVE ----------------
 DROP TABLE IF EXISTS table_insert;
 CREATE TABLE table_insert
 (
@@ -1744,7 +1779,7 @@ INSERT INTO table_insert
 
 SELECT DISTINCT(texte) FROM table_insert ORDER BY texte;
 
- 
+---------------- RESPONSABLE_SCIENTIFIQUE ----------------
  INSERT INTO responsable_scientifique VALUES
 (1, 'La Rochelle Université', 'Alumno', 'Master LEA Amérique', 'SPA'),
 (4, 'Université de Poitiers', 'Profesor', 'CRLA Institut des textes et manuscrits modernes CNRS-UMR8132', 'SPA'),
@@ -1753,12 +1788,14 @@ SELECT DISTINCT(texte) FROM table_insert ORDER BY texte;
 (4, 'Université de Poitiers', 'Professor', 'CRLA Institut des textes et manuscrits modernes CNRS-UMR8132', 'ENG'),
 (2, 'La Rochelle Université', 'Professor', 'Equipo CRHIA', 'ENG');
 
+---------------- EDITEUR ----------------
 INSERT INTO editeur(id_editeur,nom_editeur,code) VALUES
 (1,'Editor Proyecto e-spectateur AAP 2020', 'SPA'),
 (2,'Editor Proyecto CollEx-Persée Archivos 3.0 AAP 2018', 'SPA'),
 (1,'Editor Project e-spectateur, AAP 2020', 'ENG'),
 (2,'Editor Project CollEx-Persée Files 3.0, AAP 2018', 'ENG');
 
+---------------- CONTEXTE_GEOGRAPHIQUE ----------------
 INSERT INTO contexte_geo VALUES
 (1,'España',40.463667, -3.749220, 'SPA'),
 (2,'Estados Unidos',37.090240,-95.712891, 'SPA'),
@@ -1775,6 +1812,21 @@ INSERT INTO contexte_geo VALUES
 (6,'Peru',-6.8699697,-75.0458515, 'ENG'),
 (7,'Latin America',null,null, 'ENG');
 
+---------------- LOCALISATION ----------------
+
+---------------- LICENCE ----------------
+
+---------------- DROITS ----------------
+
+---------------- ETAT_GENETIQUE ----------------
+
+---------------- AUTRES_RELATIONS ----------------
+
+---------------- NATURE_DOCUMENT ----------------
+
+---------------- SUPPORT ----------------
+
+---------------- ETAT ----------------
 INSERT INTO etat VALUES
 (1,'muy dañado', 'SPA'),
 (2,'dañado', 'SPA'),
@@ -1786,3 +1838,11 @@ INSERT INTO etat VALUES
 (3,'very poor', 'ENG'),
 (4,'poor', 'ENG'),
 (5,'good', 'ENG');
+
+---------------- ETAT_GENERAL ----------------
+
+---------------- PUBLICATION ----------------
+
+---------------- REPRESENTATION ----------------
+
+---------------- REVISION ----------------
