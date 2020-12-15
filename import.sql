@@ -2,6 +2,7 @@ set datestyle to 'european';
 
 DROP TABLE IF EXISTS imported_data;
 
+-- Table d'importation des données brutes espagnoles
 CREATE TABLE imported_data
 (
     cote                       text,
@@ -50,6 +51,7 @@ CREATE TABLE imported_data
 
 DROP TABLE IF EXISTS imported_en;
 
+-- Table d'importation des données brutes anglaises
 CREATE TABLE imported_en
 (
     cote                       text,
@@ -1456,10 +1458,12 @@ CREATE TABLE document_datatype
 DROP TABLE IF EXISTS titre CASCADE;
 CREATE TABLE titre
 (
-    id_document varchar(15),
-    nom      varchar(150),
+	id_titre serial,
+	titre_num integer,
 	code	varchar(3),
-	PRIMARY KEY(id_document,code),
+	nom      varchar(150),
+	PRIMARY KEY(id_titre),
+	FOREIGN KEY (id_titre) REFERENCES titre(id_titre),
 	FOREIGN KEY (code) REFERENCES langue(code)
 );
 
@@ -1602,13 +1606,23 @@ CREATE TABLE localisation
     FOREIGN KEY (id_contexte_geo,code) REFERENCES contexte_geo (id_contexte_geo,code)
 );
 
+-- Identifie une licence
 DROP TABLE IF EXISTS licence CASCADE;
 CREATE TABLE licence
+(
+	id_licence serial,
+	PRIMARY KEY(id_licence)
+);
+
+-- Le texte d'une licence
+DROP TABLE IF EXISTS licence_text CASCADE;
+CREATE TABLE licence_text
 (
     id_licence serial,
     texte      text,
 	code	varchar(3),
 	PRIMARY KEY(id_licence,code),
+	FOREIGN KEY (id_licence) REFERENCES licence(id_licence),
 	FOREIGN KEY (code) REFERENCES langue(code)
 );
 
@@ -1621,7 +1635,7 @@ CREATE TABLE droits
 	code	varchar(3),
 	PRIMARY KEY(id_droit,code),
 	FOREIGN KEY (code) REFERENCES langue(code),
-    FOREIGN KEY (id_licence) REFERENCES licence_es (id_licence)
+    FOREIGN KEY (id_licence) REFERENCES licence (id_licence)
 );
 
 DROP TABLE IF EXISTS etat_genetique CASCADE;
@@ -1693,8 +1707,9 @@ CREATE TABLE revision
 
 ------------------------------------------------ MISE EN PLACE DES INSERTIONS ------------------------------------------------
 ---------------- LANGUE ----------------
+-- Ici, on créer les codes ISO 3166-1 des pays sur 3 lettres
 INSERT INTO langue VALUES
-('SPA'),('ENG'),('FRA');
+('SPA'),('ENG'),('FRA'); -- FRA est ajouté à titre d'exemple
 
 ---------------- PERSONNE ----------------
 INSERT INTO personne(nom,prenom) VALUES 
@@ -1705,40 +1720,48 @@ INSERT INTO personne(nom,prenom) VALUES
 
 ---------------- TYPE ----------------
 INSERT INTO type(nom,code)
-(SELECT DISTINCT(type),'SPA' FROM imported_data WHERE type IS NOT null);
+(SELECT DISTINCT(type),'SPA' FROM imported_data WHERE type IS NOT NULL);
+-- On insère ensuite les types en anglais, avec le même id mais un code de langue différent
 INSERT INTO type(id_type,nom,code)
-(SELECT DiSTINCT(B.id_type), C.type,'ENG' FROM imported_data A JOIN type B On B.nom=A.type JOIN imported_en C ON A.cote=C.cote WHERE C.type IS NOT null);
+(SELECT DISTINCT(B.id_type), C.type,'ENG' FROM imported_data A JOIN type B On B.nom=A.type JOIN imported_en C ON A.cote=C.cote WHERE C.type IS NOT NULL);
 
 ---------------- DATATYPE ----------------
 INSERT INTO datatype(nom,code)
-(SELECT DISTINCT(datatype),'SPA' FROM imported_data WHERE datatype IS NOT null);
+(SELECT DISTINCT(datatype),'SPA' FROM imported_data WHERE datatype IS NOT NULL);
 INSERT INTO datatype(id_datatype,nom,code)
 (SELECT DISTINCT(B.id_datatype), C.datatype,'ENG' FROM imported_data A
- JOIN datatype B On B.nom=A.datatype JOIN imported_en C ON A.cote=C.cote WHERE C.datatype IS NOT null AND C.datatype!='imagen');
+ JOIN datatype B On B.nom=A.datatype JOIN imported_en C ON A.cote=C.cote WHERE C.datatype IS NOT NULL AND C.datatype!='imagen'); -- != imagen = correction manuelle
 
 ---------------- DOCUMENT ----------------
+-- Table principale
 
 ---------------- DOCUMENT_TYPE ----------------
 
 ---------------- DOCUMENT_DATATYPE ----------------
 
 ---------------- TITRE ----------------
-INSERT INTO titre(nom,id_document,code)
-(SELECT DISTINCT(titre),cote,'SPA' FROM imported_data WHERE titre IS NOT null);
-INSERT INTO titre(nom,id_document,code)
-(SELECT DISTINCT(titre),cote,'ENG' FROM imported_en WHERE titre IS NOT null);
+INSERT INTO titre (SELECT FROM (SELECT DISTINCT(titre) FROM imported_data WHERE titre IS NOT NULL) AS sub);
 
+INSERT INTO titre(nom,id_document,code)
+(SELECT DISTINCT(titre),cote,'SPA' FROM imported_data WHERE titre IS NOT NULL);
+INSERT INTO titre(nom,id_document,code)
+(SELECT DISTINCT(titre),cote,'ENG' FROM imported_en WHERE titre IS NOT NULL);
+
+SELECT DISTINCT(B.id_titre), B.nom, B.code, C.titre,'ENG' FROM imported_data A
+JOIN titre B On B.nom=A.titre 
+JOIN imported_en C ON A.cote=C.cote 
+WHERE C.titre IS NOT null ORDER BY B.id_titre;
 ---------------- SOUS_TITRE ----------------
 INSERT INTO sous_titre(nom,id_document,code)
-(SELECT DISTINCT(sous_titre),cote,'SPA' FROM imported_data WHERE sous_titre IS NOT null);
+(SELECT DISTINCT(sous_titre),cote,'SPA' FROM imported_data WHERE sous_titre IS NOT NULL);
 INSERT INTO sous_titre(nom,id_document,code)
-(SELECT DISTINCT(sous_titre),cote,'ENG' FROM imported_en WHERE sous_titre IS NOT null);
+(SELECT DISTINCT(sous_titre),cote,'ENG' FROM imported_en WHERE sous_titre IS NOT NULL);
 
 ---------------- AUTEUR ----------------
 INSERT INTO auteur(nom,code)
-(SELECT DISTINCT(auteur),'SPA' FROM imported_data WHERE auteur IS NOT null);
+(SELECT DISTINCT(auteur),'SPA' FROM imported_data WHERE auteur IS NOT NULL);
 INSERT INTO auteur(nom,code)
-(SELECT DISTINCT(auteur),'ENG' FROM imported_en WHERE auteur IS NOT null);
+(SELECT DISTINCT(auteur),'ENG' FROM imported_en WHERE auteur IS NOT NULL);
 
 ---------------- DESTINATAIRE ----------------
 INSERT INTO destinataire(nom,id_document,code)
