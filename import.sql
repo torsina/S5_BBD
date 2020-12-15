@@ -545,6 +545,8 @@ UPDATE imported_data
 SET sujet='Teatro Solis'
 WHERE sujet = 'Teatro Solís';
 
+UPDATE imported_en
+SET sujet=TRIM(sujet);			      
 
 ------------------------------------------------DESCRIPTION------------------------------------------------
 
