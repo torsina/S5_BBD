@@ -1275,14 +1275,18 @@ SET date_analyse = TRIM(blank_to_space(date_analyse));
 UPDATE imported_data
 SET date_analyse = TRIM(BOTH '$' FROM date_analyse);
 UPDATE imported_data
-SET date_analyse = '2015-01-01/2019-01-01'
+SET date_analyse = '2019-01-01'
 WHERE date_analyse = '2015/2019';
+ALTER TABLE imported_data 
+	ALTER date_analyse DROP DEFAULT,
+	ALTER date_analyse TYPE timestamp USING date_analyse::timestamp;
+				       
 UPDATE imported_en
 SET date_analyse = TRIM(blank_to_space(date_analyse));
 UPDATE imported_en
 SET date_analyse = TRIM(BOTH '$' FROM date_analyse);
 UPDATE imported_en
-SET date_analyse = '2015-01-01/2019-01-01'
+SET date_analyse = '2019-01-01'
 WHERE date_analyse = '2015/2019';
 
 /*
@@ -1310,6 +1314,9 @@ SET date_creation_notice = TRIM(BOTH '$' FROM date_creation_notice);
 UPDATE imported_data
 SET date_creation_notice = '2015-01-01/2019-01-01'
 WHERE date_creation_notice = '2015/2019';
+ALTER TABLE imported_data 
+	ALTER date_creation_notice DROP DEFAULT,
+	ALTER date_creation_notice TYPE timestamp USING date_creation_notice::timestamp;
 UPDATE imported_en
 SET date_creation_notice = TRIM(blank_to_space(date_creation_notice));
 UPDATE imported_en
