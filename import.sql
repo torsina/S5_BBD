@@ -793,7 +793,11 @@ SET localisation='Montevideo'
 WHERE contexte_geographique = 'Uruguay | Montevideo'
   and localisation = null;
 
-
+UPDATE imported_en
+SET localisation=TRIM(localisation);
+UPDATE imported_en
+SET localisation=null
+WHERE LOWER(contexte_geographique) = 'undetermined';
 ------------------------------------------------DROITS------------------------------------------------
 /*
 On retire les caractères en trop avant et après les droits.
