@@ -1518,26 +1518,25 @@ CREATE TABLE sujet
 	FOREIGN KEY (code) REFERENCES langue(code)
 );
 
+DROP TABLE IF EXISTS auteur_description CASCADE;
+CREATE TABLE auteur_description
+(
+	id_auteur_description serial,
+	nom varchar(50),
+	PRIMARY KEY(id_auteur_description)
+);
+
 DROP TABLE IF EXISTS description CASCADE;
 CREATE TABLE description
 (
     id_document varchar(15),
+	id_auteur_description integer,
     texte          text,
 	code	varchar(3),
 	PRIMARY KEY(id_document,code),
-	FOREIGN KEY (code) REFERENCES langue(code)
+	FOREIGN KEY (code) REFERENCES langue(code),
+	FOREIGN KEY (id_auteur_description) REFERENCES auteur_description(id_auteur_description)
 );
-
-/*DROP TABLE IF EXISTS auteur_description CASCADE;
-CREATE TABLE auteur_description
-(
-    id_description integer,
-	code		varchar(3),
-    nom       varchar(50),
-	PRIMARY KEY(id_description,id_personne),
-    FOREIGN KEY (id_description,code) REFERENCES description(id_description,code),
-    FOREIGN KEY (nom) REFERENCES auteur(nom)
-);*/
 
 DROP TABLE IF EXISTS notes CASCADE;
 CREATE TABLE notes
@@ -1547,8 +1546,8 @@ CREATE TABLE notes
     nom       varchar(50),
 	code	varchar(3),
 	FOREIGN KEY (code) REFERENCES langue(code),
-    FOREIGN KEY (nom,code) REFERENCES auteur (nom,code)
-    --FOREIGN KEY (id_document) REFERENCES document (id_document)
+    FOREIGN KEY (nom,code) REFERENCES auteur (nom,code),
+    FOREIGN KEY (id_document) REFERENCES document (id_document)
 );
 
 DROP TABLE IF EXISTS resume CASCADE;
@@ -1679,6 +1678,18 @@ CREATE TABLE nature_document
     FOREIGN KEY (code) REFERENCES langue(code)
 );
 
+DROP TABLE IF EXISTS document_nature_document CASCADE;
+CREATE TABLE document_nature_document
+(
+    id_document varchar(15) ,
+	code	varchar(3),
+	id_nature_document integer,
+	PRIMARY KEY(id_document,code),
+	FOREIGN KEY (code) REFERENCES langue(code),
+	FOREIGN KEY (id_document) REFERENCES document(id_document),
+	FOREIGN KEY (id_nature_document,code) REFERENCES nature_document(id_nature_document,code)
+);
+
 DROP TABLE IF EXISTS support CASCADE;
 CREATE TABLE support
 (
@@ -1687,6 +1698,18 @@ CREATE TABLE support
 	code		varchar(3),
 	PRIMARY KEY(id_support,code),
 	FOREIGN KEY (code) REFERENCES langue(code)
+);
+
+DROP TABLE IF EXISTS document_support CASCADE;
+CREATE TABLE document_support
+(
+    id_document varchar(15) ,
+	code	varchar(3),
+	id_support integer,
+	PRIMARY KEY(id_document,code),
+	FOREIGN KEY (code) REFERENCES langue(code),
+	FOREIGN KEY (id_document) REFERENCES document(id_document),
+	FOREIGN KEY (id_support,code) REFERENCES support(id_support,code)
 );
 
 DROP TABLE IF EXISTS etat_general CASCADE;
@@ -1699,6 +1722,18 @@ CREATE TABLE etat_general
 	FOREIGN KEY (code) REFERENCES langue(code)
 );
 
+DROP TABLE IF EXISTS document_etat_general CASCADE;
+CREATE TABLE document_etat_general
+(
+    id_document varchar(15) ,
+	code	varchar(3),
+	id_etat_general integer,
+	PRIMARY KEY(id_document,code),
+	FOREIGN KEY (code) REFERENCES langue(code),
+	FOREIGN KEY (id_document) REFERENCES document(id_document),
+	FOREIGN KEY (id_etat_general,code) REFERENCES etat_general(id_etat_general,code)
+);
+
 DROP TABLE IF EXISTS publication CASCADE;
 CREATE TABLE publication
 (
@@ -1709,12 +1744,13 @@ CREATE TABLE publication
 	FOREIGN KEY (id_document) REFERENCES document (id_document)
 );
 
-DROP TABLE IF EXISTS revision CASCADE;
-CREATE TABLE revision
+DROP TABLE IF EXISTS document_revision CASCADE;
+CREATE TABLE document_revision
 (
     id_document          varchar(15),
     date_revision_notice timestamp,
     id_personne          integer,
+	PRIMARY KEY (id_document,date_revision_notice),
     FOREIGN KEY (id_document) REFERENCES document (id_document),
     FOREIGN KEY (id_personne) REFERENCES personne (id_personne)
 );
@@ -1802,12 +1838,19 @@ INSERT INTO sujet(nom,id_document,code)
 (SELECT DISTINCT(sujet),cote,'ENG' FROM imported_en WHERE sujet IS NOT null);
 
 ---------------- DESCRIPTION ----------------
-INSERT INTO description(texte,id_document,code)
-(SELECT DISTINCT(description),cote,'SPA' FROM imported_data WHERE description IS NOT null);
-INSERT INTO description(texte,id_document,code)
-(SELECT DISTINCT(description),cote,'ENG' FROM imported_en WHERE description IS NOT null);
+INSERT INTO description(texte,id_document,code,id_auteur_description)
+(SELECT DISTINCT(A.description),A.cote,'SPA',B.id_auteur_description FROM imported_data A
+JOIN auteur_description B ON B.nom=A.auteur_description
+WHERE description IS NOT null);
+INSERT INTO description(texte,id_document,code,id_auteur_description)
+(SELECT DISTINCT(A.description),A.cote,'ENG',B.id_auteur_description FROM imported_data A
+JOIN auteur_description B ON B.nom=A.auteur_description
+WHERE description IS NOT null);
 
 ---------------- AUTEUR_DESCRIPTION ----------------
+INSERT INTO auteur_description(nom)
+(SELECT DISTINCT auteur_description FROM imported_data WHERE auteur_description IS NOT null);
+
 
 ---------------- NOTES ----------------
 INSERT INTO notes(texte,id_document,nom,code)
@@ -1868,6 +1911,9 @@ WHERE (texte)='Undetermined';
 
 INSERT INTO responsable_archive(nom,code)
 (SELECT DISTINCT(texte),'ENG' FROM table_insert WHERE texte IS NOT NULL);
+DROP TABLE table_insert;
+
+
 
 ---------------- RESPONSABLE_SCIENTIFIQUE ----------------
  INSERT INTO responsable_scientifique VALUES
@@ -1952,11 +1998,33 @@ INSERT INTO nature_document(id_nature_document,nom,code) VALUES
 (3,'PNG', 'ENG'),
 (4,'JPG', 'ENG');
 
+---------------- DOCUMENT_NATURE_DOCUMENT ----------------
+INSERT INTO document_nature_document(id_document,code,id_nature_document)
+(SELECT DISTINCT A.cote, 'SPA', B.id_nature_document FROM imported_data A
+JOIN nature_document B ON B.nom=A.nature_document
+WHERE A.nature_document IS NOT null);
+
+INSERT INTO document_nature_document(id_document,code,id_nature_document)
+(SELECT DISTINCT A.cote, 'ENG', B.id_nature_document FROM imported_en A
+JOIN nature_document B ON B.nom=A.nature_document
+WHERE A.nature_document IS NOT null);
+
 ---------------- SUPPORT ----------------
 INSERT INTO support(nom,code)
 (SELECT DISTINCT(support),'SPA' FROM imported_data WHERE support IS NOT null); 
 INSERT INTO support(id_support,nom,code) VALUES
 (1,'PAPER','ENG'), (2,'DIGITAL','ENG');
+
+---------------- DOCUMENT_SUPPORT ----------------
+INSERT INTO document_support(id_document,code,id_support)
+(SELECT DISTINCT A.cote, 'SPA', B.id_support FROM imported_data A
+JOIN support B ON B.nom=A.support
+WHERE A.support IS NOT null);
+
+INSERT INTO document_support(id_document,code,id_support)
+(SELECT DISTINCT A.cote, 'ENG', B.id_support FROM imported_en A
+JOIN support B ON B.nom=A.support
+WHERE A.support IS NOT null);
 
 ---------------- ETAT_GENERAL ----------------
 INSERT INTO etat_general(id_etat_general,nom,code) VALUES
@@ -1971,10 +2039,36 @@ INSERT INTO etat_general(id_etat_general,nom,code) VALUES
 (4,'poor', 'ENG'),
 (5,'good', 'ENG');
 
+---------------- DOCUMENT_ETAT_GENERAL ----------------
+INSERT INTO document_etat_general(id_document,code,id_etat_general)
+(SELECT DISTINCT A.cote, 'SPA', B.id_etat_general FROM imported_data A
+JOIN etat_general B ON B.nom=A.etat_general
+WHERE A.etat_general IS NOT null);
+
+INSERT INTO document_etat_general(id_document,code,id_etat_general)
+(SELECT DISTINCT A.cote, 'ENG', B.id_etat_general FROM imported_en A
+JOIN etat_general B ON B.nom=A.etat_general
+WHERE A.etat_general IS NOT null);
+
 ---------------- PUBLICATION ----------------
 INSERT INTO publication(texte,id_document,code)
 (SELECT DISTINCT(publication),cote,'SPA' FROM imported_data WHERE publication IS NOT null);
 INSERT INTO publication(texte,id_document,code)
 (SELECT DISTINCT(publication),cote,'ENG' FROM imported_en WHERE publication IS NOT null);
 
----------------- REVISION ----------------
+---------------- DOCUMENT_REVISION ----------------
+/* AUCUNE ENTRÉE*/
+
+
+
+
+
+
+
+
+
+
+
+------------------------------------------------ MISE EN PLACE DES TRIGGERS ------------------------------------------------
+
+------------------------------------------------ MISE EN PLACE DES REQUÊTES ------------------------------------------------
