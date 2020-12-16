@@ -1406,8 +1406,7 @@ DROP TABLE IF EXISTS personne CASCADE;
 CREATE TABLE personne
 (
     id_personne serial primary key,
-    nom         varchar(25),
-    prenom      varchar(25)
+    nom         varchar(50)
 );
 
 DROP TABLE IF EXISTS type CASCADE;
@@ -1452,7 +1451,8 @@ CREATE TABLE document_type
     id_type  	integer,
 	PRIMARY KEY(id_document,code),
 	FOREIGN KEY (id_type,code) REFERENCES type(id_type,code),
-	FOREIGN KEY (code) REFERENCES langue(code)
+	FOREIGN KEY (code) REFERENCES langue(code),
+	FOREIGN KEY (id_document) REFERENCES document(id_document)
 );
 
 DROP TABLE IF EXISTS document_datatype CASCADE;
@@ -1463,19 +1463,19 @@ CREATE TABLE document_datatype
     id_datatype integer,
 	PRIMARY KEY(id_document,code),
 	FOREIGN KEY (id_datatype,code) REFERENCES datatype(id_datatype,code),
-	FOREIGN KEY (code) REFERENCES langue(code)
+	FOREIGN KEY (code) REFERENCES langue(code),
+	FOREIGN KEY (id_document) REFERENCES document(id_document)
 );
 
 DROP TABLE IF EXISTS titre CASCADE;
 CREATE TABLE titre
 (
-	id_titre serial,
-	titre_num integer,
+	id_document varchar(15),
 	code	varchar(3),
 	nom      varchar(150),
-	PRIMARY KEY(id_titre),
-	FOREIGN KEY (id_titre) REFERENCES titre(id_titre),
-	FOREIGN KEY (code) REFERENCES langue(code)
+	PRIMARY KEY(id_document,code),
+	FOREIGN KEY (code) REFERENCES langue(code),
+	FOREIGN KEY (id_document) REFERENCES document(id_document)
 );
 
 DROP TABLE IF EXISTS sous_titre CASCADE;
@@ -1485,7 +1485,8 @@ CREATE TABLE sous_titre
     nom           text,
 	code	varchar(3),
 	PRIMARY KEY(id_document,code),
-	FOREIGN KEY (code) REFERENCES langue(code)
+	FOREIGN KEY (code) REFERENCES langue(code),
+	FOREIGN KEY (id_document) REFERENCES document(id_document)
 );
 
 DROP TABLE IF EXISTS auteur CASCADE;
@@ -1605,48 +1606,51 @@ CREATE TABLE contexte_geo
 	FOREIGN KEY (code) REFERENCES langue(code)
 );
 
+DROP TABLE IF EXISTS document_contexte_geo CASCADE;
+CREATE TABLE document_contexte_geo
+(
+    id_document varchar(15) ,
+	code	varchar(3),
+	id_contexte_geo integer,
+	PRIMARY KEY(id_document,code),
+	FOREIGN KEY (code) REFERENCES langue(code),
+	FOREIGN KEY (id_document) REFERENCES document(id_document),
+	FOREIGN KEY (id_contexte_geo,code) REFERENCES contexte_geo(id_contexte_geo,code)
+);
+
 DROP TABLE IF EXISTS localisation CASCADE;
 CREATE TABLE localisation
 (
-    id_localisation serial,
+    id_document varchar(15),
     nom             varchar(300),
     id_contexte_geo integer DEFAULT NULL,
 	code	varchar(3),
-	PRIMARY KEY(id_localisation,code),
+	PRIMARY KEY(id_document,code),
 	FOREIGN KEY (code) REFERENCES langue(code),
-    FOREIGN KEY (id_contexte_geo,code) REFERENCES contexte_geo (id_contexte_geo,code)
-);
-
--- Identifie une licence
-DROP TABLE IF EXISTS licence CASCADE;
-CREATE TABLE licence
-(
-	id_licence serial,
-	PRIMARY KEY(id_licence)
-);
-
--- Le texte d'une licence
-DROP TABLE IF EXISTS licence_text CASCADE;
-CREATE TABLE licence_text
-(
-    id_licence serial,
-    texte      text,
-	code	varchar(3),
-	PRIMARY KEY(id_licence,code),
-	FOREIGN KEY (id_licence) REFERENCES licence(id_licence),
-	FOREIGN KEY (code) REFERENCES langue(code)
+    FOREIGN KEY (id_contexte_geo,code) REFERENCES contexte_geo (id_contexte_geo,code),
+	FOREIGN KEY (id_document) REFERENCES document(id_document)
 );
 
 DROP TABLE IF EXISTS droits CASCADE;
 CREATE TABLE droits
 (
-    id_droit   serial,
+    id_droits   serial,
     texte      text,
-    id_licence integer,
 	code	varchar(3),
-	PRIMARY KEY(id_droit,code),
+	PRIMARY KEY(id_droits,code),
+	FOREIGN KEY (code) REFERENCES langue(code)
+);
+
+DROP TABLE IF EXISTS document_droits CASCADE;
+CREATE TABLE document_droits
+(
+    id_document varchar(15) ,
+	code	varchar(3),
+	id_droits integer,
+	PRIMARY KEY(id_document,code),
 	FOREIGN KEY (code) REFERENCES langue(code),
-    FOREIGN KEY (id_licence) REFERENCES licence (id_licence)
+	FOREIGN KEY (id_document) REFERENCES document(id_document),
+	FOREIGN KEY (id_droits,code) REFERENCES droits(id_droits,code)
 );
 
 DROP TABLE IF EXISTS etat_genetique CASCADE;
@@ -1701,8 +1705,8 @@ CREATE TABLE publication
     id_document varchar(15),
     texte       text,
 	code	varchar(3) NOT NULL,
-	FOREIGN KEY (code) REFERENCES langue(code)
-	--FOREIGN KEY (id_document) REFERENCES document (id_document)
+	FOREIGN KEY (code) REFERENCES langue(code),
+	FOREIGN KEY (id_document) REFERENCES document (id_document)
 );
 
 DROP TABLE IF EXISTS revision CASCADE;
@@ -1711,7 +1715,7 @@ CREATE TABLE revision
     id_document          varchar(15),
     date_revision_notice timestamp,
     id_personne          integer,
-    --FOREIGN KEY (id_document) REFERENCES document (id_document),
+    FOREIGN KEY (id_document) REFERENCES document (id_document),
     FOREIGN KEY (id_personne) REFERENCES personne (id_personne)
 );
 
@@ -1723,11 +1727,11 @@ INSERT INTO langue VALUES
 ('SPA'),('ENG'),('FRA'); -- FRA est ajouté à titre d'exemple
 
 ---------------- PERSONNE ----------------
-INSERT INTO personne(nom,prenom) VALUES 
-('Gil','Alan'),
-('Chantraine Braillon','Cécile'),
-('Dalmagro','María Cristina'),
-('Idmhand','Fatiha');
+INSERT INTO personne(nom) VALUES 
+('Gil Alan'),
+('Chantraine Braillon, Cécile'),
+('Dalmagro, María Cristina'),
+('Idmhand Fatiha');
 
 ---------------- TYPE ----------------
 INSERT INTO type(nom,code)
@@ -1741,27 +1745,38 @@ INSERT INTO datatype(nom,code)
 (SELECT DISTINCT(datatype),'SPA' FROM imported_data WHERE datatype IS NOT NULL);
 INSERT INTO datatype(id_datatype,nom,code)
 (SELECT DISTINCT(B.id_datatype), C.datatype,'ENG' FROM imported_data A
- JOIN datatype B On B.nom=A.datatype JOIN imported_en C ON A.cote=C.cote WHERE C.datatype IS NOT NULL AND C.datatype!='imagen'); -- != imagen = correction manuelle
+ JOIN datatype B On B.nom=A.datatype
+ JOIN imported_en C ON A.cote=C.cote
+ WHERE C.datatype IS NOT NULL AND C.datatype!='imagen'); -- != imagen = correction manuelle
 
 ---------------- DOCUMENT ----------------
 -- Table principale
+INSERT INTO document(id_document,dates,relations_genetiques,format,id_auteur_analyse,date_analyse,date_creation_notice)
+(SELECT A.cote, A.dates, A.relations_genetiques, A.format, B.id_personne, A.date_analyse, A.date_creation_notice
+FROM imported_data A
+JOIN personne B ON A.auteur_analyse=B.nom);
 
 ---------------- DOCUMENT_TYPE ----------------
+INSERT INTO document_type
+(SELECT A.cote, B.code, B.id_type FROM imported_data A
+JOIN type B ON B.nom=A.type);
 
 ---------------- DOCUMENT_DATATYPE ----------------
+INSERT INTO document_datatype
+(SELECT DISTINCT A.cote, 'SPA', B.id_datatype FROM imported_data A
+JOIN datatype B ON B.nom=A.datatype
+WHERE A.datatype IS NOT null);
+INSERT INTO document_datatype
+(SELECT DISTINCT A.cote, 'ENG', B.id_datatype FROM imported_en A
+JOIN datatype B ON B.nom=A.datatype);
 
 ---------------- TITRE ----------------
-INSERT INTO titre (SELECT FROM (SELECT DISTINCT(titre) FROM imported_data WHERE titre IS NOT NULL) AS sub);
-
+--INSERT INTO titre (SELECT FROM (SELECT DISTINCT(titre) FROM imported_data WHERE titre IS NOT NULL) AS sub);
 INSERT INTO titre(nom,id_document,code)
 (SELECT DISTINCT(titre),cote,'SPA' FROM imported_data WHERE titre IS NOT NULL);
 INSERT INTO titre(nom,id_document,code)
 (SELECT DISTINCT(titre),cote,'ENG' FROM imported_en WHERE titre IS NOT NULL);
 
-SELECT DISTINCT(B.id_titre), B.nom, B.code, C.titre,'ENG' FROM imported_data A
-JOIN titre B On B.nom=A.titre 
-JOIN imported_en C ON A.cote=C.cote 
-WHERE C.titre IS NOT null ORDER BY B.id_titre;
 ---------------- SOUS_TITRE ----------------
 INSERT INTO sous_titre(nom,id_document,code)
 (SELECT DISTINCT(sous_titre),cote,'SPA' FROM imported_data WHERE sous_titre IS NOT NULL);
@@ -1887,15 +1902,46 @@ INSERT INTO contexte_geo VALUES
 (6,'Peru',-6.8699697,-75.0458515, 'ENG'),
 (7,'Latin America',null,null, 'ENG');
 
----------------- LOCALISATION ----------------
+---------------- DOCUMENT_CONTEXTE_GEOGRAPHIQUE ----------------
+INSERT INTO document_contexte_geo(id_document,code,id_contexte_geo)
+(SELECT DISTINCT A.cote, 'SPA', B.id_contexte_geo FROM imported_data A
+JOIN contexte_geo B ON B.nom=A.contexte_geographique
+WHERE A.contexte_geographique IS NOT null);
 
----------------- LICENCE ----------------
+INSERT INTO document_contexte_geo(id_document,code,id_contexte_geo)
+(SELECT DISTINCT A.cote, 'ENG', B.id_contexte_geo FROM imported_en A
+JOIN contexte_geo B ON B.nom=A.contexte_geographique
+WHERE A.contexte_geographique IS NOT null);
+
+---------------- LOCALISATION ----------------
+INSERT INTO localisation(nom,id_document,id_contexte_geo,code)
+(SELECT DISTINCT(A.localisation),A.cote,B.id_contexte_geo, 'SPA' FROM imported_data A
+JOIN contexte_geo B ON B.nom = A.contexte_geographique
+WHERE A.localisation IS NOT NULL);
+
+INSERT INTO localisation(nom,id_document,id_contexte_geo,code)
+(SELECT DISTINCT(A.localisation),A.cote,B.id_contexte_geo, 'ENG' FROM imported_en A
+JOIN contexte_geo B ON B.nom = A.contexte_geographique
+WHERE A.localisation IS NOT NULL);
 
 ---------------- DROITS ----------------
+INSERT INTO droits(texte,code)
+(SELECT DISTINCT droits,'SPA' FROM imported_data WHERE droits IS NOT NULL);
+
+---------------- DOCUMENT_DROITS ----------------
+INSERT INTO document_droits(id_document,code,id_droits)
+(SELECT DISTINCT A.cote, 'SPA', B.id_droits FROM imported_data A
+JOIN droits B ON B.texte=A.droits
+WHERE A.droits IS NOT null);
 
 ---------------- ETAT_GENETIQUE ----------------
+INSERT INTO etat_genetique(id_document,texte)
+(SELECT cote,etat_genetique FROM imported_data WHERE etat_genetique IS NOT NULL);
+
 
 ---------------- AUTRES_RELATIONS ----------------
+INSERT INTO autres_relations(id_document,texte)
+(SELECT cote, autres_ressources_relation FROM imported_data WHERE autres_ressources_relation IS NOT NULL);
 
 ---------------- NATURE_DOCUMENT ----------------
 INSERT INTO nature_document(nom,code)
