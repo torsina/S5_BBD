@@ -797,7 +797,7 @@ UPDATE imported_en
 SET localisation=TRIM(localisation);
 UPDATE imported_en
 SET localisation=null
-WHERE LOWER(contexte_geographique) = 'undetermined';
+WHERE LOWER(localisation) = 'undetermined';
 ------------------------------------------------DROITS------------------------------------------------
 /*
 On retire les caractères en trop avant et après les droits.
