@@ -1563,11 +1563,19 @@ CREATE TABLE resume
 DROP TABLE IF EXISTS responsable_archive CASCADE;
 CREATE TABLE responsable_archive
 (
-    id_reponsable_archive serial,
+    id_responsable_archive serial,
+	PRIMARY KEY(id_responsable_archive)
+);
+
+DROP TABLE IF EXISTS responsable_archive_nom CASCADE;
+CREATE TABLE responsable_archive_nom
+(
+	id_responsable_archive integer,
     nom                   varchar(150),
 	code	varchar(3),
-	PRIMARY KEY(id_reponsable_archive,code),
-	FOREIGN KEY (code) REFERENCES langue(code)
+	PRIMARY KEY(id_responsable_archive,code),
+	FOREIGN KEY (code) REFERENCES langue(code),
+	FOREIGN KEY (id_responsable_archive) REFERENCES responsable_archive(id_responsable_archive)
 );
 
 DROP TABLE IF EXISTS responsable_scientifique CASCADE;
@@ -1583,7 +1591,7 @@ CREATE TABLE responsable_scientifique
     FOREIGN KEY (id_reponsable) REFERENCES personne (id_personne)
 );
 
-DROP TABLE IF EXISTS editeur CASCADE;
+/*DROP TABLE IF EXISTS editeur CASCADE;
 CREATE TABLE editeur
 (
     id_editeur  serial,
@@ -1592,7 +1600,7 @@ CREATE TABLE editeur
 	PRIMARY KEY(id_editeur,code),
 	FOREIGN KEY (code) REFERENCES langue(code)
 );
-
+*/
 DROP TABLE IF EXISTS contexte_geo CASCADE;
 CREATE TABLE contexte_geo
 (
@@ -1602,6 +1610,26 @@ CREATE TABLE contexte_geo
     lon             float,
 	code	varchar(3),
 	PRIMARY KEY(id_contexte_geo,code),
+	FOREIGN KEY (code) REFERENCES langue(code)
+);
+
+DROP TABLE IF EXISTS editeur CASCADE;
+CREATE TABLE editeur
+(
+	id_editeur  serial,
+	id_responsable_archive integer,
+	PRIMARY KEY (id_editeur),
+	FOREIGN KEY (id_responsable_archive) REFERENCES responsable_archive(id_responsable_archive)
+);
+
+DROP TABLE IF EXISTS editeur_nom CASCADE;
+CREATE TABLE editeur_nom
+(
+	id_editeur  integer,
+	code	varchar(3),
+	nom_editeur varchar(150),
+	PRIMARY KEY (id_editeur, code),
+	FOREIGN KEY (id_editeur) REFERENCES editeur(id_editeur),
 	FOREIGN KEY (code) REFERENCES langue(code)
 );
 
@@ -1896,6 +1924,7 @@ UPDATE table_insert
 SET texte=null
 WHERE (texte)='Indeterminadoecto e-';
  
+-- TODO : invalide
 INSERT INTO responsable_archive(nom,code)
 (SELECT DISTINCT(texte),'SPA' FROM table_insert WHERE texte IS NOT NULL);
 
@@ -1909,6 +1938,36 @@ UPDATE table_insert
 SET texte=null
 WHERE (texte)='Undetermined';
 
+-- TODO : à faire
+/*
+Créer une fonction qui boucle sur les 
+
+(SELECT DISTINCT(texte),'SPA' FROM table_insert WHERE texte IS NOT NULL)
+
+Puis
+DELETE FROM table_insert;
+INSERT INTO table_insert
+A : (SELECT ((regexp_matches(editeur, '^Responsible for the file: [[:blank:]]+([\w[:blank:]-]+)[,\(\|#]?(.*)$'))[1]) as colonne1 FROM imported_en);
+
+UPDATE table_insert
+SET texte=TRIM(texte);
+UPDATE table_insert
+SET texte=null
+WHERE (texte)='Undetermined';
+
+et
+B : (SELECT DISTINCT(texte),'ENG' FROM table_insert WHERE texte IS NOT NULL
+
+Et de A et B (cursor) :
+
+Dans la boucle de parcours de A : 
+créer les id pour responsable_archive (insert vide ou insert d'une valeur incrémentée, plus simple!!!!)
+insérer dans responsable_archive_nom les données SPA/ENG avec le id_responsable_archive
+*/
+
+INSERT INTO responsable_archive (SELECT FROM (SELECT DISTINCT(texte) FROM table_insert WHERE texte IS NOT NULL) AS sub);
+
+-- TODO : invalide
 INSERT INTO responsable_archive(nom,code)
 (SELECT DISTINCT(texte),'ENG' FROM table_insert WHERE texte IS NOT NULL);
 DROP TABLE table_insert;
