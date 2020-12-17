@@ -1928,7 +1928,7 @@ WHERE (texte)='Indeterminadoecto e-';
 INSERT INTO responsable_archive(nom,code)
 (SELECT DISTINCT(texte),'SPA' FROM table_insert WHERE texte IS NOT NULL);
 
-DELETE FROM table_insert;
+DELETE FROM table_insert WHERE TRUE;
 INSERT INTO table_insert
 (SELECT ((regexp_matches(editeur, '^Responsible for the file: [[:blank:]]+([\w[:blank:]-]+)[,\(\|#]?(.*)$'))[1]) as colonne1 FROM imported_en);
 
