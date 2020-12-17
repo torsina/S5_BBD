@@ -1557,6 +1557,13 @@ CREATE TABLE resume
   FOREIGN KEY (id_document) REFERENCES document (id_document)
 );
 
+DROP TABLE IF EXISTS editeur CASCADE;
+CREATE TABLE editeur
+(
+  id_editeur             serial,
+  PRIMARY KEY (id_editeur)
+);
+
 DROP TABLE IF EXISTS responsable_archive CASCADE;
 CREATE TABLE responsable_archive
 (
@@ -1601,13 +1608,6 @@ CREATE TABLE contexte_geo
   code            varchar(3),
   PRIMARY KEY (id_contexte_geo, code),
   FOREIGN KEY (code) REFERENCES langue (code)
-);
-
-DROP TABLE IF EXISTS editeur CASCADE;
-CREATE TABLE editeur
-(
-  id_editeur             serial,
-  PRIMARY KEY (id_editeur)
 );
 
 DROP TABLE IF EXISTS editeur_nom CASCADE;
