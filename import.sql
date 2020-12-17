@@ -1555,7 +1555,9 @@ DROP TABLE IF EXISTS responsable_archive CASCADE;
 CREATE TABLE responsable_archive
 (
   id_responsable_archive serial,
-  PRIMARY KEY (id_responsable_archive)
+  id_editeur integer,
+  PRIMARY KEY (id_responsable_archive),
+  FOREIGN KEY (id_editeur) REFERENCES editeur(id_editeur)
 );
 
 DROP TABLE IF EXISTS responsable_archive_nom CASCADE;
@@ -1888,6 +1890,15 @@ INSERT INTO notes(texte, id_document, nom, code)
 ---------------- RESUME ----------------
 /* AUCUNE ENTRÉE */
 
+---------------- EDITEUR ----------------
+INSERT INTO editeur(id_editeur) VALUES (1), (2);
+
+INSERT INTO editeur_nom(id_editeur, code, nom_editeur) VALUES
+(1, 'SPA', 'Editor Proyecto e-spectateur AAP 2020'),
+(2, 'SPA', 'Editor Proyecto CollEx-Persée Archivos 3.0 AAP 2018'),
+(1, 'ENG', 'Editor Project e-spectateur, AAP 2020'),
+(2, 'ENG', 'Editor Project CollEx-Persée Files 3.0, AAP 2018');
+
 ---------------- RESPONSABLE_ARCHIVE ----------------
 DROP TABLE IF EXISTS table_insert;
 CREATE TABLE table_insert
@@ -1928,11 +1939,12 @@ BEGIN
   CREATE TABLE table_insert
   (
     texte_es varchar(150),
-    texte_en varchar(150)
+    texte_en varchar(150),
+    id_editeur integer
   );
 
-  FOR t IN SELECT DISTINCT((editeur_parse_es(A.editeur))[1], (editeur_parse_en(B.editeur))[1]),(editeur_parse_es(A.editeur))[1] AS r_a_es, (editeur_parse_en(B.editeur))[1] AS r_a_en FROM imported_data A FULL OUTER JOIN imported_en B ON A.cote=B.cote LOOP
-    INSERT INTO table_insert(texte_es, texte_en) VALUES (t.r_a_es, t.r_a_en);
+  FOR t IN SELECT DISTINCT((editeur_parse_es(A.editeur))[1], (editeur_parse_en(B.editeur))[1]),(editeur_parse_es(A.editeur))[1] AS r_a_es, (editeur_parse_en(B.editeur))[1] AS r_a_en, (CASE WHEN A.editeur LIKE '%2018%' THEN 2 ELSE 1 END) AS id_editeur FROM imported_data A FULL OUTER JOIN imported_en B ON A.cote=B.cote LOOP
+    INSERT INTO table_insert(texte_es, texte_en, id_editeur) VALUES (t.r_a_es, t.r_a_en, t.id_editeur);
   END LOOP;
 
   -- Corrections des noms de responsables d'archive en espagnol
@@ -1965,10 +1977,10 @@ BEGIN
   SET texte_en=NULL
   WHERE (texte_en)='Undetermined';
 
-  FOR t IN SELECT texte_es, texte_en FROM table_insert LOOP
+  FOR t IN SELECT * FROM table_insert LOOP
     -- Insertion dans responsable_archive avec la valeur par défaut (prochain entier dans la séquence/serial)
-    INSERT INTO responsable_archive DEFAULT VALUES RETURNING id_responsable_archive INTO id_r_a;
-    RAISE NOTICE 'New r_a : %', id_r_a;
+    INSERT INTO responsable_archive(id_editeur) VALUES (t.id_editeur) RETURNING id_responsable_archive INTO id_r_a;
+
     IF t.texte_es IS NOT NULL THEN
       INSERT INTO responsable_archive_nom(id_responsable_archive, nom, code) VALUES (id_r_a, t.texte_es, 'SPA');
     END IF;
@@ -1995,14 +2007,7 @@ TODO : remove
 (4, 'Université de Poitiers', 'Professor', 'CRLA Institut des textes et manuscrits modernes CNRS-UMR8132', 'ENG'),
 (2, 'La Rochelle Université', 'Professor', 'Equipo CRHIA', 'ENG');
 */
----------------- EDITEUR ----------------
-INSERT INTO editeur(id_editeur) VALUES (1), (2);
 
-INSERT INTO editeur_nom(id_editeur, code, nom_editeur) VALUES
-(1, 'SPA', 'Editor Proyecto e-spectateur AAP 2020'),
-(2, 'SPA', 'Editor Proyecto CollEx-Persée Archivos 3.0 AAP 2018'),
-(1, 'ENG', 'Editor Project e-spectateur, AAP 2020'),
-(2, 'ENG', 'Editor Project CollEx-Persée Files 3.0, AAP 2018');
 
 ---------------- CONTEXTE_GEOGRAPHIQUE ----------------
 INSERT INTO contexte_geo VALUES
