@@ -5,48 +5,48 @@ DROP TABLE IF EXISTS imported_data;
 -- Table d'importation des données brutes espagnoles
 CREATE TABLE imported_data
 (
-    cote                       text,
-    type                       text,
-    datatype                   text,
-    dates                      text,
-    titre                      text,
-    sous_titre                 text,
-    auteur                     text,
-    destinataire               text,
-    sujet                      text,
-    description                text,
-    notes                      text,
-    resume                     text,
-    editeur                    text,
-    localisation               text,
-    droits                     text,
-    ayants_droit               text,
-    format                     text,
-    langue                     text,
-    etat_genetique             text,
-    relations_genetiques       text,
-    autres_ressources_relation text,
-    nature_document            text,
-    support                    text,
-    etat_general               text,
-    publication                text,
-    representation             text,
-    contexte_geographique      text,
-    lieu_expedition            text,
-    type_publication           text,
-    titre_publication          text,
-    lieu_publication           text,
-    numero_publication         text,
-    periodicite                text,
-    directeur_publication      text,
-    auteur_analyse             text,
-    date_analyse               text,
-    auteur_description         text,
-    date_creation_notice       text,
-    auteur_revision            text,
-    date_revision_notice       text,
-    auteur_transcription       text,
-    __dummy                    text
+  cote                       text,
+  type                       text,
+  datatype                   text,
+  dates                      text,
+  titre                      text,
+  sous_titre                 text,
+  auteur                     text,
+  destinataire               text,
+  sujet                      text,
+  description                text,
+  notes                      text,
+  resume                     text,
+  editeur                    text,
+  localisation               text,
+  droits                     text,
+  ayants_droit               text,
+  format                     text,
+  langue                     text,
+  etat_genetique             text,
+  relations_genetiques       text,
+  autres_ressources_relation text,
+  nature_document            text,
+  support                    text,
+  etat_general               text,
+  publication                text,
+  representation             text,
+  contexte_geographique      text,
+  lieu_expedition            text,
+  type_publication           text,
+  titre_publication          text,
+  lieu_publication           text,
+  numero_publication         text,
+  periodicite                text,
+  directeur_publication      text,
+  auteur_analyse             text,
+  date_analyse               text,
+  auteur_description         text,
+  date_creation_notice       text,
+  auteur_revision            text,
+  date_revision_notice       text,
+  auteur_transcription       text,
+  __dummy                    text
 );
 
 DROP TABLE IF EXISTS imported_en;
@@ -54,112 +54,112 @@ DROP TABLE IF EXISTS imported_en;
 -- Table d'importation des données brutes anglaises
 CREATE TABLE imported_en
 (
-    cote                       text,
-    type                       text,
-    datatype                   text,
-    dates                      text,
-    titre                      text,
-    sous_titre                 text,
-    auteur                     text,
-    destinataire               text,
-    sujet                      text,
-    description                text,
-    notes                      text,
-    resume                     text,
-    editeur                    text,
-    localisation               text,
-    droits                     text,
-    ayants_droit               text,
-    format                     text,
-    langue                     text,
-    etat_genetique             text,
-    relations_genetiques       text,
-    autres_ressources_relation text,
-    nature_document            text,
-    support                    text,
-    etat_general               text,
-    publication                text,
-    representation             text,
-    contexte_geographique      text,
-    lieu_expedition            text,
-    type_publication           text,
-    titre_publication          text,
-    lieu_publication           text,
-    numero_publication         text,
-    periodicite                text,
-    directeur_publication      text,
-    auteur_analyse             text,
-    date_analyse               text,
-    auteur_description         text,
-    date_creation_notice       text,
-    auteur_revision            text,
-    date_revision_notice       text,
-    auteur_transcription       text
+  cote                       text,
+  type                       text,
+  datatype                   text,
+  dates                      text,
+  titre                      text,
+  sous_titre                 text,
+  auteur                     text,
+  destinataire               text,
+  sujet                      text,
+  description                text,
+  notes                      text,
+  resume                     text,
+  editeur                    text,
+  localisation               text,
+  droits                     text,
+  ayants_droit               text,
+  format                     text,
+  langue                     text,
+  etat_genetique             text,
+  relations_genetiques       text,
+  autres_ressources_relation text,
+  nature_document            text,
+  support                    text,
+  etat_general               text,
+  publication                text,
+  representation             text,
+  contexte_geographique      text,
+  lieu_expedition            text,
+  type_publication           text,
+  titre_publication          text,
+  lieu_publication           text,
+  numero_publication         text,
+  periodicite                text,
+  directeur_publication      text,
+  auteur_analyse             text,
+  date_analyse               text,
+  auteur_description         text,
+  date_creation_notice       text,
+  auteur_revision            text,
+  date_revision_notice       text,
+  auteur_transcription       text
 );
 -- Importation du CSV. Pourquoi en 2020, ce logiciel n'accepte pas les chemins relatifs ????
 COPY imported_data
-    FROM 'E:\Esp-fotos.csv'--'D:\Boulot\L3\BASE_DE_DONNEES\PROJET\Esp-fotos.csv' 'D:\projects\S5\S5_BBD\Esp-fotos.csv'
-    DELIMITER ';'
-    CSV HEADER;
+  FROM 'E:\Esp-fotos.csv'--'D:\Boulot\L3\BASE_DE_DONNEES\PROJET\Esp-fotos.csv' 'D:\projects\S5\S5_BBD\Esp-fotos.csv'
+  DELIMITER ';'
+  CSV HEADER;
 
 COPY imported_en
-    FROM 'E:\Ang-fotos.csv'--'D:\Boulot\L3\BASE_DE_DONNEES\PROJET\Ang-fotos.csv' D:\projects\S5\S5_BBD\Ang-fotos.csv
-    DELIMITER ';'
-    CSV HEADER;
+  FROM 'E:\Ang-fotos.csv'--'D:\Boulot\L3\BASE_DE_DONNEES\PROJET\Ang-fotos.csv' D:\projects\S5\S5_BBD\Ang-fotos.csv
+  DELIMITER ';'
+  CSV HEADER;
 
 
 ------------------------------------------------ FONCTIONS ------------------------------------------------
 CREATE OR REPLACE FUNCTION parse_format(t text)
-    RETURNS text[] AS
+  RETURNS text[] AS
 $$
 DECLARE
-    -- 9 valeurs
-    parsed text[];
+  -- 9 valeurs
+  parsed text[];
 BEGIN
-    IF t IS NULL
-    THEN
-        RETURN NULL;
-    END IF;
-    -- Tous les caractères "blancs" sont remplacés par des espaces, on enlève ceux des extrémités
-    t := LOWER(TRIM(blank_to_space(t)));
-    parsed := regexp_matches(t,
-                             '^(((\d{2,4})[[:blank:]]*[x×][[:blank:]]*(\d{2,4}))[[:blank:]]*((\d{1,3}([\.\,]\d{1,2})?)[[:blank:]]*([kmg]o))?)?([[:blank:]]*\[.*\])?$');
-    IF parsed IS NULL -- Si le 1er parsing n'a pas marché
-    THEN
-        RETURN NULL;
-    ELSIF array_length(parsed, 1) != 9 -- Si le parsing a partiellement match. Le 1 représente la dimension (ici 1ère dimension).
-    THEN
-        RETURN NULL;
-    ELSE
-        RETURN parsed;
-    END IF;
+  IF t IS NULL
+  THEN
+    RETURN NULL;
+  END IF;
+  -- Tous les caractères "blancs" sont remplacés par des espaces, on enlève ceux des extrémités
+  t := LOWER(TRIM(blank_to_space(t)));
+  parsed := regexp_matches(t,
+                           '^(((\d{2,4})[[:blank:]]*[x×][[:blank:]]*(\d{2,4}))[[:blank:]]*((\d{1,3}([\.\,]\d{1,2})?)[[:blank:]]*([kmg]o))?)?([[:blank:]]*\[.*\])?$');
+  IF parsed IS NULL -- Si le 1er parsing n'a pas marché
+  THEN
+    RETURN NULL;
+  ELSIF array_length(parsed, 1) != 9 -- Si le parsing a partiellement match. Le 1 représente la dimension (ici 1ère dimension).
+  THEN
+    RETURN NULL;
+  ELSE
+    RETURN parsed;
+  END IF;
 END;
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION cote_to_id(cote text)
-    RETURNS int AS
+  RETURNS int AS
 $$
 BEGIN
-    RETURN CAST((regexp_split_to_array(TRIM(cote), 'MX-F-'))[2] AS int);
+  RETURN CAST((regexp_split_to_array(TRIM(cote), 'MX-F-')) [ 2] AS int);
 END;
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION parse_editeur()
-    RETURNS VOID AS
+  RETURNS VOID AS
 $$
 DECLARE
-    trimmed_text CURSOR FOR SELECT DISTINCT((regexp_split_to_array(editeur, 'Responsable del archivo\s*:{0,1}\s*'))[2])
-                            FROM imported_data;
-    editeur_line RECORD;
+  trimmed_text CURSOR FOR SELECT DISTINCT((regexp_split_to_array(editeur, 'Responsable del archivo\s*:{0,1}\s*')) [ 2])
+                          FROM imported_data;
+  editeur_line RECORD;
 BEGIN
-    OPEN trimmed_text;
-    LOOP
-        FETCH trimmed_text INTO editeur_line;
-        IF NOT FOUND THEN EXIT; END IF;
+  OPEN trimmed_text;
+  LOOP
+    FETCH trimmed_text INTO editeur_line;
+    IF NOT FOUND THEN EXIT; END IF;
 
-        RAISE NOTICE '%', editeur_line;
-    END LOOP;
-    CLOSE trimmed_text;
+    RAISE NOTICE '%', editeur_line;
+  END LOOP;
+  CLOSE trimmed_text;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -178,21 +178,21 @@ Caractères supprimés :
 Ces caractères ont été détectés dans le fichier.
 */
 CREATE OR REPLACE FUNCTION trim_blank(t text)
-    RETURNS text AS
+  RETURNS text AS
 $$
 DECLARE
-    t_returned text;
+  t_returned text;
 BEGIN
-    -- Remplacement en début de chaîne de caractères
-    t_returned := regexp_replace(t, '^[\xC2\xA0\x20\x0A\xE2\x2006\x0D]+', '');
-    -- Remplacement en fin de chaîne de caractères
-    t_returned := regexp_replace(t_returned, '[\xC2\xA0\x20\x0A\xE2\x2006\x0D]+$', '');
-    IF char_length(t_returned) = 0
-    THEN
-        RETURN NULL;
-    ELSE
-        RETURN t_returned;
-    END IF;
+  -- Remplacement en début de chaîne de caractères
+  t_returned := regexp_replace(t, '^[\xC2\xA0\x20\x0A\xE2\x2006\x0D]+', '');
+  -- Remplacement en fin de chaîne de caractères
+  t_returned := regexp_replace(t_returned, '[\xC2\xA0\x20\x0A\xE2\x2006\x0D]+$', '');
+  IF char_length(t_returned) = 0
+  THEN
+    RETURN NULL;
+  ELSE
+    RETURN t_returned;
+  END IF;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -214,22 +214,12 @@ Caractère de remplacement :
 Ces caractères ont été détectés dans le fichier.
 */
 CREATE OR REPLACE FUNCTION blank_to_space(t text)
-    RETURNS text AS
+  RETURNS text AS
 $$
 BEGIN
-    RETURN regexp_replace(t, E'[\\xC2\\xA0\\x20\\x0A\\xE2\\x2006\\x0D]+', ' ', 'g');
+  RETURN regexp_replace(t, E'[\\xC2\\xA0\\x20\\x0A\\xE2\\x2006\\x0D]+', ' ', 'g');
 END;
 $$ LANGUAGE plpgsql;
-
-
-/*CREATE OR REPLACE FUNCTION parse_format(format text, dt text)
-RETURNS text[] AS $$
-DECLARE
-	output text[]
-BEGIN
-	regexp_split_to_array(editeur, 'Responsable del archivo\s*:{0,1}\s*'))[2])
-END;
-$$ LANGUAGE plpgsql;*/
 
 
 ------------------------------------------------ NETTOYAGE DE LA TABLE ------------------------------------------------
@@ -294,7 +284,7 @@ Décalage de la colonne titre pour "MX-F-20" corrigé.
 UPDATE imported_data
 SET dates=TRIM(blank_to_space(dates));
 UPDATE imported_data
-SET dates=NULL
+SET dates= NULL
 WHERE LOWER(dates) = 'desconocido'
    or LOWER(dates) = 'indeterminado'
    or LOWER(dates) = 'gunther gerzso'
@@ -332,7 +322,7 @@ Pour les données en anglais :
 Ce sont des doublons (parfois erronnés) de la colonne date des données espagnoles.
 */
 UPDATE imported_en
-SET dates=NULL
+SET dates= NULL
 WHERE TRUE;
 
 -- Test, vérifie que tous les enregistrements sont au bon format.
@@ -401,7 +391,7 @@ UPDATE imported_data
 SET sous_titre=TRIM(blank_to_space(sous_titre));
 -- "MX-F-556" a un sous-titre vide mais non NULL.
 UPDATE imported_data
-SET sous_titre=NULL
+SET sous_titre= NULL
 WHERE char_length(sous_titre) = 0;
 
 -- Test, on vérifie bien que seuls un enregistrement a un sous-titre.
@@ -423,7 +413,7 @@ UPDATE imported_data
 SET auteur=trim_blank(auteur);
 -- On fait une comparaison avec le texte en minuscule pour ignorer la casse
 UPDATE imported_data
-SET auteur=NULL
+SET auteur= NULL
 WHERE LOWER(auteur) = 'indeterminado';
 -- Correction manuelle de l'enregistrement "MX-F-438"
 UPDATE imported_data
@@ -451,7 +441,7 @@ Pour les données en anglais :
 UPDATE imported_en
 SET auteur=TRIM(blank_to_space(auteur));
 UPDATE imported_en
-SET auteur=NULL
+SET auteur= NULL
 WHERE LOWER(auteur) = 'undetermined';
 -- Il manque une partie du nom de famille
 UPDATE imported_en
@@ -475,7 +465,7 @@ UPDATE imported_en
 SET auteur=regexp_replace(auteur, '\.$', '');
 -- On supprime tous les enregistrements qui sont similaires à ceux des données espagnoles
 UPDATE imported_en B
-SET auteur=NULL
+SET auteur= NULL
 WHERE B.auteur = (SELECT A.auteur FROM imported_data A WHERE B.cote = A.cote);
 
 ------------------------------------------------DESTINATAIRE------------------------------------------------
@@ -498,7 +488,7 @@ SET sujet='Margarita xirgu'
 WHERE cote = 'MX-F-185';
 -- Tout ce qui est indeterminé devient NULL
 UPDATE imported_data
-SET sujet=NULL
+SET sujet= NULL
 WHERE LOWER(sujet) = 'indeterminado'
    OR sujet = 'Indeterminadp';
 UPDATE imported_data
@@ -548,7 +538,7 @@ SET sujet='Teatro Solis'
 WHERE sujet = 'Teatro Solís';
 
 UPDATE imported_en
-SET sujet=TRIM(sujet);			      
+SET sujet=TRIM(sujet);
 
 ------------------------------------------------DESCRIPTION------------------------------------------------
 
@@ -561,7 +551,7 @@ UPDATE imported_data
 SET description=TRIM(description);
 -- Maintenant qu'on a supprimé des caractères blancs, on met à NULL les descriptions vides;
 UPDATE imported_data
-SET description=NULL
+SET description= NULL
 WHERE char_length(description) = 0;
 -- Certains descriptions commencent par des tirets (suivis de caractères blancs), on les supprime
 UPDATE imported_data
@@ -579,13 +569,13 @@ On retire les caractères en trop avant et après les notes.
 UPDATE imported_data
 SET notes=TRIM(blank_to_space(notes));
 UPDATE imported_data
-SET notes=null
-WHERE LOWER(notes)='indeterminado';
+SET notes= null
+WHERE LOWER(notes) = 'indeterminado';
 UPDATE imported_en
 SET notes=TRIM(blank_to_space(notes));
 UPDATE imported_en
-SET notes=null
-WHERE LOWER(notes)='undetermined';
+SET notes= null
+WHERE LOWER(notes) = 'undetermined';
 
 ------------------------------------------------RESUME------------------------------------------------
 
@@ -635,7 +625,8 @@ UPDATE imported_data
 SET editeur=REPLACE(editeur,
                     'Responsable del archivo  Fondo Margarita Xirgu del Instituto del Teatro de la Diputación de Barcelona.Editor Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)',
                     'Responsable del archivo Fondo Margarita Xirgu del Instituto del Teatro de la Diputación de Barcelona.Editor Proyecto e-spectateur AAP 2020 (Responsable científico Alumno Alan Gil Master LEA Amérique La Rochelle Université)');
-UPDATE imported_data SET editeur=regexp_replace(editeur, '[:blank:]*[eE]ditor[:blank:]*', ' # ');
+UPDATE imported_data
+SET editeur=regexp_replace(editeur, '[:blank:]*[eE]ditor[:blank:]*', ' # ');
 
 UPDATE imported_data
 SET editeur=TRIM(blank_to_space(editeur));
@@ -650,7 +641,7 @@ Correction des erreurs pour certaines localisations.
 UPDATE imported_data
 SET localisation=TRIM(blank_to_space(localisation));
 UPDATE imported_data
-SET localisation=NULL
+SET localisation= NULL
 WHERE LOWER(localisation) = 'desconocido'
    OR LOWER(localisation) = 'indeterminado';
 UPDATE imported_data
@@ -678,7 +669,7 @@ UPDATE imported_data
 SET localisation=regexp_replace(localisation, '[[:blank:]]+España$', '');
 -- "MX-F-449" a une localisation qui est erronnée (c'est la description, dupliquée).
 UPDATE imported_data
-SET localisation=NULL
+SET localisation= NULL
 WHERE localisation = 'figura de cera de Margarita Xirgu';
 UPDATE imported_data
 SET localisation='Teatro Solís de Montevideo'
@@ -796,7 +787,7 @@ WHERE contexte_geographique = 'Uruguay | Montevideo'
 UPDATE imported_en
 SET localisation=TRIM(localisation);
 UPDATE imported_en
-SET localisation=null
+SET localisation= null
 WHERE LOWER(localisation) = 'undetermined';
 ------------------------------------------------DROITS------------------------------------------------
 /*
@@ -834,14 +825,14 @@ Correction des erreurs sur "MX-F-247", dupliqué de notes
 UPDATE imported_data
 SET format=TRIM(blank_to_space(format));
 UPDATE imported_data
-SET format=NULL
+SET format= NULL
 WHERE format = 'Indeterminado';
 -- On supprime les extensions de fichier (avec ou sans point) dans la colonne format car doublon et non consistent.
 UPDATE imported_data
 SET format=regexp_replace(LOWER(format), '\.?(j[[:blank:]]?[p]?[e]?g|png|pdf)', '');
 -- Si certains formats sont vides, on les met à NULL. Important après l'opération précédente.
 UPDATE imported_data
-SET format=NULL
+SET format= NULL
 WHERE char_length(format) = 0;
 -- Les formats de tailles de fichiers sont parfois incohérents : jko, lko, kpo pour ko.
 UPDATE imported_data
@@ -1042,7 +1033,7 @@ UPDATE imported_data
 SET etat_general='mediocre'
 WHERE LOWER(etat_general) = 'médiocre';
 UPDATE imported_data
-SET etat_general=NULL
+SET etat_general= NULL
 WHERE LOWER(etat_general) = 'indeterminado';
 UPDATE imported_en
 SET etat_general=trim_blank(LOWER(blank_to_space(etat_general)));
@@ -1057,7 +1048,7 @@ SET etat_general='poor'
 WHERE LOWER(etat_general) = 'mediocre'
    or LOWER(etat_general) = 'médiocre';
 UPDATE imported_en
-SET etat_general=null
+SET etat_general= null
 WHERE LOWER(etat_general) = 'unspecified';
 
 
@@ -1281,10 +1272,10 @@ SET date_analyse = TRIM(BOTH '$' FROM date_analyse);
 UPDATE imported_data
 SET date_analyse = '2019-01-01'
 WHERE date_analyse = '2015/2019';
-ALTER TABLE imported_data 
-	ALTER date_analyse DROP DEFAULT,
-	ALTER date_analyse TYPE timestamp USING date_analyse::timestamp;
-				       
+ALTER TABLE imported_data
+  ALTER date_analyse DROP DEFAULT,
+  ALTER date_analyse TYPE timestamp USING date_analyse::timestamp;
+
 UPDATE imported_en
 SET date_analyse = TRIM(blank_to_space(date_analyse));
 UPDATE imported_en
@@ -1318,9 +1309,9 @@ SET date_creation_notice = TRIM(BOTH '$' FROM date_creation_notice);
 UPDATE imported_data
 SET date_creation_notice = '2015-01-01/2019-01-01'
 WHERE date_creation_notice = '2015/2019';
-ALTER TABLE imported_data 
-	ALTER date_creation_notice DROP DEFAULT,
-	ALTER date_creation_notice TYPE timestamp USING date_creation_notice::timestamp;
+ALTER TABLE imported_data
+  ALTER date_creation_notice DROP DEFAULT,
+  ALTER date_creation_notice TYPE timestamp USING date_creation_notice::timestamp;
 UPDATE imported_en
 SET date_creation_notice = TRIM(blank_to_space(date_creation_notice));
 UPDATE imported_en
@@ -1342,11 +1333,11 @@ On passe la table en type "timestamp" pour une future utilisation.
 UPDATE imported_data
 SET date_revision_notice = TRIM(blank_to_space(date_revision_notice));
 ALTER TABLE imported_data
-    ALTER date_revision_notice DROP DEFAULT,
-    ALTER date_revision_notice TYPE timestamp USING date_revision_notice::timestamp;
+  ALTER date_revision_notice DROP DEFAULT,
+  ALTER date_revision_notice TYPE timestamp USING date_revision_notice::timestamp;
 ALTER TABLE imported_en
-    ALTER date_revision_notice DROP DEFAULT,
-    ALTER date_revision_notice TYPE timestamp USING date_revision_notice::timestamp;
+  ALTER date_revision_notice DROP DEFAULT,
+  ALTER date_revision_notice TYPE timestamp USING date_revision_notice::timestamp;
 
 /*
 On retire les caractères en trop avant et après le mot.
@@ -1398,497 +1389,501 @@ WHERE format ~ '(.*)(\d+\s*[x×X]\s*\d+)(.*)';
 DROP TABLE IF EXISTS langue CASCADE;
 CREATE TABLE langue
 (
-	-- Code ISO 639-1
-	code VARCHAR(3) PRIMARY KEY
+  -- Code ISO 639-1
+  code VARCHAR(3) PRIMARY KEY
 );
 
 DROP TABLE IF EXISTS personne CASCADE;
 CREATE TABLE personne
 (
-    id_personne serial primary key,
-    nom         varchar(50)
+  id_personne serial primary key,
+  nom         varchar(50)
 );
 
 DROP TABLE IF EXISTS type CASCADE;
 CREATE TABLE type
 (
-    id_type serial,
-    nom     varchar(50),
-	code	varchar(3),
-	PRIMARY KEY(id_type,code),
-	FOREIGN KEY (code) REFERENCES langue(code)
+  id_type serial,
+  nom     varchar(50),
+  code    varchar(3),
+  PRIMARY KEY (id_type, code),
+  FOREIGN KEY (code) REFERENCES langue (code)
 );
 
 DROP TABLE IF EXISTS datatype CASCADE;
 CREATE TABLE datatype
 (
-    id_datatype serial,
-    nom         varchar(10),
-	code	varchar(3),
-	PRIMARY KEY(id_datatype,code),
-	FOREIGN KEY (code) REFERENCES langue(code)
+  id_datatype serial,
+  nom         varchar(10),
+  code        varchar(3),
+  PRIMARY KEY (id_datatype, code),
+  FOREIGN KEY (code) REFERENCES langue (code)
 );
 
 DROP TABLE IF EXISTS document CASCADE;
 CREATE TABLE document
 (
-    id_document          varchar(15) primary key,
-    dates		         varchar(10),
-    relations_genetiques text,
-	representation boolean NOT NULL DEFAULT false,
-    format               varchar(100),
-    id_auteur_analyse    integer,
-    date_analyse         timestamp NOT NULL DEFAULT NOW(),
-    date_creation_notice timestamp          DEFAULT NULL,
-    FOREIGN KEY (id_auteur_analyse) REFERENCES personne (id_personne)
+  id_document          varchar(15) primary key,
+  dates                varchar(10),
+  relations_genetiques text,
+  representation       boolean   NOT NULL DEFAULT false,
+  format               varchar(100),
+  id_auteur_analyse    integer,
+  date_analyse         timestamp NOT NULL DEFAULT NOW(),
+  date_creation_notice timestamp          DEFAULT NULL,
+  FOREIGN KEY (id_auteur_analyse) REFERENCES personne (id_personne)
 );
 
 DROP TABLE IF EXISTS document_type CASCADE;
 CREATE TABLE document_type
 (
-    id_document varchar(15),
-	code		varchar(3),
-    id_type  	integer,
-	PRIMARY KEY(id_document,code),
-	FOREIGN KEY (id_type,code) REFERENCES type(id_type,code),
-	FOREIGN KEY (code) REFERENCES langue(code),
-	FOREIGN KEY (id_document) REFERENCES document(id_document)
+  id_document varchar(15),
+  code        varchar(3),
+  id_type     integer,
+  PRIMARY KEY (id_document, code),
+  FOREIGN KEY (id_type, code) REFERENCES type (id_type, code),
+  FOREIGN KEY (code) REFERENCES langue (code),
+  FOREIGN KEY (id_document) REFERENCES document (id_document)
 );
 
 DROP TABLE IF EXISTS document_datatype CASCADE;
 CREATE TABLE document_datatype
 (
-    id_document varchar(15),
-	code		varchar(3),
-    id_datatype integer,
-	PRIMARY KEY(id_document,code),
-	FOREIGN KEY (id_datatype,code) REFERENCES datatype(id_datatype,code),
-	FOREIGN KEY (code) REFERENCES langue(code),
-	FOREIGN KEY (id_document) REFERENCES document(id_document)
+  id_document varchar(15),
+  code        varchar(3),
+  id_datatype integer,
+  PRIMARY KEY (id_document, code),
+  FOREIGN KEY (id_datatype, code) REFERENCES datatype (id_datatype, code),
+  FOREIGN KEY (code) REFERENCES langue (code),
+  FOREIGN KEY (id_document) REFERENCES document (id_document)
 );
 
 DROP TABLE IF EXISTS titre CASCADE;
 CREATE TABLE titre
 (
-	id_document varchar(15),
-	code	varchar(3),
-	nom      varchar(150),
-	PRIMARY KEY(id_document,code),
-	FOREIGN KEY (code) REFERENCES langue(code),
-	FOREIGN KEY (id_document) REFERENCES document(id_document)
+  id_document varchar(15),
+  code        varchar(3),
+  nom         varchar(150),
+  PRIMARY KEY (id_document, code),
+  FOREIGN KEY (code) REFERENCES langue (code),
+  FOREIGN KEY (id_document) REFERENCES document (id_document)
 );
 
 DROP TABLE IF EXISTS sous_titre CASCADE;
 CREATE TABLE sous_titre
 (
-    id_document varchar(15),
-    nom           text,
-	code	varchar(3),
-	PRIMARY KEY(id_document,code),
-	FOREIGN KEY (code) REFERENCES langue(code),
-	FOREIGN KEY (id_document) REFERENCES document(id_document)
+  id_document varchar(15),
+  nom         text,
+  code        varchar(3),
+  PRIMARY KEY (id_document, code),
+  FOREIGN KEY (code) REFERENCES langue (code),
+  FOREIGN KEY (id_document) REFERENCES document (id_document)
 );
 
 DROP TABLE IF EXISTS auteur CASCADE;
 CREATE TABLE auteur
 (
-    nom       varchar(50),
-	code	varchar(3),
-	PRIMARY KEY(nom,code),
-	FOREIGN KEY (code) REFERENCES langue(code)
+  nom  varchar(50),
+  code varchar(3),
+  PRIMARY KEY (nom, code),
+  FOREIGN KEY (code) REFERENCES langue (code)
 );
 
 DROP TABLE IF EXISTS destinataire CASCADE;
 CREATE TABLE destinataire
 (
-	id_document varchar(15),
-    nom             text,
-	code	varchar(3),
-	PRIMARY KEY(id_document,code),
-	FOREIGN KEY (code) REFERENCES langue(code)
+  id_document varchar(15),
+  nom         text,
+  code        varchar(3),
+  PRIMARY KEY (id_document, code),
+  FOREIGN KEY (code) REFERENCES langue (code)
 );
 
 DROP TABLE IF EXISTS sujet CASCADE;
 CREATE TABLE sujet
 (
-    id_document varchar(15),
-    nom      text,
-	code	varchar(3),
-	PRIMARY KEY(id_document,code),
-	FOREIGN KEY (code) REFERENCES langue(code)
+  id_document varchar(15),
+  nom         text,
+  code        varchar(3),
+  PRIMARY KEY (id_document, code),
+  FOREIGN KEY (code) REFERENCES langue (code)
 );
 
 DROP TABLE IF EXISTS auteur_description CASCADE;
 CREATE TABLE auteur_description
 (
-	id_auteur_description serial,
-	nom varchar(50),
-	PRIMARY KEY(id_auteur_description)
+  id_auteur_description serial,
+  nom                   varchar(50),
+  PRIMARY KEY (id_auteur_description)
 );
 
 DROP TABLE IF EXISTS description CASCADE;
 CREATE TABLE description
 (
-    id_document varchar(15),
-	id_auteur_description integer,
-    texte          text,
-	code	varchar(3),
-	PRIMARY KEY(id_document,code),
-	FOREIGN KEY (code) REFERENCES langue(code),
-	FOREIGN KEY (id_auteur_description) REFERENCES auteur_description(id_auteur_description)
+  id_document           varchar(15),
+  id_auteur_description integer,
+  texte                 text,
+  code                  varchar(3),
+  PRIMARY KEY (id_document, code),
+  FOREIGN KEY (code) REFERENCES langue (code),
+  FOREIGN KEY (id_auteur_description) REFERENCES auteur_description (id_auteur_description)
 );
 
 DROP TABLE IF EXISTS notes CASCADE;
 CREATE TABLE notes
 (
-    id_document varchar(15),
-    texte       text,
-    nom       varchar(50),
-	code	varchar(3),
-	FOREIGN KEY (code) REFERENCES langue(code),
-    FOREIGN KEY (nom,code) REFERENCES auteur (nom,code),
-    FOREIGN KEY (id_document) REFERENCES document (id_document)
+  id_document varchar(15),
+  texte       text,
+  nom         varchar(50),
+  code        varchar(3),
+  FOREIGN KEY (code) REFERENCES langue (code),
+  FOREIGN KEY (nom, code) REFERENCES auteur (nom, code),
+  FOREIGN KEY (id_document) REFERENCES document (id_document)
 );
 
 DROP TABLE IF EXISTS resume CASCADE;
 CREATE TABLE resume
 (
-    id_document varchar(15),
-    texte       text,
-	code	varchar(3),
-	FOREIGN KEY (code) REFERENCES langue(code),
-    FOREIGN KEY (id_document) REFERENCES document (id_document)
+  id_document varchar(15),
+  texte       text,
+  code        varchar(3),
+  FOREIGN KEY (code) REFERENCES langue (code),
+  FOREIGN KEY (id_document) REFERENCES document (id_document)
 );
 
 DROP TABLE IF EXISTS responsable_archive CASCADE;
 CREATE TABLE responsable_archive
 (
-    id_responsable_archive serial,
-	PRIMARY KEY(id_responsable_archive)
+  id_responsable_archive serial,
+  PRIMARY KEY (id_responsable_archive)
 );
 
 DROP TABLE IF EXISTS responsable_archive_nom CASCADE;
 CREATE TABLE responsable_archive_nom
 (
-	id_responsable_archive integer,
-    nom                   varchar(150),
-	code	varchar(3),
-	PRIMARY KEY(id_responsable_archive,code),
-	FOREIGN KEY (code) REFERENCES langue(code),
-	FOREIGN KEY (id_responsable_archive) REFERENCES responsable_archive(id_responsable_archive)
+  id_responsable_archive integer,
+  nom                    varchar(150),
+  code                   varchar(3),
+  PRIMARY KEY (id_responsable_archive, code),
+  FOREIGN KEY (code) REFERENCES langue (code),
+  FOREIGN KEY (id_responsable_archive) REFERENCES responsable_archive (id_responsable_archive)
 );
 
 DROP TABLE IF EXISTS responsable_scientifique CASCADE;
 CREATE TABLE responsable_scientifique
 (
-    id_reponsable integer,
-    localisation  varchar(150),
-    statut        varchar(150),
-    poste         varchar(150),
-	code	varchar(3),
-	FOREIGN KEY (code) REFERENCES langue(code),
-    PRIMARY KEY(id_reponsable,code),
-    FOREIGN KEY (id_reponsable) REFERENCES personne (id_personne)
+  id_reponsable integer,
+  localisation  varchar(150),
+  statut        varchar(150),
+  poste         varchar(150),
+  code          varchar(3),
+  FOREIGN KEY (code) REFERENCES langue (code),
+  PRIMARY KEY (id_reponsable, code),
+  FOREIGN KEY (id_reponsable) REFERENCES personne (id_personne)
 );
 
-/*DROP TABLE IF EXISTS editeur CASCADE;
-CREATE TABLE editeur
-(
-    id_editeur  serial,
-    nom_editeur varchar(150),
-	code	varchar(3),
-	PRIMARY KEY(id_editeur,code),
-	FOREIGN KEY (code) REFERENCES langue(code)
-);
-*/
+
 DROP TABLE IF EXISTS contexte_geo CASCADE;
 CREATE TABLE contexte_geo
 (
-    id_contexte_geo serial ,
-    nom             varchar(30),
-    lat             float,
-    lon             float,
-	code	varchar(3),
-	PRIMARY KEY(id_contexte_geo,code),
-	FOREIGN KEY (code) REFERENCES langue(code)
+  id_contexte_geo serial,
+  nom             varchar(30),
+  lat             float,
+  lon             float,
+  code            varchar(3),
+  PRIMARY KEY (id_contexte_geo, code),
+  FOREIGN KEY (code) REFERENCES langue (code)
 );
 
 DROP TABLE IF EXISTS editeur CASCADE;
 CREATE TABLE editeur
 (
-	id_editeur  serial,
-	id_responsable_archive integer,
-	PRIMARY KEY (id_editeur),
-	FOREIGN KEY (id_responsable_archive) REFERENCES responsable_archive(id_responsable_archive)
+  id_editeur             serial,
+  PRIMARY KEY (id_editeur)
 );
 
 DROP TABLE IF EXISTS editeur_nom CASCADE;
 CREATE TABLE editeur_nom
 (
-	id_editeur  integer,
-	code	varchar(3),
-	nom_editeur varchar(150),
-	PRIMARY KEY (id_editeur, code),
-	FOREIGN KEY (id_editeur) REFERENCES editeur(id_editeur),
-	FOREIGN KEY (code) REFERENCES langue(code)
+  id_editeur  integer,
+  code        varchar(3),
+  nom_editeur varchar(150),
+  PRIMARY KEY (id_editeur, code),
+  FOREIGN KEY (id_editeur) REFERENCES editeur (id_editeur),
+  FOREIGN KEY (code) REFERENCES langue (code)
 );
 
 DROP TABLE IF EXISTS document_contexte_geo CASCADE;
 CREATE TABLE document_contexte_geo
 (
-    id_document varchar(15) ,
-	code	varchar(3),
-	id_contexte_geo integer,
-	PRIMARY KEY(id_document,code),
-	FOREIGN KEY (code) REFERENCES langue(code),
-	FOREIGN KEY (id_document) REFERENCES document(id_document),
-	FOREIGN KEY (id_contexte_geo,code) REFERENCES contexte_geo(id_contexte_geo,code)
+  id_document     varchar(15),
+  code            varchar(3),
+  id_contexte_geo integer,
+  PRIMARY KEY (id_document, code),
+  FOREIGN KEY (code) REFERENCES langue (code),
+  FOREIGN KEY (id_document) REFERENCES document (id_document),
+  FOREIGN KEY (id_contexte_geo, code) REFERENCES contexte_geo (id_contexte_geo, code)
 );
 
 DROP TABLE IF EXISTS localisation CASCADE;
 CREATE TABLE localisation
 (
-    id_document varchar(15),
-    nom             varchar(300),
-    id_contexte_geo integer DEFAULT NULL,
-	code	varchar(3),
-	PRIMARY KEY(id_document,code),
-	FOREIGN KEY (code) REFERENCES langue(code),
-    FOREIGN KEY (id_contexte_geo,code) REFERENCES contexte_geo (id_contexte_geo,code),
-	FOREIGN KEY (id_document) REFERENCES document(id_document)
+  id_document     varchar(15),
+  nom             varchar(300),
+  id_contexte_geo integer DEFAULT NULL,
+  code            varchar(3),
+  PRIMARY KEY (id_document, code),
+  FOREIGN KEY (code) REFERENCES langue (code),
+  FOREIGN KEY (id_contexte_geo, code) REFERENCES contexte_geo (id_contexte_geo, code),
+  FOREIGN KEY (id_document) REFERENCES document (id_document)
 );
 
 DROP TABLE IF EXISTS droits CASCADE;
 CREATE TABLE droits
 (
-    id_droits   serial,
-    texte      text,
-	code	varchar(3),
-	PRIMARY KEY(id_droits,code),
-	FOREIGN KEY (code) REFERENCES langue(code)
+  id_droits serial,
+  texte     text,
+  code      varchar(3),
+  PRIMARY KEY (id_droits, code),
+  FOREIGN KEY (code) REFERENCES langue (code)
 );
 
 DROP TABLE IF EXISTS document_droits CASCADE;
 CREATE TABLE document_droits
 (
-    id_document varchar(15) ,
-	code	varchar(3),
-	id_droits integer,
-	PRIMARY KEY(id_document,code),
-	FOREIGN KEY (code) REFERENCES langue(code),
-	FOREIGN KEY (id_document) REFERENCES document(id_document),
-	FOREIGN KEY (id_droits,code) REFERENCES droits(id_droits,code)
+  id_document varchar(15),
+  code        varchar(3),
+  id_droits   integer,
+  PRIMARY KEY (id_document, code),
+  FOREIGN KEY (code) REFERENCES langue (code),
+  FOREIGN KEY (id_document) REFERENCES document (id_document),
+  FOREIGN KEY (id_droits, code) REFERENCES droits (id_droits, code)
 );
 
 DROP TABLE IF EXISTS etat_genetique CASCADE;
 CREATE TABLE etat_genetique
 (
-    id_document varchar(15),
-    texte       text,
-    FOREIGN KEY (id_document) REFERENCES document (id_document)
+  id_document varchar(15),
+  texte       text,
+  FOREIGN KEY (id_document) REFERENCES document (id_document)
 );
 
 DROP TABLE IF EXISTS autres_relations CASCADE;
 CREATE TABLE autres_relations
 (
-    id_document varchar(15),
-    texte       text,
-    FOREIGN KEY (id_document) REFERENCES document (id_document)
+  id_document varchar(15),
+  texte       text,
+  FOREIGN KEY (id_document) REFERENCES document (id_document)
 );
 
 DROP TABLE IF EXISTS nature_document CASCADE;
 CREATE TABLE nature_document
 (
-    id_nature_document serial,
-    nom         varchar(25),
-	code		varchar(3),
-	PRIMARY KEY(id_nature_document,code),
-    FOREIGN KEY (code) REFERENCES langue(code)
+  id_nature_document serial,
+  nom                varchar(25),
+  code               varchar(3),
+  PRIMARY KEY (id_nature_document, code),
+  FOREIGN KEY (code) REFERENCES langue (code)
 );
 
 DROP TABLE IF EXISTS document_nature_document CASCADE;
 CREATE TABLE document_nature_document
 (
-    id_document varchar(15) ,
-	code	varchar(3),
-	id_nature_document integer,
-	PRIMARY KEY(id_document,code),
-	FOREIGN KEY (code) REFERENCES langue(code),
-	FOREIGN KEY (id_document) REFERENCES document(id_document),
-	FOREIGN KEY (id_nature_document,code) REFERENCES nature_document(id_nature_document,code)
+  id_document        varchar(15),
+  code               varchar(3),
+  id_nature_document integer,
+  PRIMARY KEY (id_document, code),
+  FOREIGN KEY (code) REFERENCES langue (code),
+  FOREIGN KEY (id_document) REFERENCES document (id_document),
+  FOREIGN KEY (id_nature_document, code) REFERENCES nature_document (id_nature_document, code)
 );
 
 DROP TABLE IF EXISTS support CASCADE;
 CREATE TABLE support
 (
-    id_support 	serial,
-    nom         varchar(7) NOT NULL,
-	code		varchar(3),
-	PRIMARY KEY(id_support,code),
-	FOREIGN KEY (code) REFERENCES langue(code)
+  id_support serial,
+  nom        varchar(7) NOT NULL,
+  code       varchar(3),
+  PRIMARY KEY (id_support, code),
+  FOREIGN KEY (code) REFERENCES langue (code)
 );
 
 DROP TABLE IF EXISTS document_support CASCADE;
 CREATE TABLE document_support
 (
-    id_document varchar(15) ,
-	code	varchar(3),
-	id_support integer,
-	PRIMARY KEY(id_document,code),
-	FOREIGN KEY (code) REFERENCES langue(code),
-	FOREIGN KEY (id_document) REFERENCES document(id_document),
-	FOREIGN KEY (id_support,code) REFERENCES support(id_support,code)
+  id_document varchar(15),
+  code        varchar(3),
+  id_support  integer,
+  PRIMARY KEY (id_document, code),
+  FOREIGN KEY (code) REFERENCES langue (code),
+  FOREIGN KEY (id_document) REFERENCES document (id_document),
+  FOREIGN KEY (id_support, code) REFERENCES support (id_support, code)
 );
 
 DROP TABLE IF EXISTS etat_general CASCADE;
 CREATE TABLE etat_general
 (
-    id_etat_general serial,
-    nom         varchar(15),
-	code		varchar(3) NOT NULL,
-	PRIMARY KEY(id_etat_general,code),
-	FOREIGN KEY (code) REFERENCES langue(code)
+  id_etat_general serial,
+  nom             varchar(15),
+  code            varchar(3) NOT NULL,
+  PRIMARY KEY (id_etat_general, code),
+  FOREIGN KEY (code) REFERENCES langue (code)
 );
 
 DROP TABLE IF EXISTS document_etat_general CASCADE;
 CREATE TABLE document_etat_general
 (
-    id_document varchar(15) ,
-	code	varchar(3),
-	id_etat_general integer,
-	PRIMARY KEY(id_document,code),
-	FOREIGN KEY (code) REFERENCES langue(code),
-	FOREIGN KEY (id_document) REFERENCES document(id_document),
-	FOREIGN KEY (id_etat_general,code) REFERENCES etat_general(id_etat_general,code)
+  id_document     varchar(15),
+  code            varchar(3),
+  id_etat_general integer,
+  PRIMARY KEY (id_document, code),
+  FOREIGN KEY (code) REFERENCES langue (code),
+  FOREIGN KEY (id_document) REFERENCES document (id_document),
+  FOREIGN KEY (id_etat_general, code) REFERENCES etat_general (id_etat_general, code)
 );
 
 DROP TABLE IF EXISTS publication CASCADE;
 CREATE TABLE publication
 (
-    id_document varchar(15),
-    texte       text,
-	code	varchar(3) NOT NULL,
-	FOREIGN KEY (code) REFERENCES langue(code),
-	FOREIGN KEY (id_document) REFERENCES document (id_document)
+  id_document varchar(15),
+  texte       text,
+  code        varchar(3) NOT NULL,
+  FOREIGN KEY (code) REFERENCES langue (code),
+  FOREIGN KEY (id_document) REFERENCES document (id_document)
 );
 
 DROP TABLE IF EXISTS document_revision CASCADE;
 CREATE TABLE document_revision
 (
-    id_document          varchar(15),
-    date_revision_notice timestamp,
-    id_personne          integer,
-	PRIMARY KEY (id_document,date_revision_notice),
-    FOREIGN KEY (id_document) REFERENCES document (id_document),
-    FOREIGN KEY (id_personne) REFERENCES personne (id_personne)
+  id_document          varchar(15),
+  date_revision_notice timestamp,
+  id_personne          integer,
+  PRIMARY KEY (id_document, date_revision_notice),
+  FOREIGN KEY (id_document) REFERENCES document (id_document),
+  FOREIGN KEY (id_personne) REFERENCES personne (id_personne)
 );
 
 
 ------------------------------------------------ MISE EN PLACE DES INSERTIONS ------------------------------------------------
 ---------------- LANGUE ----------------
 -- Ici, on créer les codes ISO 3166-1 des pays sur 3 lettres
-INSERT INTO langue VALUES
-('SPA'),('ENG'),('FRA'); -- FRA est ajouté à titre d'exemple
+INSERT INTO langue
+VALUES ('SPA'),
+       ('ENG'),
+       ('FRA'); -- FRA est ajouté à titre d'exemple
 
 ---------------- PERSONNE ----------------
-INSERT INTO personne(nom) VALUES 
-('Gil Alan'),
-('Chantraine Braillon, Cécile'),
-('Dalmagro, María Cristina'),
-('Idmhand Fatiha');
+INSERT INTO personne(nom)
+VALUES ('Gil Alan'),
+       ('Chantraine Braillon, Cécile'),
+       ('Dalmagro, María Cristina'),
+       ('Idmhand Fatiha');
 
 ---------------- TYPE ----------------
-INSERT INTO type(nom,code)
-(SELECT DISTINCT(type),'SPA' FROM imported_data WHERE type IS NOT NULL);
+INSERT INTO type(nom, code)
+  (SELECT DISTINCT(type),'SPA' FROM imported_data WHERE type IS NOT NULL);
 -- On insère ensuite les types en anglais, avec le même id mais un code de langue différent
-INSERT INTO type(id_type,nom,code)
-(SELECT DISTINCT(B.id_type), C.type,'ENG' FROM imported_data A JOIN type B On B.nom=A.type JOIN imported_en C ON A.cote=C.cote WHERE C.type IS NOT NULL);
+INSERT INTO type(id_type, nom, code)
+  (SELECT DISTINCT(B.id_type), C.type,'ENG'
+   FROM imported_data A
+          JOIN type B On B.nom = A.type
+          JOIN imported_en C ON A.cote = C.cote
+   WHERE C.type IS NOT NULL);
 
 ---------------- DATATYPE ----------------
-INSERT INTO datatype(nom,code)
-(SELECT DISTINCT(datatype),'SPA' FROM imported_data WHERE datatype IS NOT NULL);
-INSERT INTO datatype(id_datatype,nom,code)
-(SELECT DISTINCT(B.id_datatype), C.datatype,'ENG' FROM imported_data A
- JOIN datatype B On B.nom=A.datatype
- JOIN imported_en C ON A.cote=C.cote
- WHERE C.datatype IS NOT NULL AND C.datatype!='imagen'); -- != imagen = correction manuelle
+INSERT INTO datatype(nom, code)
+  (SELECT DISTINCT(datatype),'SPA' FROM imported_data WHERE datatype IS NOT NULL);
+INSERT INTO datatype(id_datatype, nom, code)
+  (SELECT DISTINCT(B.id_datatype), C.datatype,'ENG'
+   FROM imported_data A
+          JOIN datatype B On B.nom = A.datatype
+          JOIN imported_en C ON A.cote = C.cote
+   WHERE C.datatype IS NOT NULL
+     AND C.datatype != 'imagen'); -- != imagen = correction manuelle
 
 ---------------- DOCUMENT ----------------
 -- Table principale
-INSERT INTO document(id_document,dates,relations_genetiques,format,id_auteur_analyse,date_analyse,date_creation_notice)
-(SELECT A.cote, A.dates, A.relations_genetiques, A.format, B.id_personne, A.date_analyse, A.date_creation_notice
-FROM imported_data A
-JOIN personne B ON A.auteur_analyse=B.nom);
+INSERT INTO document(id_document, dates, relations_genetiques, format, id_auteur_analyse, date_analyse,
+                     date_creation_notice)
+  (SELECT A.cote, A.dates, A.relations_genetiques, A.format, B.id_personne, A.date_analyse, A.date_creation_notice
+   FROM imported_data A
+          JOIN personne B ON A.auteur_analyse = B.nom);
 
 ---------------- DOCUMENT_TYPE ----------------
 INSERT INTO document_type
-(SELECT A.cote, B.code, B.id_type FROM imported_data A
-JOIN type B ON B.nom=A.type);
+  (SELECT A.cote, B.code, B.id_type
+   FROM imported_data A
+          JOIN type B ON B.nom = A.type);
 
 ---------------- DOCUMENT_DATATYPE ----------------
 INSERT INTO document_datatype
-(SELECT DISTINCT A.cote, 'SPA', B.id_datatype FROM imported_data A
-JOIN datatype B ON B.nom=A.datatype
-WHERE A.datatype IS NOT null);
+  (SELECT DISTINCT A.cote, 'SPA', B.id_datatype
+   FROM imported_data A
+          JOIN datatype B ON B.nom = A.datatype
+   WHERE A.datatype IS NOT null);
 INSERT INTO document_datatype
-(SELECT DISTINCT A.cote, 'ENG', B.id_datatype FROM imported_en A
-JOIN datatype B ON B.nom=A.datatype);
+  (SELECT DISTINCT A.cote, 'ENG', B.id_datatype
+   FROM imported_en A
+          JOIN datatype B ON B.nom = A.datatype);
 
 ---------------- TITRE ----------------
---INSERT INTO titre (SELECT FROM (SELECT DISTINCT(titre) FROM imported_data WHERE titre IS NOT NULL) AS sub);
-INSERT INTO titre(nom,id_document,code)
-(SELECT DISTINCT(titre),cote,'SPA' FROM imported_data WHERE titre IS NOT NULL);
-INSERT INTO titre(nom,id_document,code)
-(SELECT DISTINCT(titre),cote,'ENG' FROM imported_en WHERE titre IS NOT NULL);
+INSERT INTO titre(nom, id_document, code)
+  (SELECT DISTINCT(titre),cote,'SPA' FROM imported_data WHERE titre IS NOT NULL);
+INSERT INTO titre(nom, id_document, code)
+  (SELECT DISTINCT(titre),cote,'ENG' FROM imported_en WHERE titre IS NOT NULL);
 
 ---------------- SOUS_TITRE ----------------
-INSERT INTO sous_titre(nom,id_document,code)
-(SELECT DISTINCT(sous_titre),cote,'SPA' FROM imported_data WHERE sous_titre IS NOT NULL);
-INSERT INTO sous_titre(nom,id_document,code)
-(SELECT DISTINCT(sous_titre),cote,'ENG' FROM imported_en WHERE sous_titre IS NOT NULL);
+INSERT INTO sous_titre(nom, id_document, code)
+  (SELECT DISTINCT(sous_titre),cote,'SPA' FROM imported_data WHERE sous_titre IS NOT NULL);
+INSERT INTO sous_titre(nom, id_document, code)
+  (SELECT DISTINCT(sous_titre),cote,'ENG' FROM imported_en WHERE sous_titre IS NOT NULL);
 
 ---------------- AUTEUR ----------------
-INSERT INTO auteur(nom,code)
-(SELECT DISTINCT(auteur),'SPA' FROM imported_data WHERE auteur IS NOT NULL);
-INSERT INTO auteur(nom,code)
-(SELECT DISTINCT(auteur),'ENG' FROM imported_en WHERE auteur IS NOT NULL);
+INSERT INTO auteur(nom, code)
+  (SELECT DISTINCT(auteur),'SPA' FROM imported_data WHERE auteur IS NOT NULL);
+INSERT INTO auteur(nom, code)
+  (SELECT DISTINCT(auteur),'ENG' FROM imported_en WHERE auteur IS NOT NULL);
 
 ---------------- DESTINATAIRE ----------------
-INSERT INTO destinataire(nom,id_document,code)
-(SELECT DISTINCT(destinataire),cote,'SPA' FROM imported_data WHERE destinataire IS NOT null);
-INSERT INTO destinataire(nom,id_document,code)
-(SELECT DISTINCT(destinataire),cote,'ENG' FROM imported_en WHERE destinataire IS NOT null);
+INSERT INTO destinataire(nom, id_document, code)
+  (SELECT DISTINCT(destinataire),cote,'SPA' FROM imported_data WHERE destinataire IS NOT null);
+INSERT INTO destinataire(nom, id_document, code)
+  (SELECT DISTINCT(destinataire),cote,'ENG' FROM imported_en WHERE destinataire IS NOT null);
 
 ---------------- SUJET ----------------
-INSERT INTO sujet(nom,id_document,code)
-(SELECT DISTINCT(sujet),cote,'SPA' FROM imported_data WHERE sujet IS NOT null);
-INSERT INTO sujet(nom,id_document,code)
-(SELECT DISTINCT(sujet),cote,'ENG' FROM imported_en WHERE sujet IS NOT null);
+INSERT INTO sujet(nom, id_document, code)
+  (SELECT DISTINCT(sujet),cote,'SPA' FROM imported_data WHERE sujet IS NOT null);
+INSERT INTO sujet(nom, id_document, code)
+  (SELECT DISTINCT(sujet),cote,'ENG' FROM imported_en WHERE sujet IS NOT null);
 
 ---------------- DESCRIPTION ----------------
-INSERT INTO description(texte,id_document,code,id_auteur_description)
-(SELECT DISTINCT(A.description),A.cote,'SPA',B.id_auteur_description FROM imported_data A
-JOIN auteur_description B ON B.nom=A.auteur_description
-WHERE description IS NOT null);
-INSERT INTO description(texte,id_document,code,id_auteur_description)
-(SELECT DISTINCT(A.description),A.cote,'ENG',B.id_auteur_description FROM imported_data A
-JOIN auteur_description B ON B.nom=A.auteur_description
-WHERE description IS NOT null);
+INSERT INTO description(texte, id_document, code, id_auteur_description)
+  (SELECT DISTINCT(A.description),A.cote,'SPA',B.id_auteur_description
+   FROM imported_data A
+          JOIN auteur_description B ON B.nom = A.auteur_description
+   WHERE description IS NOT null);
+INSERT INTO description(texte, id_document, code, id_auteur_description)
+  (SELECT DISTINCT(A.description),A.cote,'ENG',B.id_auteur_description
+   FROM imported_data A
+          JOIN auteur_description B ON B.nom = A.auteur_description
+   WHERE description IS NOT null);
 
 ---------------- AUTEUR_DESCRIPTION ----------------
 INSERT INTO auteur_description(nom)
-(SELECT DISTINCT auteur_description FROM imported_data WHERE auteur_description IS NOT null);
+  (SELECT DISTINCT auteur_description FROM imported_data WHERE auteur_description IS NOT null);
 
 
 ---------------- NOTES ----------------
-INSERT INTO notes(texte,id_document,nom,code)
-(SELECT DISTINCT(A.notes),A.cote,B.nom,'SPA' FROM imported_data A
-JOIN auteur B ON B.nom=A.auteur
-WHERE notes IS NOT null);
-INSERT INTO notes(texte,id_document,nom,code)
-(SELECT DISTINCT(A.notes),A.cote,B.nom,'ENG' FROM imported_en A
-JOIN auteur B ON B.nom=A.auteur
-WHERE notes IS NOT null);
+INSERT INTO notes(texte, id_document, nom, code)
+  (SELECT DISTINCT(A.notes),A.cote,B.nom,'SPA'
+   FROM imported_data A
+          JOIN auteur B ON B.nom = A.auteur
+   WHERE notes IS NOT null);
+INSERT INTO notes(texte, id_document, nom, code)
+  (SELECT DISTINCT(A.notes),A.cote,B.nom,'ENG'
+   FROM imported_en A
+          JOIN auteur B ON B.nom = A.auteur
+   WHERE notes IS NOT null);
 
 ---------------- RESUME ----------------
 /* AUCUNE ENTRÉE */
@@ -1897,83 +1892,100 @@ WHERE notes IS NOT null);
 DROP TABLE IF EXISTS table_insert;
 CREATE TABLE table_insert
 (
-	texte varchar(150)
+  texte_es varchar(150),
+  texte_en varchar(150)
 );
 
-INSERT INTO table_insert
-(SELECT ((regexp_matches(editeur, '^Responsable del archivo[[:blank:]]+([\w[:blank:]-]+)[,\(\|#]?(.*)$'))[1]) as colonne1 FROM imported_data);
-UPDATE table_insert
-SET texte=null
-WHERE TRIM(texte)='spectateur AAP 2020' or TRIM(texte)='';
-UPDATE table_insert
-SET texte=REPLACE(texte, ' spectateur AAP 2020 ', '');
-UPDATE table_insert
-SET texte=REPLACE(texte, 'spectateur AAP 2020 ', '');
-UPDATE table_insert
-SET texte=TRIM(texte);
-UPDATE table_insert
-SET texte=null
-WHERE (texte)='ecto e-';
-UPDATE table_insert
-SET texte=null
-WHERE (texte)='ndeterminado';
-UPDATE table_insert
-SET texte=null
-WHERE (texte)='Indeterminado';
-UPDATE table_insert
-SET texte=null
-WHERE (texte)='Indeterminadoecto e-';
- 
--- TODO : invalide
-INSERT INTO responsable_archive(nom,code)
-(SELECT DISTINCT(texte),'SPA' FROM table_insert WHERE texte IS NOT NULL);
+CREATE OR REPLACE FUNCTION editeur_parse_es(editeur text)
+  RETURNS text[] AS
+$$
+BEGIN
+  RETURN regexp_matches(editeur, '^Responsable del archivo[[:blank:]]+([\w[:blank:]-]+)[,\(\|#]?(.*)$');
+END;
+$$
+  LANGUAGE plpgsql;
 
-DELETE FROM table_insert WHERE TRUE;
-INSERT INTO table_insert
-(SELECT ((regexp_matches(editeur, '^Responsible for the file: [[:blank:]]+([\w[:blank:]-]+)[,\(\|#]?(.*)$'))[1]) as colonne1 FROM imported_en);
+CREATE OR REPLACE FUNCTION editeur_parse_en(editeur text)
+  RETURNS text[] AS
+$$
+BEGIN
+  RETURN regexp_matches(editeur, '^Responsible for the file: [[:blank:]]+([\w[:blank:]-]+)[,\(\|#]?(.*)$');
+END;
+$$
+  LANGUAGE plpgsql;
 
-UPDATE table_insert
-SET texte=TRIM(texte);
-UPDATE table_insert
-SET texte=null
-WHERE (texte)='Undetermined';
+CREATE OR REPLACE FUNCTION insert_r_a()
+  RETURNS VOID AS
+$$
+DECLARE
+  t RECORD;
+  id_r_a integer;
+BEGIN
+  DELETE FROM responsable_archive_nom WHERE TRUE;
+  DELETE FROM responsable_archive WHERE TRUE;
 
--- TODO : à faire
+  DROP TABLE IF EXISTS table_insert;
+  CREATE TABLE table_insert
+  (
+    texte_es varchar(150),
+    texte_en varchar(150)
+  );
+
+  FOR t IN SELECT DISTINCT((editeur_parse_es(A.editeur))[1], (editeur_parse_en(B.editeur))[1]),(editeur_parse_es(A.editeur))[1] AS r_a_es, (editeur_parse_en(B.editeur))[1] AS r_a_en FROM imported_data A FULL OUTER JOIN imported_en B ON A.cote=B.cote LOOP
+    INSERT INTO table_insert(texte_es, texte_en) VALUES (t.r_a_es, t.r_a_en);
+  END LOOP;
+
+  -- Corrections des noms de responsables d'archive en espagnol
+  UPDATE table_insert
+  SET texte_es=NULL
+  WHERE TRIM(texte_es)='spectateur AAP 2020' or TRIM(texte_es)='';
+  UPDATE table_insert
+  SET texte_es=REPLACE(texte_es, ' spectateur AAP 2020 ', '');
+  UPDATE table_insert
+  SET texte_es=REPLACE(texte_es, 'spectateur AAP 2020 ', '');
+  UPDATE table_insert
+  SET texte_es=TRIM(texte_es);
+  UPDATE table_insert
+  SET texte_es=NULL
+  WHERE (texte_es)='ecto e-';
+  UPDATE table_insert
+  SET texte_es=NULL
+  WHERE (texte_es)='ndeterminado';
+  UPDATE table_insert
+  SET texte_es=NULL
+  WHERE (texte_es)='Indeterminado';
+  UPDATE table_insert
+  SET texte_es=NULL
+  WHERE (texte_es)='Indeterminadoecto e-';
+
+  -- Corrections des noms de responsables d'archive en anglais
+  UPDATE table_insert
+  SET texte_en=TRIM(texte_en);
+  UPDATE table_insert
+  SET texte_en=NULL
+  WHERE (texte_en)='Undetermined';
+
+  FOR t IN SELECT texte_es, texte_en FROM table_insert LOOP
+    -- Insertion dans responsable_archive avec la valeur par défaut (prochain entier dans la séquence/serial)
+    INSERT INTO responsable_archive DEFAULT VALUES RETURNING id_responsable_archive INTO id_r_a;
+    RAISE NOTICE 'New r_a : %', id_r_a;
+    IF t.texte_es IS NOT NULL THEN
+      INSERT INTO responsable_archive_nom(id_responsable_archive, nom, code) VALUES (id_r_a, t.texte_es, 'SPA');
+    END IF;
+
+    IF t.texte_en IS NOT NULL THEN
+      INSERT INTO responsable_archive_nom(id_responsable_archive, nom, code) VALUES (id_r_a, t.texte_en, 'ENG');
+    END IF;
+  END LOOP;
+  DROP TABLE table_insert;
+
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT insert_r_a();
+
 /*
-Créer une fonction qui boucle sur les 
-
-(SELECT DISTINCT(texte),'SPA' FROM table_insert WHERE texte IS NOT NULL)
-
-Puis
-DELETE FROM table_insert;
-INSERT INTO table_insert
-A : (SELECT ((regexp_matches(editeur, '^Responsible for the file: [[:blank:]]+([\w[:blank:]-]+)[,\(\|#]?(.*)$'))[1]) as colonne1 FROM imported_en);
-
-UPDATE table_insert
-SET texte=TRIM(texte);
-UPDATE table_insert
-SET texte=null
-WHERE (texte)='Undetermined';
-
-et
-B : (SELECT DISTINCT(texte),'ENG' FROM table_insert WHERE texte IS NOT NULL
-
-Et de A et B (cursor) :
-
-Dans la boucle de parcours de A : 
-créer les id pour responsable_archive (insert vide ou insert d'une valeur incrémentée, plus simple!!!!)
-insérer dans responsable_archive_nom les données SPA/ENG avec le id_responsable_archive
-*/
-
-INSERT INTO responsable_archive (SELECT FROM (SELECT DISTINCT(texte) FROM table_insert WHERE texte IS NOT NULL) AS sub);
-
--- TODO : invalide
-INSERT INTO responsable_archive(nom,code)
-(SELECT DISTINCT(texte),'ENG' FROM table_insert WHERE texte IS NOT NULL);
-DROP TABLE table_insert;
-
-
-
+TODO : remove
 ---------------- RESPONSABLE_SCIENTIFIQUE ----------------
  INSERT INTO responsable_scientifique VALUES
 (1, 'La Rochelle Université', 'Alumno', 'Master LEA Amérique', 'SPA'),
@@ -1982,13 +1994,15 @@ DROP TABLE table_insert;
 (1, 'La Rochelle Université', 'Student', 'Master LEA Amérique', 'ENG'),
 (4, 'Université de Poitiers', 'Professor', 'CRLA Institut des textes et manuscrits modernes CNRS-UMR8132', 'ENG'),
 (2, 'La Rochelle Université', 'Professor', 'Equipo CRHIA', 'ENG');
-
+*/
 ---------------- EDITEUR ----------------
-INSERT INTO editeur(id_editeur,nom_editeur,code) VALUES
-(1,'Editor Proyecto e-spectateur AAP 2020', 'SPA'),
-(2,'Editor Proyecto CollEx-Persée Archivos 3.0 AAP 2018', 'SPA'),
-(1,'Editor Project e-spectateur, AAP 2020', 'ENG'),
-(2,'Editor Project CollEx-Persée Files 3.0, AAP 2018', 'ENG');
+INSERT INTO editeur(id_editeur) VALUES (1), (2);
+
+INSERT INTO editeur_nom(id_editeur, code, nom_editeur) VALUES
+(1, 'SPA', 'Editor Proyecto e-spectateur AAP 2020'),
+(2, 'SPA', 'Editor Proyecto CollEx-Persée Archivos 3.0 AAP 2018'),
+(1, 'ENG', 'Editor Project e-spectateur, AAP 2020'),
+(2, 'ENG', 'Editor Project CollEx-Persée Files 3.0, AAP 2018');
 
 ---------------- CONTEXTE_GEOGRAPHIQUE ----------------
 INSERT INTO contexte_geo VALUES
