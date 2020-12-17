@@ -2130,4 +2130,28 @@ INSERT INTO publication(texte,id_document,code)
 
 ------------------------------------------------ MISE EN PLACE DES TRIGGERS ------------------------------------------------
 
+CREATE OR REPLACE FUNCTION trigger_personne_nom_valide() RETURNS TRIGGER
+AS $$
+BEGIN
+    IF NEW.nom == ''
+    THEN
+        RAISE EXCEPTION 'Une personne dois forcément avoir un nom!';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE 'plpgsql';
+
+CREATE TRIGGER trigger_personne_nom_valide BEFORE INSERT OR UPDATE ON personne FOR EACH ROW EXECUTE PROCEDURE trigger_personne_nom_valide();
+
+CREATE OR REPLACE FUNCTION trigger_document_log() RETURNS TRIGGER
+AS $$
+BEGIN
+
+    RAISE NOTICE 'Le nouveau document à pour id: %, sa représentation est %, il a été analysé le %', NEW.id_document, NEW.representation, NEW.date_analyse;
+    RETURN NEW;
+END;
+$$ LANGUAGE 'plpgsql';
+
+CREATE TRIGGER trigger_document_log BEFORE INSERT OR UPDATE ON document FOR EACH ROW EXECUTE PROCEDURE trigger_document_log();
+
 ------------------------------------------------ MISE EN PLACE DES REQUÊTES ------------------------------------------------
