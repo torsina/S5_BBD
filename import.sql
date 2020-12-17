@@ -1765,10 +1765,8 @@ CREATE TABLE document_revision
 (
   id_document          varchar(15),
   date_revision_notice timestamp,
-  id_personne          integer,
   PRIMARY KEY (id_document, date_revision_notice),
-  FOREIGN KEY (id_document) REFERENCES document (id_document),
-  FOREIGN KEY (id_personne) REFERENCES personne (id_personne)
+  FOREIGN KEY (id_document) REFERENCES document (id_document)
 );
 
 
@@ -2185,6 +2183,33 @@ END;
 $$ LANGUAGE 'plpgsql';
 
 CREATE TRIGGER trigger_langue_validate BEFORE INSERT OR UPDATE ON langue FOR EACH ROW EXECUTE PROCEDURE trigger_langue_validate();
+
+-- publication, titre
+-- document_type, document_support
+
+CREATE OR REPLACE FUNCTION trigger_document_revision() RETURNS TRIGGER
+AS $$
+BEGIN
+    INSERT INTO document_revision VALUES (NEW.id_document, now());
+    RETURN NEW;
+END;
+$$ LANGUAGE 'plpgsql';
+
+CREATE TRIGGER trigger_document_revision AFTER UPDATE ON document_droits FOR EACH ROW EXECUTE PROCEDURE trigger_document_revision();
+CREATE TRIGGER trigger_document_revision AFTER UPDATE ON document_contexte_geo FOR EACH ROW EXECUTE PROCEDURE trigger_document_revision();
+CREATE TRIGGER trigger_document_revision AFTER UPDATE ON localisation FOR EACH ROW EXECUTE PROCEDURE trigger_document_revision();
+CREATE TRIGGER trigger_document_revision AFTER UPDATE ON document_datatype FOR EACH ROW EXECUTE PROCEDURE trigger_document_revision();
+CREATE TRIGGER trigger_document_revision AFTER UPDATE ON document_etat_general FOR EACH ROW EXECUTE PROCEDURE trigger_document_revision();
+CREATE TRIGGER trigger_document_revision AFTER UPDATE ON autres_relations FOR EACH ROW EXECUTE PROCEDURE trigger_document_revision();
+CREATE TRIGGER trigger_document_revision AFTER UPDATE ON etat_genetique FOR EACH ROW EXECUTE PROCEDURE trigger_document_revision();
+CREATE TRIGGER trigger_document_revision AFTER UPDATE ON notes FOR EACH ROW EXECUTE PROCEDURE trigger_document_revision();
+CREATE TRIGGER trigger_document_revision AFTER UPDATE ON resume FOR EACH ROW EXECUTE PROCEDURE trigger_document_revision();
+CREATE TRIGGER trigger_document_revision AFTER UPDATE ON publication FOR EACH ROW EXECUTE PROCEDURE trigger_document_revision();
+CREATE TRIGGER trigger_document_revision AFTER UPDATE ON titre FOR EACH ROW EXECUTE PROCEDURE trigger_document_revision();
+CREATE TRIGGER trigger_document_revision AFTER UPDATE ON document_type FOR EACH ROW EXECUTE PROCEDURE trigger_document_revision();
+CREATE TRIGGER trigger_document_revision AFTER UPDATE ON document_support FOR EACH ROW EXECUTE PROCEDURE trigger_document_revision();
+CREATE TRIGGER trigger_document_revision AFTER UPDATE ON document FOR EACH ROW EXECUTE PROCEDURE trigger_document_revision();
+
 
 ------------------------------------------------ MISE EN PLACE DES REQUÊTES ------------------------------------------------
 
