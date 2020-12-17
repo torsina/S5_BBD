@@ -2,6 +2,12 @@ set datestyle to 'european';
 
 DROP TABLE IF EXISTS imported_data;
 
+DROP SCHEMA public CASCADE;
+CREATE SCHEMA public;
+
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO public;
+
 -- Table d'importation des données brutes espagnoles
 CREATE TABLE imported_data
 (
@@ -2068,8 +2074,11 @@ INSERT INTO autres_relations(id_document,texte)
 (SELECT cote, autres_ressources_relation FROM imported_data WHERE autres_ressources_relation IS NOT NULL);
 
 ---------------- NATURE_DOCUMENT ----------------
-INSERT INTO nature_document(nom,code)
-(SELECT DISTINCT(nature_document),'SPA' FROM imported_data WHERE nature_document IS NOT null);
+INSERT INTO nature_document(id_nature_document,nom,code) VALUES
+(1,'FOLIOS TAPUSCRITOS LIBRES', 'SPA'),
+(2,'PDF', 'SPA'),
+(3,'PNG', 'SPA'),
+(4,'JPG', 'SPA');
 INSERT INTO nature_document(id_nature_document,nom,code) VALUES
 (1,'FREE TAPESTRY SHEETS', 'ENG'),
 (2,'PDF', 'ENG'),
@@ -2149,21 +2158,9 @@ INSERT INTO publication(texte,id_document,code)
 
 ------------------------------------------------ MISE EN PLACE DES TRIGGERS ------------------------------------------------
 
-CREATE OR REPLACE FUNCTION trigger_personne_nom_valide() RETURNS TRIGGER
-AS $$
-BEGIN
-    IF NEW.nom == ''
-    THEN
-        RAISE EXCEPTION 'Une personne dois forcément avoir un nom!';
-    END IF;
-    RETURN NEW;
-END;
-$$ LANGUAGE 'plpgsql';
-
-CREATE TRIGGER trigger_personne_nom_valide BEFORE INSERT OR UPDATE ON personne FOR EACH ROW EXECUTE PROCEDURE trigger_personne_nom_valide();
-
 CREATE OR REPLACE FUNCTION trigger_document_log() RETURNS TRIGGER
 AS $$
+DECLARE
 BEGIN
 
     RAISE NOTICE 'Le nouveau document à pour id: %, sa représentation est %, il a été analysé le %', NEW.id_document, NEW.representation, NEW.date_analyse;
@@ -2172,6 +2169,22 @@ END;
 $$ LANGUAGE 'plpgsql';
 
 CREATE TRIGGER trigger_document_log BEFORE INSERT OR UPDATE ON document FOR EACH ROW EXECUTE PROCEDURE trigger_document_log();
+
+-- check langue
+
+DROP FUNCTION IF EXISTS trigger_langue_validate() CASCADE;
+CREATE OR REPLACE FUNCTION trigger_langue_validate() RETURNS TRIGGER
+AS $$
+BEGIN
+    IF NOT regexp_matches(NEW.code, '\w{3}') THEN
+        RAISE EXCEPTION 'Format invalide';
+    end if;
+    NEW.code = trim_blank(upper(NEW.code));
+    RETURN NEW;
+END;
+$$ LANGUAGE 'plpgsql';
+
+CREATE TRIGGER trigger_langue_validate BEFORE INSERT OR UPDATE ON langue FOR EACH ROW EXECUTE PROCEDURE trigger_langue_validate();
 
 ------------------------------------------------ MISE EN PLACE DES REQUÊTES ------------------------------------------------
 
@@ -2230,3 +2243,5 @@ SELECT A.id_document, C.nom as titre, A.nom as auteur, A.texte as notes
 FROM notes A
 JOIN titre C ON C.id_document = A.id_document and C.code = 'SPA'
 ORDER BY A.id_document;
+
+--
