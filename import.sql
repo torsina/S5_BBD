@@ -564,10 +564,6 @@ WHERE char_length(description) = 0;
 UPDATE imported_data
 SET description=regexp_replace(description, '^-[[:blank:]]*', '');
 
--- TODO : remove
--- SELECT description, COUNT(auteur_description) FROM imported_data GROUP BY description HAVING COUNT(DISTINCT auteur_description) != 1;
--- SELECT * FROM imported_data WHERE description='Foto de Margarita Xirgu sacada en el "peristilo" del teatro romano de Mérida, caracterizada de Elektra';
-
 ------------------------------------------------NOTES------------------------------------------------
 
 /*
@@ -884,17 +880,7 @@ SET format=regexp_replace(format,
                           '^((\d{2,4})[[:blank:]]*[x×][[:blank:]]*(\d{2,4}))[[:blank:]]*((\d{1,3}([\.\,]\d{1,2})?)[[:blank:]]*([kmg]o))?([[:blank:]]\[.*\])?$',
                           '\2x\3 \5\7\8');
 -- Texte dans le format qui est le même que dans notes.
--- TODO : remove UPDATE imported_data SET format=NULL WHERE cote='MX-F-247';
 
-
--- TODO : remove
-/*SELECT DISTINCT(format) FROM imported_data;
-SELECT regexp_matches(LOWER('640 × 454 49,5 ko'), '(\d{2,3}[[:blank:]]*[x×][[:blank:]]*\d{2,3})[[:blank:]]*(\d{1,2}([\.\,]\d{1,2})?[[:blank:]]*([kmg]o))?$');--'(\d{2,4}[[:blank:]]*[x×][[:blank:]]*\d{2,4})[[:blank:]]*(\d{1,2}[\.,]{0,1}[kmg]o)$');
-SELECT format FROM imported_data WHERE regexp_replace(blank_to_space(format), '^[\xC2\xA0\x20\x0A]*', ' ') !~ '(\d{2,4}[[:blank:]]*[x×][[:blank:]]*\d{2,4})[[:blank:]]*(\d{1,3}([\.\,]\d{1,2})?[[:blank:]]*([kmg]o))?$';
-SELECT regexp_replace('277×582 414,7ko', E'[\\xC2\\xA0\\x20\\x0A]', ' ', 'g') ~ '(\d{2,4}[[:blank:]]*[x×][[:blank:]]*\d{2,4})[[:blank:]]*(\d{1,3}([\.\,]\d{1,2})?[[:blank:]]*([kmg]o))?$';
-SELECT parse_format('277 × 582 414,7 ko');
-SELECT regexp_replace('277 × 582 414,7 ko', E'[\\xC2\\xA0\\x20\\x0A]', 'a', 'g');
-SELECT regexp_matches(blank_to_space('277x55 3,5ko'), '(\d{2,3}[[:blank:]]*[x×][[:blank:]]*\d{2,3})[[:blank:]]*(\d{1,2}([\.\,]\d{1,2})?[[:blank:]]*([kmg]o))?$');*/
 SELECT cote, format
 FROM imported_data
 WHERE parse_format(format) IS NULL
@@ -902,9 +888,6 @@ WHERE parse_format(format) IS NULL
 SELECT regexp_replace('476 × 464231,5 ko [sjask56]',
                       '^((\d{2,4})[[:blank:]]*[x×][[:blank:]]*(\d{2,4}))[[:blank:]]*((\d{1,3}([\.\,]\d{1,2})?)[[:blank:]]*([kmg]o))?([[:blank:]]\[.*\])?$',
                       '\2x\3 \5\7\8');
-/*SELECT regexp_replace('go', '(([a-z]k)|(k[a-z])|(?![gmk])[a-z])o', 'ko');
-SELECT regexp_replace(blank_to_space('33ko, 305 × 500'), '(\d{1,3}([\.\,]\d{1,2})?[[:blank:]]*([kmg]o)),?[[:blank:]]*((\d{2,4})[[:blank:]]*[x×][[:blank:]]*(\d{2,4}))[[:blank:]]*$', '\5x\6 \1');
-SELECT regexp_matches('411x640 jdz', '^((\d{2,4})[[:blank:]]*[x×][[:blank:]]*(\d{2,4}))[[:blank:]]+[a-z]*$');*/
 SELECT regexp_matches('[131 f., 139 p. numeradas 1-6, 5-6, 7-57, 2 pág. s.n., 58-116, 107, 117-137, 220 x 350 mm]',
                       '^(((\d{2,4})[[:blank:]]*[x×][[:blank:]]*(\d{2,4}))[[:blank:]]*((\d{1,3}([\.\,]\d{1,2})?)[[:blank:]]*([kmg]o))?)?([[:blank:]]*\[.*\])?$');
 
@@ -912,20 +895,9 @@ SELECT regexp_matches('[131 f., 139 p. numeradas 1-6, 5-6, 7-57, 2 pág. s.n., 5
 
 -- La langue est inutile, voir justification.
 
-
--- TODO : remove
--- On retire les caractères en trop avant et après la langue.
--- UPDATE imported_data SET langue=TRIM(LOWER(langue));
--- SELECT langue FROM imported_data WHERE langue IS NOT NULL;
-
 ------------------------------------------------ETAT GENETIQUE------------------------------------------------
 
 -- L'état génétique est inutile, voir justification.
-
--- TODO : remove
--- On retire les caractères en trop avant et après l'état génétique.
--- UPDATE imported_data SET etat_genetique=TRIM(etat_genetique);
--- SELECT etat_genetique FROM imported_data WHERE etat_genetique IS NOT NULL;
 
 ------------------------------------------------RELATIONS GENETIQUES------------------------------------------------
 
@@ -983,10 +955,6 @@ WHERE relations_genetiques = 'mx164/165/168/169/170/187/188';
 UPDATE imported_data
 SET relations_genetiques='MX-F-950/MX-F-953'
 WHERE relations_genetiques = 'MX950/953';
-
--- TODO : remove
--- SELECT DISTINCT relations_genetiques FROM imported_data WHERE relations_genetiques !~ '(MX-F-\d{3,4}/?)+';
--- SELECT regexp_matches('Mx-412/Mx-602-Mx-625/Mx-637/Mx-642', '(Mx-\d{1,4}/?)+');
 
 /*
 On retire les caractères en trop avant et après les autres relations.
@@ -1067,9 +1035,6 @@ SET publication = TRIM(blank_to_space(publication));
 SELECT publication
 FROM imported_data
 WHERE cote = 'MX-F-306';
-
--- TODO : remove
--- SELECT regexp_replace(blank_to_space('http://margaritaxirgu.es/002.jpg   Link'), '(https?://.+?)[[:blank:]]*+', 'a', 'ng'); -- : https://photooos.google.com/share/a3ln  https://photos.google.com/share/Aln'),
 
 SELECT regexp_replace(blank_to_space('https://margaritaxirgu.es/002.jpg Link :  http://margaritaxirgu.es/002.jpg'),
                       '(https?://[^[:blank:]]+)[[:blank:]]*([^(http)]*)', '[\1] (\2) ',
@@ -1364,9 +1329,6 @@ WHERE cote = 'MX-F-93';
 UPDATE imported_data
 SET publication=(SELECT __dummy FROM imported_data WHERE cote = 'MX-F-95')
 WHERE cote = 'MX-F-94';
-
--- Désormais cette colonne n'est plus d'aucune utilité
--- TODO : ALTER TABLE imported_data DROP COLUMN __dummy;
 
 
 -- Exploration
