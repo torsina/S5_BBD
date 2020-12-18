@@ -2113,8 +2113,8 @@ INSERT INTO publication(texte,id_document,code)
 ---------------- DOCUMENT_REVISION ----------------
 /* AUCUNE ENTRÉE*/
 
-
 ------------------------------------------------ MISE EN PLACE DES TRIGGERS ------------------------------------------------
+
 
 CREATE OR REPLACE FUNCTION trigger_document_log() RETURNS TRIGGER
 AS $$
@@ -2203,7 +2203,7 @@ $$ LANGUAGE 'plpgsql';
 CREATE TRIGGER trigger_nature_document_validate BEFORE INSERT OR UPDATE ON nature_document FOR EACH ROW EXECUTE PROCEDURE trigger_nature_document_validate();					
 
 
------------------------------------------------- MISE EN PLACE DES REQUÊTES ------------------------------------------------
+------------------------------------------------ REQUÊTES ------------------------------------------------
 
 --- 1 : On récupère l'état en anglais des documents par ordre croissant d'état.
 SELECT A.id_document, C.nom
@@ -2262,7 +2262,7 @@ JOIN titre C ON C.id_document = A.id_document and C.code = 'SPA'
 ORDER BY A.id_document;
 
 
--- Nombre d'oeuvres analysées par année
+-- 9 : Nombre d'oeuvres analysées par année
 SELECT date_part('year', A.date_analyse), COUNT(*)
 FROM document A
 GROUP BY date_part('year', A.date_analyse);
@@ -2284,21 +2284,29 @@ WHERE A.id_document NOT IN
 )
 ORDER BY A.id_document;
 
-
--- Nombre de titres non traduits dans une autre langue qu'espagnol
+-- 12 : Nombre de descriptions écrites par chaque auteur
+SELECT B.nom, count(*)
+FROM description A
+JOIN auteur_description B ON B.id_auteur_description = A.id_auteur_description
+WHERE A.code='ENG'
+GROUP BY B.nom
+ORDER BY count(*) DESC;
+			       
+-- 13 : Nombre de titres non traduits dans une autre langue qu'espagnol
 SELECT COUNT(t1.id_document) FROM titre t1 WHERE t1.code='SPA' AND NOT EXISTS (SELECT 1 FROM titre t2 WHERE t2.id_document=t1.id_document AND t2.code != 'SPA');
 
--- Editeur les plus actifs (du plus actif au moins actif)
+-- 14 : Editeur les plus actifs (du plus actif au moins actif)
 SELECT E.id_editeur, EN.nom_editeur, COUNT(D.id_document) AS nb_documents FROM editeur E INNER JOIN editeur_nom EN on E.id_editeur = EN.id_editeur INNER JOIN document D on E.id_editeur = D.id_editeur WHERE EN.code='SPA' GROUP BY E.id_editeur, EN.nom_editeur ORDER BY nb_documents DESC;
 
--- Id et noms (en espagnol) des contextes géographiques les mieux couverts
+-- 15 : Id et noms (en espagnol) des contextes géographiques les mieux couverts
 SELECT C.id_contexte_geo, C.nom, COUNT(DCG.id_document) AS nb_documents FROM document_contexte_geo DCG LEFT JOIN contexte_geo C ON DCG.id_contexte_geo = C.id_contexte_geo WHERE C.code='SPA' GROUP BY C.id_contexte_geo, C.nom ORDER BY nb_documents DESC;
 
--- Nombre de révisions moyen par document. Attention : pour l'instant document_revision est vide, il n'y a donc pas de résultats
+-- 16 : Nombre de révisions moyen par document. Attention : pour l'instant document_revision est vide, il n'y a donc pas de résultats
 SELECT AVG(sub.nb_revisions) FROM (SELECT COUNT(R.id_document) AS nb_revisions FROM document_revision R GROUP BY R.id_document) AS sub;
 
--- Les mois (avec l'année) les plus productions par ordre décroissants par rapport à la date d'analyse
+-- 17 : Les mois (avec l'année) les plus productions par ordre décroissants par rapport à la date d'analyse
 SELECT date_trunc('month', A.date_analyse) AS month, COUNT(A.id_document) AS nb_documents FROM document A GROUP BY month ORDER BY nb_documents DESC;
+
 					  
 -- 12 : Nombre de descriptions écrites par chaque auteur
 SELECT B.nom, count(*)
