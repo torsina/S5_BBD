@@ -1427,10 +1427,18 @@ CREATE TABLE datatype
   FOREIGN KEY (code) REFERENCES langue (code)
 );
 
+DROP TABLE IF EXISTS editeur CASCADE;
+CREATE TABLE editeur
+(
+  id_editeur             serial,
+  PRIMARY KEY (id_editeur)
+);
+
 DROP TABLE IF EXISTS document CASCADE;
 CREATE TABLE document
 (
   id_document          varchar(15) primary key,
+  id_editeur           integer,
   dates                varchar(10),
   relations_genetiques text,
   representation       boolean   NOT NULL DEFAULT false,
@@ -1438,7 +1446,8 @@ CREATE TABLE document
   id_auteur_analyse    integer,
   date_analyse         timestamp NOT NULL DEFAULT NOW(),
   date_creation_notice timestamp          DEFAULT NULL,
-  FOREIGN KEY (id_auteur_analyse) REFERENCES personne (id_personne)
+  FOREIGN KEY (id_auteur_analyse) REFERENCES personne (id_personne),
+  FOREIGN KEY (id_editeur) REFERENCES editeur(id_editeur)
 );
 
 DROP TABLE IF EXISTS document_type CASCADE;
@@ -1556,13 +1565,6 @@ CREATE TABLE resume
   code        varchar(3),
   FOREIGN KEY (code) REFERENCES langue (code),
   FOREIGN KEY (id_document) REFERENCES document (id_document)
-);
-
-DROP TABLE IF EXISTS editeur CASCADE;
-CREATE TABLE editeur
-(
-  id_editeur             serial,
-  PRIMARY KEY (id_editeur)
 );
 
 DROP TABLE IF EXISTS responsable_archive CASCADE;
@@ -1808,93 +1810,6 @@ INSERT INTO datatype(id_datatype, nom, code)
    WHERE C.datatype IS NOT NULL
      AND C.datatype != 'imagen'); -- != imagen = correction manuelle
 
----------------- DOCUMENT ----------------
--- Table principale
-INSERT INTO document(id_document, dates, relations_genetiques, format, id_auteur_analyse, date_analyse,
-                     date_creation_notice)
-  (SELECT A.cote, A.dates, A.relations_genetiques, A.format, B.id_personne, A.date_analyse, A.date_creation_notice
-   FROM imported_data A
-          JOIN personne B ON A.auteur_analyse = B.nom);
-
----------------- DOCUMENT_TYPE ----------------
-INSERT INTO document_type
-  (SELECT A.cote, B.code, B.id_type
-   FROM imported_data A
-          JOIN type B ON B.nom = A.type);
-
----------------- DOCUMENT_DATATYPE ----------------
-INSERT INTO document_datatype
-  (SELECT DISTINCT A.cote, 'SPA', B.id_datatype
-   FROM imported_data A
-          JOIN datatype B ON B.nom = A.datatype
-   WHERE A.datatype IS NOT null);
-INSERT INTO document_datatype
-  (SELECT DISTINCT A.cote, 'ENG', B.id_datatype
-   FROM imported_en A
-          JOIN datatype B ON B.nom = A.datatype);
-
----------------- TITRE ----------------
-INSERT INTO titre(nom, id_document, code)
-  (SELECT DISTINCT(titre),cote,'SPA' FROM imported_data WHERE titre IS NOT NULL);
-INSERT INTO titre(nom, id_document, code)
-  (SELECT DISTINCT(titre),cote,'ENG' FROM imported_en WHERE titre IS NOT NULL);
-
----------------- SOUS_TITRE ----------------
-INSERT INTO sous_titre(nom, id_document, code)
-  (SELECT DISTINCT(sous_titre),cote,'SPA' FROM imported_data WHERE sous_titre IS NOT NULL);
-INSERT INTO sous_titre(nom, id_document, code)
-  (SELECT DISTINCT(sous_titre),cote,'ENG' FROM imported_en WHERE sous_titre IS NOT NULL);
-
----------------- AUTEUR ----------------
-INSERT INTO auteur(nom, code)
-  (SELECT DISTINCT(auteur),'SPA' FROM imported_data WHERE auteur IS NOT NULL);
-INSERT INTO auteur(nom, code)
-  (SELECT DISTINCT(auteur),'ENG' FROM imported_en WHERE auteur IS NOT NULL);
-
----------------- DESTINATAIRE ----------------
-INSERT INTO destinataire(nom, id_document, code)
-  (SELECT DISTINCT(destinataire),cote,'SPA' FROM imported_data WHERE destinataire IS NOT null);
-INSERT INTO destinataire(nom, id_document, code)
-  (SELECT DISTINCT(destinataire),cote,'ENG' FROM imported_en WHERE destinataire IS NOT null);
-
----------------- SUJET ----------------
-INSERT INTO sujet(nom, id_document, code)
-  (SELECT DISTINCT(sujet),cote,'SPA' FROM imported_data WHERE sujet IS NOT null);
-INSERT INTO sujet(nom, id_document, code)
-  (SELECT DISTINCT(sujet),cote,'ENG' FROM imported_en WHERE sujet IS NOT null);
-
----------------- DESCRIPTION ----------------
-INSERT INTO description(texte, id_document, code, id_auteur_description)
-  (SELECT DISTINCT(A.description),A.cote,'SPA',B.id_auteur_description
-   FROM imported_data A
-          JOIN auteur_description B ON B.nom = A.auteur_description
-   WHERE description IS NOT null);
-INSERT INTO description(texte, id_document, code, id_auteur_description)
-  (SELECT DISTINCT(A.description),A.cote,'ENG',B.id_auteur_description
-   FROM imported_data A
-          JOIN auteur_description B ON B.nom = A.auteur_description
-   WHERE description IS NOT null);
-
----------------- AUTEUR_DESCRIPTION ----------------
-INSERT INTO auteur_description(nom)
-  (SELECT DISTINCT auteur_description FROM imported_data WHERE auteur_description IS NOT null);
-
-
----------------- NOTES ----------------
-INSERT INTO notes(texte, id_document, nom, code)
-  (SELECT DISTINCT(A.notes),A.cote,B.nom,'SPA'
-   FROM imported_data A
-          JOIN auteur B ON B.nom = A.auteur
-   WHERE notes IS NOT null);
-INSERT INTO notes(texte, id_document, nom, code)
-  (SELECT DISTINCT(A.notes),A.cote,B.nom,'ENG'
-   FROM imported_en A
-          JOIN auteur B ON B.nom = A.auteur
-   WHERE notes IS NOT null);
-
----------------- RESUME ----------------
-/* AUCUNE ENTRÉE */
-
 ---------------- EDITEUR ----------------
 INSERT INTO editeur(id_editeur) VALUES (1), (2);
 
@@ -2001,6 +1916,95 @@ $$ LANGUAGE plpgsql;
 
 SELECT insert_r_a();
 
+
+---------------- DOCUMENT ----------------
+-- Table principale, on insère à partir de la table espagnole puisque les champs insérés sont identiques entre espagnol et anglais
+INSERT INTO document(id_document, id_editeur, dates, relations_genetiques, format, id_auteur_analyse, date_analyse,
+                     date_creation_notice)
+  (SELECT A.cote, (CASE WHEN A.editeur LIKE '%2018%' THEN 2 ELSE 1 END), A.dates, A.relations_genetiques, A.format, B.id_personne, A.date_analyse, A.date_creation_notice
+   FROM imported_data A
+          JOIN personne B ON A.auteur_analyse = B.nom);
+
+---------------- DOCUMENT_TYPE ----------------
+INSERT INTO document_type
+  (SELECT A.cote, B.code, B.id_type
+   FROM imported_data A
+          JOIN type B ON B.nom = A.type);
+
+---------------- DOCUMENT_DATATYPE ----------------
+INSERT INTO document_datatype
+  (SELECT DISTINCT A.cote, 'SPA', B.id_datatype
+   FROM imported_data A
+          JOIN datatype B ON B.nom = A.datatype
+   WHERE A.datatype IS NOT null);
+INSERT INTO document_datatype
+  (SELECT DISTINCT A.cote, 'ENG', B.id_datatype
+   FROM imported_en A
+          JOIN datatype B ON B.nom = A.datatype);
+
+---------------- TITRE ----------------
+INSERT INTO titre(nom, id_document, code)
+  (SELECT DISTINCT(titre),cote,'SPA' FROM imported_data WHERE titre IS NOT NULL);
+INSERT INTO titre(nom, id_document, code)
+  (SELECT DISTINCT(titre),cote,'ENG' FROM imported_en WHERE titre IS NOT NULL);
+
+---------------- SOUS_TITRE ----------------
+INSERT INTO sous_titre(nom, id_document, code)
+  (SELECT DISTINCT(sous_titre),cote,'SPA' FROM imported_data WHERE sous_titre IS NOT NULL);
+INSERT INTO sous_titre(nom, id_document, code)
+  (SELECT DISTINCT(sous_titre),cote,'ENG' FROM imported_en WHERE sous_titre IS NOT NULL);
+
+---------------- AUTEUR ----------------
+INSERT INTO auteur(nom, code)
+  (SELECT DISTINCT(auteur),'SPA' FROM imported_data WHERE auteur IS NOT NULL);
+INSERT INTO auteur(nom, code)
+  (SELECT DISTINCT(auteur),'ENG' FROM imported_en WHERE auteur IS NOT NULL);
+
+---------------- DESTINATAIRE ----------------
+INSERT INTO destinataire(nom, id_document, code)
+  (SELECT DISTINCT(destinataire),cote,'SPA' FROM imported_data WHERE destinataire IS NOT null);
+INSERT INTO destinataire(nom, id_document, code)
+  (SELECT DISTINCT(destinataire),cote,'ENG' FROM imported_en WHERE destinataire IS NOT null);
+
+---------------- SUJET ----------------
+INSERT INTO sujet(nom, id_document, code)
+  (SELECT DISTINCT(sujet),cote,'SPA' FROM imported_data WHERE sujet IS NOT null);
+INSERT INTO sujet(nom, id_document, code)
+  (SELECT DISTINCT(sujet),cote,'ENG' FROM imported_en WHERE sujet IS NOT null);
+
+---------------- DESCRIPTION ----------------
+INSERT INTO description(texte, id_document, code, id_auteur_description)
+  (SELECT DISTINCT(A.description),A.cote,'SPA',B.id_auteur_description
+   FROM imported_data A
+          JOIN auteur_description B ON B.nom = A.auteur_description
+   WHERE description IS NOT null);
+INSERT INTO description(texte, id_document, code, id_auteur_description)
+  (SELECT DISTINCT(A.description),A.cote,'ENG',B.id_auteur_description
+   FROM imported_data A
+          JOIN auteur_description B ON B.nom = A.auteur_description
+   WHERE description IS NOT null);
+
+---------------- AUTEUR_DESCRIPTION ----------------
+INSERT INTO auteur_description(nom)
+  (SELECT DISTINCT auteur_description FROM imported_data WHERE auteur_description IS NOT null);
+
+
+---------------- NOTES ----------------
+INSERT INTO notes(texte, id_document, nom, code)
+  (SELECT DISTINCT(A.notes),A.cote,B.nom,'SPA'
+   FROM imported_data A
+          JOIN auteur B ON B.nom = A.auteur
+   WHERE notes IS NOT null);
+INSERT INTO notes(texte, id_document, nom, code)
+  (SELECT DISTINCT(A.notes),A.cote,B.nom,'ENG'
+   FROM imported_en A
+          JOIN auteur B ON B.nom = A.auteur
+   WHERE notes IS NOT null);
+
+---------------- RESUME ----------------
+/* AUCUNE ENTRÉE */
+
+
 /*
 TODO : remove
 ---------------- RESPONSABLE_SCIENTIFIQUE ----------------
@@ -2105,12 +2109,12 @@ INSERT INTO support(id_support,nom,code) VALUES
 INSERT INTO document_support(id_document,code,id_support)
 (SELECT DISTINCT A.cote, 'SPA', B.id_support FROM imported_data A
 JOIN support B ON B.nom=A.support
-WHERE A.support IS NOT null);
+WHERE A.support IS NOT NULL);
 
 INSERT INTO document_support(id_document,code,id_support)
 (SELECT DISTINCT A.cote, 'ENG', B.id_support FROM imported_en A
 JOIN support B ON B.nom=A.support
-WHERE A.support IS NOT null);
+WHERE A.support IS NOT NULL);
 
 ---------------- ETAT_GENERAL ----------------
 INSERT INTO etat_general(id_etat_general,nom,code) VALUES
@@ -2129,18 +2133,18 @@ INSERT INTO etat_general(id_etat_general,nom,code) VALUES
 INSERT INTO document_etat_general(id_document,code,id_etat_general)
 (SELECT DISTINCT A.cote, 'SPA', B.id_etat_general FROM imported_data A
 JOIN etat_general B ON B.nom=A.etat_general
-WHERE A.etat_general IS NOT null);
+WHERE A.etat_general IS NOT NULL);
 
 INSERT INTO document_etat_general(id_document,code,id_etat_general)
 (SELECT DISTINCT A.cote, 'ENG', B.id_etat_general FROM imported_en A
 JOIN etat_general B ON B.nom=A.etat_general
-WHERE A.etat_general IS NOT null);
+WHERE A.etat_general IS NOT NULL);
 
 ---------------- PUBLICATION ----------------
 INSERT INTO publication(texte,id_document,code)
-(SELECT DISTINCT(publication),cote,'SPA' FROM imported_data WHERE publication IS NOT null);
+(SELECT DISTINCT(publication),cote,'SPA' FROM imported_data WHERE publication IS NOT NULL);
 INSERT INTO publication(texte,id_document,code)
-(SELECT DISTINCT(publication),cote,'ENG' FROM imported_en WHERE publication IS NOT null);
+(SELECT DISTINCT(publication),cote,'ENG' FROM imported_en WHERE publication IS NOT NULL);
 
 ---------------- DOCUMENT_REVISION ----------------
 /* AUCUNE ENTRÉE*/
@@ -2162,10 +2166,10 @@ AS $$
 DECLARE
 BEGIN
 
-    RAISE NOTICE 'Le nouveau document à pour id: %, sa représentation est %, il a été analysé le %', NEW.id_document, NEW.representation, NEW.date_analyse;
-    RETURN NEW;
+  RAISE NOTICE 'Le nouveau document à pour id: %, sa représentation est %, il a été analysé le %', NEW.id_document, NEW.representation, NEW.date_analyse;
+  RETURN NEW;
 END;
-$$ LANGUAGE 'plpgsql';
+  $$ LANGUAGE 'plpgsql';
 
 CREATE TRIGGER trigger_document_log BEFORE INSERT OR UPDATE ON document FOR EACH ROW EXECUTE PROCEDURE trigger_document_log();
 
@@ -2175,18 +2179,28 @@ DROP FUNCTION IF EXISTS trigger_langue_validate() CASCADE;
 CREATE OR REPLACE FUNCTION trigger_langue_validate() RETURNS TRIGGER
 AS $$
 BEGIN
-    IF NOT regexp_matches(NEW.code, '\w{3}') THEN
-        RAISE EXCEPTION 'Format invalide';
-    end if;
-    NEW.code = trim_blank(upper(NEW.code));
-    RETURN NEW;
+  IF NOT regexp_matches(NEW.code, '\w{3}') THEN
+    RAISE EXCEPTION 'Format de code ISO 3166-1 invalide : %', NEW.code;
+  end if;
+  NEW.code = trim_blank(UPPER(NEW.code));
+  RETURN NEW;
 END;
-$$ LANGUAGE 'plpgsql';
+  $$ LANGUAGE 'plpgsql';
 
 CREATE TRIGGER trigger_langue_validate BEFORE INSERT OR UPDATE ON langue FOR EACH ROW EXECUTE PROCEDURE trigger_langue_validate();
 
--- publication, titre
--- document_type, document_support
+
+DROP FUNCTION IF EXISTS trigger_support_validate() CASCADE;
+CREATE OR REPLACE FUNCTION trigger_support_validate() RETURNS TRIGGER
+AS $$
+BEGIN
+  NEW.nom = trim_blank(UPPER(NEW.nom));
+  RETURN NEW;
+END;
+  $$ LANGUAGE 'plpgsql';
+
+CREATE TRIGGER trigger_support_validate BEFORE INSERT OR UPDATE ON support FOR EACH ROW EXECUTE PROCEDURE trigger_document_revision();
+
 
 CREATE OR REPLACE FUNCTION trigger_document_revision() RETURNS TRIGGER
 AS $$
@@ -2271,8 +2285,8 @@ JOIN titre C ON C.id_document = A.id_document and C.code = 'SPA'
 ORDER BY A.id_document;
 
 -- Nombre d'oeuvres analysées par année
-SELECT date_part('year', A.date_analyse), count(*)
-FROM imported_data A
+SELECT date_part('year', A.date_analyse), COUNT(*)
+FROM document A
 GROUP BY date_part('year', A.date_analyse);
 
 -- Nombre d'oeuvres par localisation
@@ -2291,3 +2305,19 @@ WHERE A.id_document NOT IN
 	FROM localisation B 
 )
 ORDER BY A.id_document;
+
+
+-- Nombre de titres non traduits dans une autre langue qu'espagnol
+SELECT COUNT(t1.id_document) FROM titre t1 WHERE t1.code='SPA' AND NOT EXISTS (SELECT 1 FROM titre t2 WHERE t2.id_document=t1.id_document AND t2.code != 'SPA');
+
+-- Editeur les plus actifs (du plus actif au moins actif)
+SELECT E.id_editeur, EN.nom_editeur, COUNT(D.id_document) AS nb_documents FROM editeur E INNER JOIN editeur_nom EN on E.id_editeur = EN.id_editeur INNER JOIN document D on E.id_editeur = D.id_editeur WHERE EN.code='SPA' GROUP BY E.id_editeur, EN.nom_editeur ORDER BY nb_documents DESC;
+
+-- Id et noms (en espagnol) des contextes géographiques les mieux couverts
+SELECT C.id_contexte_geo, C.nom, COUNT(DCG.id_document) AS nb_documents FROM document_contexte_geo DCG LEFT JOIN contexte_geo C ON DCG.id_contexte_geo = C.id_contexte_geo WHERE C.code='SPA' GROUP BY C.id_contexte_geo, C.nom ORDER BY nb_documents DESC;
+
+-- Nombre de révisions moyen par document. Attention : pour l'instant document_revision est vide, il n'y a donc pas de résultats
+SELECT AVG(sub.nb_revisions) FROM (SELECT COUNT(R.id_document) AS nb_revisions FROM document_revision R GROUP BY R.id_document) AS sub;
+
+-- Les mois (avec l'année) les plus productions par ordre décroissants par rapport à la date d'analyse
+SELECT date_trunc('month', A.date_analyse) AS month, COUNT(A.id_document) AS nb_documents FROM document A GROUP BY month ORDER BY nb_documents DESC;
