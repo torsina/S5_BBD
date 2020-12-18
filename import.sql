@@ -2209,6 +2209,28 @@ CREATE TRIGGER trigger_document_revision AFTER UPDATE ON titre FOR EACH ROW EXEC
 CREATE TRIGGER trigger_document_revision AFTER UPDATE ON document_type FOR EACH ROW EXECUTE PROCEDURE trigger_document_revision();
 CREATE TRIGGER trigger_document_revision AFTER UPDATE ON document_support FOR EACH ROW EXECUTE PROCEDURE trigger_document_revision();
 CREATE TRIGGER trigger_document_revision AFTER UPDATE ON document FOR EACH ROW EXECUTE PROCEDURE trigger_document_revision();
+					  
+DROP FUNCTION IF EXISTS trigger_etat_general_validate() CASCADE;
+CREATE OR REPLACE FUNCTION trigger_etat_general_validate() RETURNS TRIGGER
+AS $$
+BEGIN
+    NEW.nom = trim_blank(LOWER(NEW.nom));
+    RETURN NEW;
+END;
+$$ LANGUAGE 'plpgsql';
+
+CREATE TRIGGER trigger_etat_general_validate BEFORE INSERT OR UPDATE ON etat_general FOR EACH ROW EXECUTE PROCEDURE trigger_etat_general_validate();
+
+DROP FUNCTION IF EXISTS trigger_nature_document_validate() CASCADE;
+CREATE OR REPLACE FUNCTION trigger_nature_document_validate() RETURNS TRIGGER
+AS $$
+BEGIN
+    NEW.nom = trim_blank(UPPER(NEW.nom));
+    RETURN NEW;
+END;
+$$ LANGUAGE 'plpgsql';
+
+CREATE TRIGGER trigger_nature_document_validate BEFORE INSERT OR UPDATE ON nature_document FOR EACH ROW EXECUTE PROCEDURE trigger_nature_document_validate();					
 
 
 ------------------------------------------------ MISE EN PLACE DES REQUÊTES ------------------------------------------------
@@ -2290,3 +2312,11 @@ WHERE A.id_document NOT IN
 	FROM localisation B 
 )
 ORDER BY A.id_document;
+					  
+-- 12 : Nombre de descriptions écrites par chaque auteur
+SELECT B.nom, count(*)
+FROM description A
+JOIN auteur_description B ON B.id_auteur_description = A.id_auteur_description
+WHERE A.code='ENG'
+GROUP BY B.nom
+ORDER BY count(*) DESC;				  
