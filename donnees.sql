@@ -116,6 +116,13 @@ COPY imported_en
 
 
 ------------------------------------------------ FONCTIONS ------------------------------------------------
+
+
+/*
+Fonction servant à parse la colonne format.
+
+Nous avons décidé de ne pas subdiviser cette colonne au final (voir justification 1FN).
+ */
 CREATE OR REPLACE FUNCTION parse_format(t text)
   RETURNS text[] AS
 $$
@@ -143,6 +150,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+/*
+Fonction utilitaire qui extrait l'id numérique de la cote.
+
+Au final, nous avons utilisé la cote car le premier enregsitrement (exemple de Mme Chantraine) a un format totalement
+différent de MX-F-<nombre>
+ */
 CREATE OR REPLACE FUNCTION cote_to_id(cote text)
   RETURNS int AS
 $$
@@ -151,24 +164,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION parse_editeur()
-  RETURNS VOID AS
-$$
-DECLARE
-  trimmed_text CURSOR FOR SELECT DISTINCT((regexp_split_to_array(editeur, 'Responsable del archivo\s*:{0,1}\s*')) [ 2])
-                          FROM imported_data;
-  editeur_line RECORD;
-BEGIN
-  OPEN trimmed_text;
-  LOOP
-    FETCH trimmed_text INTO editeur_line;
-    IF NOT FOUND THEN EXIT; END IF;
-
-    RAISE NOTICE '%', editeur_line;
-  END LOOP;
-  CLOSE trimmed_text;
-END;
-$$ LANGUAGE plpgsql;
 
 /*
 Supprime les caractères blancs du début et de la fin d'une chaîne de caractères.
@@ -1340,9 +1335,6 @@ FROM imported_data;
 SELECT COUNT(*)
 FROM imported_data;
 
--- Supprime le début de la ligne
-SELECT parse_editeur();
-
 SELECT DISTINCT(notes)
 FROM imported_data;
 SELECT cote, notes
@@ -1351,14 +1343,13 @@ WHERE notes = 'El archivo original se llama:5.jpg';
 SELECT format
 FROM imported_data
 WHERE format ~ '(.*)(\d+\s*[x×X]\s*\d+)(.*)';
---regexp_matches(format, '.*(\d+\s*[x×]\s*\d+).*')
 
 
 ------------------------------------------------ CRÉATION DES TABLES ------------------------------------------------
 DROP TABLE IF EXISTS langue CASCADE;
 CREATE TABLE langue
 (
-  -- Code ISO 639-1
+  -- Code ISO 3166-1
   code VARCHAR(3) PRIMARY KEY
 );
 
@@ -1400,7 +1391,7 @@ DROP TABLE IF EXISTS document CASCADE;
 CREATE TABLE document
 (
   id_document          varchar(15) primary key,
-  id_editeur           integer,
+  id_editeur            integer,
   dates                varchar(10),
   relations_genetiques text,
   representation       boolean   NOT NULL DEFAULT false,
@@ -1649,7 +1640,7 @@ CREATE TABLE etat_genetique
 DROP TABLE IF EXISTS autres_relations CASCADE;
 CREATE TABLE autres_relations
 (
-  id_document varchar(15),
+  id_document varchar(15) PRIMARY KEY,
   texte       text NOT NULL,
   FOREIGN KEY (id_document) REFERENCES document (id_document)
 );
