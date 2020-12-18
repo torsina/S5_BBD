@@ -1861,6 +1861,10 @@ INSERT INTO sujet(nom, id_document, code)
   (SELECT DISTINCT(sujet),cote,'SPA' FROM imported_data WHERE sujet IS NOT null);
 INSERT INTO sujet(nom, id_document, code)
   (SELECT DISTINCT(sujet),cote,'ENG' FROM imported_en WHERE sujet IS NOT null);
+					       
+---------------- AUTEUR_DESCRIPTION ----------------
+INSERT INTO auteur_description(nom)
+  (SELECT DISTINCT auteur_description FROM imported_data WHERE auteur_description IS NOT null);					       
 
 ---------------- DESCRIPTION ----------------
 INSERT INTO description(texte, id_document, code, id_auteur_description)
@@ -1873,10 +1877,6 @@ INSERT INTO description(texte, id_document, code, id_auteur_description)
    FROM imported_data A
           JOIN auteur_description B ON B.nom = A.auteur_description
    WHERE description IS NOT null);
-
----------------- AUTEUR_DESCRIPTION ----------------
-INSERT INTO auteur_description(nom)
-  (SELECT DISTINCT auteur_description FROM imported_data WHERE auteur_description IS NOT null);
 
 
 ---------------- NOTES ----------------
