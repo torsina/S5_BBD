@@ -1553,13 +1553,15 @@ DROP TABLE IF EXISTS responsable_scientifique CASCADE;
 CREATE TABLE responsable_scientifique
 (
   id_reponsable integer,
+  id_editeur    integer,
   localisation  varchar(150),
   statut        varchar(150),
   poste         varchar(150),
   code          varchar(3),
   FOREIGN KEY (code) REFERENCES langue (code),
   PRIMARY KEY (id_reponsable, code),
-  FOREIGN KEY (id_reponsable) REFERENCES personne (id_personne)
+  FOREIGN KEY (id_reponsable) REFERENCES personne (id_personne),
+  FOREIGN KEY (id_editeur) REFERENCES editeur (id_editeur)
 );
 
 
@@ -1968,17 +1970,16 @@ INSERT INTO notes(texte, id_document, nom, code)
 /* AUCUNE ENTRÉE */
 
 
-/*
-TODO : remove
+
 ---------------- RESPONSABLE_SCIENTIFIQUE ----------------
- INSERT INTO responsable_scientifique VALUES
-(1, 'La Rochelle Université', 'Alumno', 'Master LEA Amérique', 'SPA'),
-(4, 'Université de Poitiers', 'Profesor', 'CRLA Institut des textes et manuscrits modernes CNRS-UMR8132', 'SPA'),
-(2, 'La Rochelle Université', 'Profesor', 'Equipo CRHIA', 'SPA'),
-(1, 'La Rochelle Université', 'Student', 'Master LEA Amérique', 'ENG'),
-(4, 'Université de Poitiers', 'Professor', 'CRLA Institut des textes et manuscrits modernes CNRS-UMR8132', 'ENG'),
-(2, 'La Rochelle Université', 'Professor', 'Equipo CRHIA', 'ENG');
-*/
+ INSERT INTO responsable_scientifique(id_reponsable, id_editeur, localisation, statut, poste, code) VALUES
+(1, 1, 'La Rochelle Université', 'Alumno', 'Master LEA Amérique', 'SPA'),
+(4, 2, 'Université de Poitiers', 'Profesor', 'CRLA Institut des textes et manuscrits modernes CNRS-UMR8132', 'SPA'),
+(2, 1, 'La Rochelle Université', 'Profesor', 'Equipo CRHIA', 'SPA'),
+(1, 1, 'La Rochelle Université', 'Student', 'Master LEA Amérique', 'ENG'),
+(4, 2, 'Université de Poitiers', 'Professor', 'CRLA Institut des textes et manuscrits modernes CNRS-UMR8132', 'ENG'),
+(2, 1, 'La Rochelle Université', 'Professor', 'Equipo CRHIA', 'ENG');
+
 
 
 ---------------- CONTEXTE_GEOGRAPHIQUE ----------------
@@ -2111,15 +2112,6 @@ INSERT INTO publication(texte,id_document,code)
 
 ---------------- DOCUMENT_REVISION ----------------
 /* AUCUNE ENTRÉE*/
-
-
-
-
-
-
-
-
-
 
 
 ------------------------------------------------ MISE EN PLACE DES TRIGGERS ------------------------------------------------
@@ -2315,3 +2307,4 @@ JOIN auteur_description B ON B.id_auteur_description = A.id_auteur_description
 WHERE A.code='ENG'
 GROUP BY B.nom
 ORDER BY count(*) DESC;
+
