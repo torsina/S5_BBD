@@ -12,16 +12,20 @@ END;
 
 CREATE TRIGGER trigger_document_log BEFORE INSERT OR UPDATE ON document FOR EACH ROW EXECUTE PROCEDURE trigger_document_log();
 
--- check langue
-
+/*
+Vérification de format valide de langue et supression de caractères invalides
+ */
 DROP FUNCTION IF EXISTS trigger_langue_validate() CASCADE;
 CREATE OR REPLACE FUNCTION trigger_langue_validate() RETURNS TRIGGER
 AS $$
+DECLARE
+  code langue.code%TYPE;
 BEGIN
-  IF NOT regexp_matches(NEW.code, '\w{3}') THEN
-    RAISE EXCEPTION 'Format de code ISO 3166-1 invalide : %', NEW.code;
-  end if;
-  NEW.code = trim_blank(UPPER(NEW.code));
+  code := trim_blank(UPPER(NEW.code));
+  IF NOT regexp_matches(code, '\w{3}') THEN
+    RAISE EXCEPTION 'Format de code ISO 3166-1 invalide : %', code;
+  END IF;
+  NEW.code = code;
   RETURN NEW;
 END;
   $$ LANGUAGE 'plpgsql';
@@ -29,6 +33,9 @@ END;
 CREATE TRIGGER trigger_langue_validate BEFORE INSERT OR UPDATE ON langue FOR EACH ROW EXECUTE PROCEDURE trigger_langue_validate();
 
 
+/*
+Quand un utilisateur insère ou modifie le support d'un document, on met le nom en majuscule pour que cela corresponde au format.
+ */
 DROP FUNCTION IF EXISTS trigger_support_validate() CASCADE;
 CREATE OR REPLACE FUNCTION trigger_support_validate() RETURNS TRIGGER
 AS $$
@@ -41,10 +48,16 @@ END;
 CREATE TRIGGER trigger_support_validate BEFORE INSERT OR UPDATE ON support FOR EACH ROW EXECUTE PROCEDURE trigger_support_validate();
 
 
+/*
+trigger_document_revision insère une nouvelle entrée dans la table document_revision correspondant à la modification d'un document
+ou d'une table associée à document.
+
+La date est mise à la date actuelle.
+ */
 CREATE OR REPLACE FUNCTION trigger_document_revision() RETURNS TRIGGER
 AS $$
 BEGIN
-    INSERT INTO document_revision VALUES (NEW.id_document, now());
+    INSERT INTO document_revision VALUES (NEW.id_document, NOW());
     RETURN NEW;
 END;
 $$ LANGUAGE 'plpgsql';
@@ -64,6 +77,12 @@ CREATE TRIGGER trigger_document_revision AFTER UPDATE ON document_type FOR EACH 
 CREATE TRIGGER trigger_document_revision AFTER UPDATE ON document_support FOR EACH ROW EXECUTE PROCEDURE trigger_document_revision();
 CREATE TRIGGER trigger_document_revision AFTER UPDATE ON document FOR EACH ROW EXECUTE PROCEDURE trigger_document_revision();
 
+
+/*
+Si l'utilisateur insère une révision manuelle du document, on doit s'assurer que la date entrée n'est pas dans le passé.
+
+Cela ne s'applique que pour les insertions.
+ */
 DROP FUNCTION IF EXISTS trigger_manual_document_revision() CASCADE;
 CREATE OR REPLACE FUNCTION trigger_manual_document_revision() RETURNS TRIGGER
 AS $$
@@ -80,6 +99,9 @@ CREATE TRIGGER trigger_manual_document_revision BEFORE INSERT ON document_revisi
 
 
 
+/*
+Quand un utilisateur insère ou modifie l'état général d'un document, on met le nom en minuscule pour que cela corresponde au format.
+ */
 DROP FUNCTION IF EXISTS trigger_etat_general_validate() CASCADE;
 CREATE OR REPLACE FUNCTION trigger_etat_general_validate() RETURNS TRIGGER
 AS $$
@@ -91,6 +113,9 @@ $$ LANGUAGE 'plpgsql';
 
 CREATE TRIGGER trigger_etat_general_validate BEFORE INSERT OR UPDATE ON etat_general FOR EACH ROW EXECUTE PROCEDURE trigger_etat_general_validate();
 
+/*
+Quand un utilisateur insère ou modifie la nature d'un document, on met le nom en majuscule pour que cela corresponde au format.
+ */
 DROP FUNCTION IF EXISTS trigger_nature_document_validate() CASCADE;
 CREATE OR REPLACE FUNCTION trigger_nature_document_validate() RETURNS TRIGGER
 AS $$
