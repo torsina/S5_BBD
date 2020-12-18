@@ -102,6 +102,7 @@ CREATE TABLE imported_en
   date_revision_notice       text,
   auteur_transcription       text
 );
+
 -- Importation du CSV. Pourquoi en 2020, ce logiciel n'accepte pas les chemins relatifs ????
 COPY imported_data
   FROM 'E:\Esp-fotos.csv'--'D:\Boulot\L3\BASE_DE_DONNEES\PROJET\Esp-fotos.csv' 'D:\projects\S5\S5_BBD\Esp-fotos.csv'
@@ -680,120 +681,120 @@ WHERE localisation = 'figura de cera de Margarita Xirgu';
 UPDATE imported_data
 SET localisation='Teatro Solís de Montevideo'
 WHERE contexte_geographique = 'Teatro Solís de Montevideo'
-  and localisation = null;
+  and localisation IS NULL;
 UPDATE imported_data
 SET localisation='Granada'
 WHERE contexte_geographique = 'Granada España'
-  and localisation = null;
+  and localisation IS NULL;
 UPDATE imported_data
 SET localisation='Sevilla'
 WHERE contexte_geographique = 'Sevilla'
-  and localisation = null;
+  and localisation IS NULL;
 UPDATE imported_data
 SET localisation='Molins de Rei'
 WHERE contexte_geographique = 'Molins de Rei'
-  and localisation = null;
+  and localisation IS NULL;
 UPDATE imported_data
 SET localisation='Punta del Este'
 WHERE contexte_geographique = 'Punta del Este'
-  and localisation = null;
+  and localisation IS NULL;
 UPDATE imported_data
 SET localisation='intendencia Maldonado'
 WHERE contexte_geographique = 'intendencia Maldonado'
-  and localisation = null;
+  and localisation IS NULL;
 UPDATE imported_data
 SET localisation='Punta Ballena'
 WHERE contexte_geographique = 'Punta ballena Uruguay'
-  and localisation = null;
+  and localisation IS NULL;
 UPDATE imported_data
 SET localisation='Plaza Margarida Xirgu Barcelona'
 WHERE contexte_geographique = 'Plaza Margarida Xirgu Barcelona'
-  and localisation = null;
+  and localisation IS NULL;
 UPDATE imported_data
 SET localisation='Colección de escenografía del Instituto del Teatro de la Diputación de Barcelona.'
 WHERE contexte_geographique = 'Colección de escenografía del Instituto del Teatro de la Diputación de Barcelona.'
-  and localisation = null;
+  and localisation IS NULL;
 UPDATE imported_data
 SET localisation='Buenos Aires'
 WHERE contexte_geographique = 'Buenos Aires Argentina'
-  and localisation = null;
+  and localisation IS NULL;
 UPDATE imported_data
 SET localisation='Madrid'
 WHERE contexte_geographique = 'Madrid España'
-  and localisation = null;
+  and localisation IS NULL;
 UPDATE imported_data
 SET localisation='Girona'
 WHERE contexte_geographique = 'Girona'
-  and localisation = null;
+  and localisation IS NULL;
 UPDATE imported_data
 SET localisation='Barcelona'
 WHERE contexte_geographique = 'Barcelona España'
-  and localisation = null;
+  and localisation IS NULL;
 UPDATE imported_data
 SET localisation='Guimera'
 WHERE contexte_geographique = 'Guimera'
-  and localisation = null;
+  and localisation IS NULL;
 UPDATE imported_data
 SET localisation='Zaragoza'
 WHERE contexte_geographique = 'España Zaragoza'
-  and localisation = null;
+  and localisation IS NULL;
 UPDATE imported_data
 SET localisation='Sala Margarita Xirgu,Teatro Español, Madrid'
 WHERE contexte_geographique = 'Sala Margarita Xirgu,Teatro Español, Madrid, España'
-  and localisation = null;
+  and localisation IS NULL;
 UPDATE imported_data
 SET localisation='Teatro Goya de Barcelona'
 WHERE contexte_geographique = 'teatro Goya de Barcelona'
-  and localisation = null;
+  and localisation IS NULL;
 UPDATE imported_data
 SET localisation='Montevideo'
 WHERE contexte_geographique = 'Montevideo'
-  and localisation = null;
+  and localisation IS NULL;
 UPDATE imported_data
 SET localisation='Puerto Rico'
 WHERE contexte_geographique = 'Puerto Rico'
-  and localisation = null;
+  and localisation IS NULL;
 UPDATE imported_data
 SET localisation='Teatro romano de Merida'
 WHERE contexte_geographique = 'Teatro romano de Merida'
-  and localisation = null;
+  and localisation IS NULL;
 UPDATE imported_data
 SET localisation='Museo de Badalona'
 WHERE contexte_geographique = 'Museo de Badalona'
-  and localisation = null;
+  and localisation IS NULL;
 UPDATE imported_data
 SET localisation='Badalona'
 WHERE contexte_geographique = 'Badalona España'
-  and localisation = null;
+  and localisation IS NULL;
 UPDATE imported_data
 SET localisation='Montevideo'
 WHERE contexte_geographique = 'Uruguay Montevideo'
-  and localisation = null;
+  and localisation IS NULL;
 UPDATE imported_data
 SET localisation='Cataluña'
 WHERE (contexte_geographique = 'España Cataluña' or contexte_geographique = 'Cataluña España')
-  and localisation = null;
+  and localisation IS NULL;
 UPDATE imported_data
 SET localisation='Montevideo'
 WHERE contexte_geographique = 'Uruguay Montevideo'
-  and localisation = null;
+  and localisation IS NULL;
 UPDATE imported_data
 SET localisation='Mérida'
 WHERE contexte_geographique = 'Mérida España'
-  and localisation = null;
+  and localisation IS NULL;
 UPDATE imported_data
 SET localisation='Valencia'
 WHERE contexte_geographique = 'Valencia'
-  and localisation = null;
+  and localisation IS NULL;
 UPDATE imported_data
 SET localisation='Montevideo'
 WHERE contexte_geographique = 'Uruguay | Montevideo'
-  and localisation = null;
+  and localisation IS NULL;
 
 UPDATE imported_en
 SET localisation=TRIM(localisation);
 UPDATE imported_en
-SET localisation= null
+SET localisation=NULL
 WHERE LOWER(localisation) = 'undetermined';
 ------------------------------------------------DROITS------------------------------------------------
 /*
