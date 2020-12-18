@@ -2269,4 +2269,24 @@ FROM notes A
 JOIN titre C ON C.id_document = A.id_document and C.code = 'SPA'
 ORDER BY A.id_document;
 
---
+-- Nombre d'oeuvres analysées par année
+SELECT date_part('year', A.date_analyse), count(*)
+FROM imported_data A
+GROUP BY date_part('year', A.date_analyse);
+
+-- Nombre d'oeuvres par localisation
+SELECT A.nom, count(*)
+FROM localisation A
+WHERE A.code = 'ENG'
+GROUP BY A.nom
+ORDER BY count(*) DESC;
+
+-- Les oeuvres qui n'ont pas de localisation connue
+SELECT A.id_document, A.date_analyse
+FROM document A
+WHERE A.id_document NOT IN
+(
+	SELECT B.id_document
+	FROM localisation B 
+)
+ORDER BY A.id_document;
