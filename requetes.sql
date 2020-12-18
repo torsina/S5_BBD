@@ -63,7 +63,23 @@ CREATE TRIGGER trigger_document_revision AFTER UPDATE ON titre FOR EACH ROW EXEC
 CREATE TRIGGER trigger_document_revision AFTER UPDATE ON document_type FOR EACH ROW EXECUTE PROCEDURE trigger_document_revision();
 CREATE TRIGGER trigger_document_revision AFTER UPDATE ON document_support FOR EACH ROW EXECUTE PROCEDURE trigger_document_revision();
 CREATE TRIGGER trigger_document_revision AFTER UPDATE ON document FOR EACH ROW EXECUTE PROCEDURE trigger_document_revision();
-					  
+
+DROP FUNCTION IF EXISTS trigger_manual_document_revision() CASCADE;
+CREATE OR REPLACE FUNCTION trigger_manual_document_revision() RETURNS TRIGGER
+AS $$
+BEGIN
+    IF NOW()::timestamp - NEW.date_revision_notice  < interval '0s'
+    THEN
+      RAISE EXCEPTION 'Vous ne pouvez pas insérer une date dans le passé !';
+      RETURN NULL;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE 'plpgsql';
+CREATE TRIGGER trigger_manual_document_revision BEFORE INSERT ON document_revision FOR EACH ROW EXECUTE PROCEDURE trigger_manual_document_revision();
+
+
+
 DROP FUNCTION IF EXISTS trigger_etat_general_validate() CASCADE;
 CREATE OR REPLACE FUNCTION trigger_etat_general_validate() RETURNS TRIGGER
 AS $$

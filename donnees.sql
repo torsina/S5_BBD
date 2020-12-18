@@ -1514,6 +1514,7 @@ CREATE TABLE notes
   texte       text NOT NULL,
   nom         varchar(50) NOT NULL,
   code        varchar(3),
+  PRIMARY KEY (id_document, code),
   FOREIGN KEY (code) REFERENCES langue (code),
   FOREIGN KEY (nom, code) REFERENCES auteur (nom, code),
   FOREIGN KEY (id_document) REFERENCES document (id_document)
@@ -1525,6 +1526,7 @@ CREATE TABLE resume
   id_document varchar(15),
   texte       text NOT NULL,
   code        varchar(3),
+  PRIMARY KEY (id_document, code),
   FOREIGN KEY (code) REFERENCES langue (code),
   FOREIGN KEY (id_document) REFERENCES document (id_document)
 );
@@ -1640,6 +1642,7 @@ CREATE TABLE etat_genetique
 (
   id_document varchar(15),
   texte       text NOT NULL,
+  PRIMARY KEY (id_document),
   FOREIGN KEY (id_document) REFERENCES document (id_document)
 );
 
@@ -1723,6 +1726,7 @@ CREATE TABLE publication
   id_document varchar(15),
   texte       text NOT NULL,
   code        varchar(3),
+  PRIMARY KEY (id_document, code),
   FOREIGN KEY (code) REFERENCES langue (code),
   FOREIGN KEY (id_document) REFERENCES document (id_document)
 );
@@ -1731,7 +1735,7 @@ DROP TABLE IF EXISTS document_revision CASCADE;
 CREATE TABLE document_revision
 (
   id_document          varchar(15),
-  date_revision_notice timestamp NOT NULL,
+  date_revision_notice timestamp NOT NULL DEFAULT NOW(),
   PRIMARY KEY (id_document, date_revision_notice),
   FOREIGN KEY (id_document) REFERENCES document (id_document)
 );
