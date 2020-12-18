@@ -1810,6 +1810,7 @@ INSERT INTO datatype(id_datatype, nom, code)
    WHERE C.datatype IS NOT NULL
      AND C.datatype != 'imagen'); -- != imagen = correction manuelle
 
+
 ---------------- EDITEUR ----------------
 INSERT INTO editeur(id_editeur) VALUES (1), (2);
 
@@ -2199,7 +2200,7 @@ BEGIN
 END;
   $$ LANGUAGE 'plpgsql';
 
-CREATE TRIGGER trigger_support_validate BEFORE INSERT OR UPDATE ON support FOR EACH ROW EXECUTE PROCEDURE trigger_document_revision();
+CREATE TRIGGER trigger_support_validate BEFORE INSERT OR UPDATE ON support FOR EACH ROW EXECUTE PROCEDURE trigger_support_validate();
 
 
 CREATE OR REPLACE FUNCTION trigger_document_revision() RETURNS TRIGGER
@@ -2224,11 +2225,33 @@ CREATE TRIGGER trigger_document_revision AFTER UPDATE ON titre FOR EACH ROW EXEC
 CREATE TRIGGER trigger_document_revision AFTER UPDATE ON document_type FOR EACH ROW EXECUTE PROCEDURE trigger_document_revision();
 CREATE TRIGGER trigger_document_revision AFTER UPDATE ON document_support FOR EACH ROW EXECUTE PROCEDURE trigger_document_revision();
 CREATE TRIGGER trigger_document_revision AFTER UPDATE ON document FOR EACH ROW EXECUTE PROCEDURE trigger_document_revision();
+					  
+DROP FUNCTION IF EXISTS trigger_etat_general_validate() CASCADE;
+CREATE OR REPLACE FUNCTION trigger_etat_general_validate() RETURNS TRIGGER
+AS $$
+BEGIN
+    NEW.nom = trim_blank(LOWER(NEW.nom));
+    RETURN NEW;
+END;
+$$ LANGUAGE 'plpgsql';
+
+CREATE TRIGGER trigger_etat_general_validate BEFORE INSERT OR UPDATE ON etat_general FOR EACH ROW EXECUTE PROCEDURE trigger_etat_general_validate();
+
+DROP FUNCTION IF EXISTS trigger_nature_document_validate() CASCADE;
+CREATE OR REPLACE FUNCTION trigger_nature_document_validate() RETURNS TRIGGER
+AS $$
+BEGIN
+    NEW.nom = trim_blank(UPPER(NEW.nom));
+    RETURN NEW;
+END;
+$$ LANGUAGE 'plpgsql';
+
+CREATE TRIGGER trigger_nature_document_validate BEFORE INSERT OR UPDATE ON nature_document FOR EACH ROW EXECUTE PROCEDURE trigger_nature_document_validate();					
 
 
 ------------------------------------------------ MISE EN PLACE DES REQUÊTES ------------------------------------------------
 
---- On récupère l'état en anglais des documents par ordre croissant d'état.
+--- 1 : On récupère l'état en anglais des documents par ordre croissant d'état.
 SELECT A.id_document, C.nom
 FROM document A
 JOIN document_etat_general B ON B.id_document = A.id_document
@@ -2236,7 +2259,7 @@ JOIN etat_general C ON C.id_etat_general=B.id_etat_general
 WHERE C.code='ENG'
 ORDER BY C.nom;
 
---- On récupère la date des documents ainsi que le lieu où la photo a été prise par ordre croissant de date.
+--- 2 : On récupère la date des documents ainsi que le lieu où la photo a été prise par ordre croissant de date.
 SELECT A.id_document, A.dates, C.nom, C.lat, C.lon
 FROM document A
 JOIN document_contexte_geo B ON B.id_document = A.id_document
@@ -2244,59 +2267,60 @@ JOIN contexte_geo C ON C.id_contexte_geo = B.id_contexte_geo
 WHERE C.code='SPA' and A.dates IS NOT null
 ORDER BY A.dates;
 
--- On récupère les documents analysés par Mme. Chantraine Braillon, Cécile ainsi que la date d'analyse de ces documents
+-- 3 : On récupère les documents analysés par Mme. Chantraine Braillon, Cécile ainsi que la date d'analyse de ces documents
 SELECT A.id_document, B.nom, A.date_analyse
 FROM document A
 JOIN personne B ON B.id_personne = A.id_auteur_analyse
 WHERE B.nom = 'Chantraine Braillon, Cécile';
 
--- On récupère le nombre de datatype (espagnol) qui ont été utilisé dans notre BDD 
+-- 4 : On récupère le nombre de datatype (espagnol) qui ont été utilisé dans notre BDD 
 SELECT A.nom, count(*)
 FROM datatype A
 JOIN document_datatype B ON B.id_datatype = A.id_datatype
 WHERE A.code = 'SPA' and B.code='SPA'
 GROUP BY A.nom;
 
--- On récupère le nombre de type (espagnol) qui ont été utilisé dans notre BDD 
+-- 5 : On récupère le nombre de type (espagnol) qui ont été utilisé dans notre BDD 
 SELECT A.nom, count(*)
 FROM type A
 JOIN document_type B ON B.id_type = A.id_type
 WHERE A.code = 'SPA' and B.code='SPA'
 GROUP BY A.nom;
 
--- On récupère le nombre de datatype (anglais) qui ont été utilisé dans notre BDD 
+-- 6 : On récupère le nombre de datatype (anglais) qui ont été utilisé dans notre BDD 
 SELECT A.nom, count(*)
 FROM datatype A
 JOIN document_datatype B ON B.id_datatype = A.id_datatype
 WHERE A.code = 'ENG' and B.code='ENG'
 GROUP BY A.nom;
 
--- On récupère le nombre de type (anglais) qui ont été utilisé dans notre BDD 
+-- 7 : On récupère le nombre de type (anglais) qui ont été utilisé dans notre BDD 
 SELECT A.nom, count(*)
 FROM type A
 JOIN document_type B ON B.id_type = A.id_type
 WHERE A.code = 'ENG'
 GROUP BY A.nom;
 
--- On récupère le titre, l'auteur et les notes associées aux documents 
+-- 8 : On récupère le titre, l'auteur et les notes associées aux documents 
 SELECT A.id_document, C.nom as titre, A.nom as auteur, A.texte as notes
 FROM notes A
 JOIN titre C ON C.id_document = A.id_document and C.code = 'SPA'
 ORDER BY A.id_document;
+
 
 -- Nombre d'oeuvres analysées par année
 SELECT date_part('year', A.date_analyse), COUNT(*)
 FROM document A
 GROUP BY date_part('year', A.date_analyse);
 
--- Nombre d'oeuvres par localisation
+-- 10 : Nombre d'oeuvres par localisation
 SELECT A.nom, count(*)
 FROM localisation A
 WHERE A.code = 'ENG'
 GROUP BY A.nom
 ORDER BY count(*) DESC;
 
--- Les oeuvres qui n'ont pas de localisation connue
+-- 11 : Les oeuvres qui n'ont pas de localisation connue
 SELECT A.id_document, A.date_analyse
 FROM document A
 WHERE A.id_document NOT IN
@@ -2321,3 +2345,11 @@ SELECT AVG(sub.nb_revisions) FROM (SELECT COUNT(R.id_document) AS nb_revisions F
 
 -- Les mois (avec l'année) les plus productions par ordre décroissants par rapport à la date d'analyse
 SELECT date_trunc('month', A.date_analyse) AS month, COUNT(A.id_document) AS nb_documents FROM document A GROUP BY month ORDER BY nb_documents DESC;
+					  
+-- 12 : Nombre de descriptions écrites par chaque auteur
+SELECT B.nom, count(*)
+FROM description A
+JOIN auteur_description B ON B.id_auteur_description = A.id_auteur_description
+WHERE A.code='ENG'
+GROUP BY B.nom
+ORDER BY count(*) DESC;
