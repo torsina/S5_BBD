@@ -1374,7 +1374,7 @@ CREATE TABLE type
 (
   id_type serial,
   nom     varchar(50),
-  code    varchar(3),
+  code    varchar(3) NOT NULL,
   PRIMARY KEY (id_type, code),
   FOREIGN KEY (code) REFERENCES langue (code)
 );
@@ -1384,7 +1384,7 @@ CREATE TABLE datatype
 (
   id_datatype serial,
   nom         varchar(10),
-  code        varchar(3),
+  code        varchar(3) NOT NULL,
   PRIMARY KEY (id_datatype, code),
   FOREIGN KEY (code) REFERENCES langue (code)
 );
@@ -1417,7 +1417,7 @@ CREATE TABLE document_type
 (
   id_document varchar(15),
   code        varchar(3),
-  id_type     integer,
+  id_type     integer NOT NULL,
   PRIMARY KEY (id_document, code),
   FOREIGN KEY (id_type, code) REFERENCES type (id_type, code),
   FOREIGN KEY (code) REFERENCES langue (code),
@@ -1429,7 +1429,7 @@ CREATE TABLE document_datatype
 (
   id_document varchar(15),
   code        varchar(3),
-  id_datatype integer,
+  id_datatype integer NOT NULL,
   PRIMARY KEY (id_document, code),
   FOREIGN KEY (id_datatype, code) REFERENCES datatype (id_datatype, code),
   FOREIGN KEY (code) REFERENCES langue (code),
@@ -1441,7 +1441,7 @@ CREATE TABLE titre
 (
   id_document varchar(15),
   code        varchar(3),
-  nom         varchar(150),
+  nom         varchar(150) NOT NULL,
   PRIMARY KEY (id_document, code),
   FOREIGN KEY (code) REFERENCES langue (code),
   FOREIGN KEY (id_document) REFERENCES document (id_document)
@@ -1451,7 +1451,7 @@ DROP TABLE IF EXISTS sous_titre CASCADE;
 CREATE TABLE sous_titre
 (
   id_document varchar(15),
-  nom         text,
+  nom         text NOT NULL,
   code        varchar(3),
   PRIMARY KEY (id_document, code),
   FOREIGN KEY (code) REFERENCES langue (code),
@@ -1471,7 +1471,7 @@ DROP TABLE IF EXISTS destinataire CASCADE;
 CREATE TABLE destinataire
 (
   id_document varchar(15),
-  nom         text,
+  nom         text NOT NULL,
   code        varchar(3),
   PRIMARY KEY (id_document, code),
   FOREIGN KEY (code) REFERENCES langue (code)
@@ -1481,7 +1481,7 @@ DROP TABLE IF EXISTS sujet CASCADE;
 CREATE TABLE sujet
 (
   id_document varchar(15),
-  nom         text,
+  nom         text NOT NULL,
   code        varchar(3),
   PRIMARY KEY (id_document, code),
   FOREIGN KEY (code) REFERENCES langue (code)
@@ -1491,7 +1491,7 @@ DROP TABLE IF EXISTS auteur_description CASCADE;
 CREATE TABLE auteur_description
 (
   id_auteur_description serial,
-  nom                   varchar(50),
+  nom                   varchar(50) NOT NULL,
   PRIMARY KEY (id_auteur_description)
 );
 
@@ -1499,8 +1499,8 @@ DROP TABLE IF EXISTS description CASCADE;
 CREATE TABLE description
 (
   id_document           varchar(15),
-  id_auteur_description integer,
-  texte                 text,
+  id_auteur_description integer NOT NULL,
+  texte                 text NOT NULL,
   code                  varchar(3),
   PRIMARY KEY (id_document, code),
   FOREIGN KEY (code) REFERENCES langue (code),
@@ -1511,8 +1511,8 @@ DROP TABLE IF EXISTS notes CASCADE;
 CREATE TABLE notes
 (
   id_document varchar(15),
-  texte       text,
-  nom         varchar(50),
+  texte       text NOT NULL,
+  nom         varchar(50) NOT NULL,
   code        varchar(3),
   FOREIGN KEY (code) REFERENCES langue (code),
   FOREIGN KEY (nom, code) REFERENCES auteur (nom, code),
@@ -1523,7 +1523,7 @@ DROP TABLE IF EXISTS resume CASCADE;
 CREATE TABLE resume
 (
   id_document varchar(15),
-  texte       text,
+  texte       text NOT NULL,
   code        varchar(3),
   FOREIGN KEY (code) REFERENCES langue (code),
   FOREIGN KEY (id_document) REFERENCES document (id_document)
@@ -1533,7 +1533,7 @@ DROP TABLE IF EXISTS responsable_archive CASCADE;
 CREATE TABLE responsable_archive
 (
   id_responsable_archive serial,
-  id_editeur integer,
+  id_editeur integer NOT NULL,
   PRIMARY KEY (id_responsable_archive),
   FOREIGN KEY (id_editeur) REFERENCES editeur(id_editeur)
 );
@@ -1542,7 +1542,7 @@ DROP TABLE IF EXISTS responsable_archive_nom CASCADE;
 CREATE TABLE responsable_archive_nom
 (
   id_responsable_archive integer,
-  nom                    varchar(150),
+  nom                    varchar(150) NOT NULL,
   code                   varchar(3),
   PRIMARY KEY (id_responsable_archive, code),
   FOREIGN KEY (code) REFERENCES langue (code),
@@ -1554,9 +1554,9 @@ CREATE TABLE responsable_scientifique
 (
   id_reponsable integer,
   id_editeur    integer,
-  localisation  varchar(150),
-  statut        varchar(150),
-  poste         varchar(150),
+  localisation  varchar(150) NOT NULL,
+  statut        varchar(150) NOT NULL,
+  poste         varchar(150) NOT NULL,
   code          varchar(3),
   FOREIGN KEY (code) REFERENCES langue (code),
   PRIMARY KEY (id_reponsable, code),
@@ -1569,7 +1569,7 @@ DROP TABLE IF EXISTS contexte_geo CASCADE;
 CREATE TABLE contexte_geo
 (
   id_contexte_geo serial,
-  nom             varchar(30),
+  nom             varchar(30) NOT NULL,
   lat             float,
   lon             float,
   code            varchar(3),
@@ -1582,7 +1582,7 @@ CREATE TABLE editeur_nom
 (
   id_editeur  integer,
   code        varchar(3),
-  nom_editeur varchar(150),
+  nom_editeur varchar(150) NOT NULL,
   PRIMARY KEY (id_editeur, code),
   FOREIGN KEY (id_editeur) REFERENCES editeur (id_editeur),
   FOREIGN KEY (code) REFERENCES langue (code)
@@ -1593,7 +1593,7 @@ CREATE TABLE document_contexte_geo
 (
   id_document     varchar(15),
   code            varchar(3),
-  id_contexte_geo integer,
+  id_contexte_geo integer NOT NULL,
   PRIMARY KEY (id_document, code),
   FOREIGN KEY (code) REFERENCES langue (code),
   FOREIGN KEY (id_document) REFERENCES document (id_document),
@@ -1604,7 +1604,7 @@ DROP TABLE IF EXISTS localisation CASCADE;
 CREATE TABLE localisation
 (
   id_document     varchar(15),
-  nom             varchar(300),
+  nom             varchar(300) NOT NULL,
   id_contexte_geo integer DEFAULT NULL,
   code            varchar(3),
   PRIMARY KEY (id_document, code),
@@ -1617,7 +1617,7 @@ DROP TABLE IF EXISTS droits CASCADE;
 CREATE TABLE droits
 (
   id_droits serial,
-  texte     text,
+  texte     text NOT NULL,
   code      varchar(3),
   PRIMARY KEY (id_droits, code),
   FOREIGN KEY (code) REFERENCES langue (code)
@@ -1628,7 +1628,7 @@ CREATE TABLE document_droits
 (
   id_document varchar(15),
   code        varchar(3),
-  id_droits   integer,
+  id_droits   integer NOT NULL,
   PRIMARY KEY (id_document, code),
   FOREIGN KEY (code) REFERENCES langue (code),
   FOREIGN KEY (id_document) REFERENCES document (id_document),
@@ -1639,7 +1639,7 @@ DROP TABLE IF EXISTS etat_genetique CASCADE;
 CREATE TABLE etat_genetique
 (
   id_document varchar(15),
-  texte       text,
+  texte       text NOT NULL,
   FOREIGN KEY (id_document) REFERENCES document (id_document)
 );
 
@@ -1647,7 +1647,7 @@ DROP TABLE IF EXISTS autres_relations CASCADE;
 CREATE TABLE autres_relations
 (
   id_document varchar(15),
-  texte       text,
+  texte       text NOT NULL,
   FOREIGN KEY (id_document) REFERENCES document (id_document)
 );
 
@@ -1655,7 +1655,7 @@ DROP TABLE IF EXISTS nature_document CASCADE;
 CREATE TABLE nature_document
 (
   id_nature_document serial,
-  nom                varchar(25),
+  nom                varchar(25) NOT NULL,
   code               varchar(3),
   PRIMARY KEY (id_nature_document, code),
   FOREIGN KEY (code) REFERENCES langue (code)
@@ -1666,7 +1666,7 @@ CREATE TABLE document_nature_document
 (
   id_document        varchar(15),
   code               varchar(3),
-  id_nature_document integer,
+  id_nature_document integer NOT NULL,
   PRIMARY KEY (id_document, code),
   FOREIGN KEY (code) REFERENCES langue (code),
   FOREIGN KEY (id_document) REFERENCES document (id_document),
@@ -1688,7 +1688,7 @@ CREATE TABLE document_support
 (
   id_document varchar(15),
   code        varchar(3),
-  id_support  integer,
+  id_support  integer NOT NULL,
   PRIMARY KEY (id_document, code),
   FOREIGN KEY (code) REFERENCES langue (code),
   FOREIGN KEY (id_document) REFERENCES document (id_document),
@@ -1699,8 +1699,8 @@ DROP TABLE IF EXISTS etat_general CASCADE;
 CREATE TABLE etat_general
 (
   id_etat_general serial,
-  nom             varchar(15),
-  code            varchar(3) NOT NULL,
+  nom             varchar(15) NOT NULL,
+  code            varchar(3),
   PRIMARY KEY (id_etat_general, code),
   FOREIGN KEY (code) REFERENCES langue (code)
 );
@@ -1710,7 +1710,7 @@ CREATE TABLE document_etat_general
 (
   id_document     varchar(15),
   code            varchar(3),
-  id_etat_general integer,
+  id_etat_general integer NOT NULL,
   PRIMARY KEY (id_document, code),
   FOREIGN KEY (code) REFERENCES langue (code),
   FOREIGN KEY (id_document) REFERENCES document (id_document),
@@ -1721,8 +1721,8 @@ DROP TABLE IF EXISTS publication CASCADE;
 CREATE TABLE publication
 (
   id_document varchar(15),
-  texte       text,
-  code        varchar(3) NOT NULL,
+  texte       text NOT NULL,
+  code        varchar(3),
   FOREIGN KEY (code) REFERENCES langue (code),
   FOREIGN KEY (id_document) REFERENCES document (id_document)
 );
@@ -1731,7 +1731,7 @@ DROP TABLE IF EXISTS document_revision CASCADE;
 CREATE TABLE document_revision
 (
   id_document          varchar(15),
-  date_revision_notice timestamp,
+  date_revision_notice timestamp NOT NULL,
   PRIMARY KEY (id_document, date_revision_notice),
   FOREIGN KEY (id_document) REFERENCES document (id_document)
 );
